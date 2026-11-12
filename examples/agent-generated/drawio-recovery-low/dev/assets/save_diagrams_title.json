@@ -1,0 +1,12 @@
+{
+  "box": [
+    526,
+    246,
+    228,
+    34
+  ],
+  "image_path": "resource/image/save_diagrams_title.png",
+  "observation_id": "obs_377a67d80cda42a2a3296bdab204a4e1",
+  "sha256": "9e49056b2f4fd63ec14e6957ed51f73ffa71f29d39baa82480be037379e3ebf6",
+  "source_sha256": "bd46f835597120cdf69162efbdd9064ab4a97ff0f73d5e628c9bdff17ee2b8ae"
+}

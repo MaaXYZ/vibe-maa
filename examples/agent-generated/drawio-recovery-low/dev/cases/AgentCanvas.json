@@ -1,0 +1,27 @@
+[
+  {
+    "expected_hit": true,
+    "image": "VibeMaa_positive.png",
+    "node": "VibeMaaVisible"
+  },
+  {
+    "expected_hit": false,
+    "image": "VibeMaa_negative.png",
+    "node": "VibeMaaVisible"
+  },
+  {
+    "expected_hit": true,
+    "image": "SplashOpen_positive.png",
+    "node": "SplashOpen"
+  },
+  {
+    "expected_hit": true,
+    "image": "VibeMaa_splash_positive.png",
+    "node": "VibeMaaVisible"
+  },
+  {
+    "expected_hit": true,
+    "image": "VibeMaa_blank_positive.png",
+    "node": "VibeMaaVisible"
+  }
+]

@@ -22,7 +22,8 @@
 Secret 优先于同名 Variable。密钥始终只使用 Secret。
 
 随后打开 **Actions → Real agent acceptance → Run workflow**。默认目标是 `drawio`；
-`drawio-recovery` 从已有原始交付物继续维护，`mailbox` 是更小的工具链自检场景。
+`drawio-recovery` 从已有原始交付物继续维护，`drawio-change` 要求在目标变化后重新开发，
+`mailbox` 是更小的工具链自检场景。
 缺少 API 密钥或模型 ID 会明确失败，不会跳过后显示成功。
 
 每次运行还可以选择 `reasoning_effort`：
@@ -54,6 +55,11 @@ gh workflow run agent-acceptance.yml --repo MaaXYZ/vibe-maa \
   Agent 只获得已有项目、现场报告和两个启动 URL，必须自行观察和修复，不提供按钮位置或修复代码。
   独立验收在正常与弹窗起点各运行三次，均使用新浏览器上下文，要求恰好一个矩形、精确标签和没有遗留弹窗。
   这是接续既有项目的维护试验，不能标成没有参考答案的从零开发。重放不消耗模型调用。
+- `drawio-change`：以已处理启动弹窗的原始模型项目为起点。保留第二台主机真实出现的识别失败，
+  并用真实 Chromium 的字体可用性变化复现先前正常、现在失败的界面。上游程序字节不变。
+  模型获得失败报告、完整截图和原有业务目标，自行观察、判断、修改并重跑；不给出替换模板或修复坐标。
+  独立验收在变化与原参考环境各检查两种起点、各重复三次，还要求持久任务针对显式声明的起点整体通过。
+  原正反样本、标签、任务预算及业务目标身份由外部契约保护。此试验验证一次具体未知变化后的开发，不能推算任意应用适应能力。
 - `mailbox`：从故意缺少公告分支的起步项目开发。独立检查程序从主页、邮箱、公告三种状态
   启动真实 MaaFW 执行，检查实际访问邮箱和返回主页。它属于 fixture 验证，不冒充真实应用结果。
 
@@ -66,7 +72,8 @@ gh workflow run agent-acceptance.yml --repo MaaXYZ/vibe-maa \
 `integration/agent/package-lock.json` 锁定 `@openai/codex@0.167.2` 及依赖完整性。
 工作流使用 `npm ci` 安装，不追随未锁定的最新版。
 
-整个 GitHub job 最多 15 分钟，Agent 默认预算 600 秒，可手动选择 30–600 秒。
+整个 GitHub job 最多 25 分钟，为修改前对照、多环境独立复验和失败证据上传留出时间；
+Agent 的预算保持默认 600 秒，可手动选择 30–600 秒。
 这是墙钟时间预算，不能当作 token 或费用上限。服务方的请求和用量限制仍由模型账号配置。
 
 Agent 使用独立项目和 workspace-write sandbox；只有该项目可写，应用交互所需的本机网络被允许。
@@ -137,6 +144,16 @@ uv run python integration/agent/run.py --target drawio --output work/agent-run
 uv run python integration/agent/run.py --target drawio --output work/agent-low --reasoning-effort low
 ```
 
+接续已有项目的真实异常起点试验，先运行无模型预检，再使用同一模型配置：
+
+```bash
+uv run python integration/agent/preflight.py --output work/recovery-preflight.json
+uv run python integration/agent/run.py --target drawio-recovery \
+  --output work/drawio-recovery --timeout-seconds 600 --reasoning-effort low
+```
+
+每次使用新的输出目录。该试验在 Ubuntu/Linux 上建立；原始 seed 的 Windows 原样重放尚未建立。
+
 本地同样使用以上环境变量。开发者已有 Codex 登录时，可以显式传入 `--local-auth`；
 该模式沿用本机已有配置，不会读取 CI API 密钥，也不会假装使用锁定的 CLI 版本。
 程序会记录实际调用的 harness 版本。
@@ -163,3 +180,12 @@ uv run python integration/agent/regrade.py \
 然后在新应用会话中运行原脚本，记录执行前后源码哈希、原生证据包和最后截图。
 `--source-archive PATH` 可额外记录原始 ZIP 的 SHA256。它不会修改脚本或放宽模板阈值；
 字体、操作系统或浏览器导致的识别差异会作为真实重放失败保留。
+
+对已解压的修复交付物，用两个起点各三次的相同矩阵进行免费复验：
+
+```bash
+uv run python integration/agent/regrade.py --project PATH_TO_EXTRACTED_PROJECT \
+  --starting-states blank splash --repetitions 3 --output work/recovery-replay
+```
+
+传入旧 seed 时，弹窗起点预期失败；不能把这类负面对照标成修复成功。

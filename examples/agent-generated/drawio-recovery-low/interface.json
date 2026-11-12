@@ -1,0 +1,25 @@
+{
+  "interface_version": 2,
+  "name": "vibe-maa-project",
+  "controller": [
+    {
+      "name": "Android",
+      "type": "Adb"
+    }
+  ],
+  "resource": [
+    {
+      "name": "Default",
+      "path": [
+        "./resource"
+      ]
+    }
+  ],
+  "task": [
+    {
+      "name": "AgentTask",
+      "label": "Create Vibe Maa rectangle",
+      "entry": "AgentTask"
+    }
+  ]
+}

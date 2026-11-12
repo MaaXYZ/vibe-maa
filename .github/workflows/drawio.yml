@@ -46,6 +46,9 @@ jobs:
         run: uv run python integration/agent/regrade.py --project examples/agent-generated/drawio-low-isolated --output work/drawio-low-isolated-replay --cache .cache/drawio
       - name: Verify the portable reference in fresh application contexts
         run: uv run python integration/agent/regrade.py --project examples/drawio-portable --output work/drawio-portable-replay --cache .cache/drawio
+      - name: Replay the original low-model recovery submission
+        if: runner.os == 'Linux'
+        run: uv run python integration/agent/regrade.py --project examples/agent-generated/drawio-recovery-low --starting-states blank splash --repetitions 3 --output work/drawio-recovery-original --cache .cache/drawio
       - if: always()
         uses: actions/upload-artifact@v7.0.2
         with:
@@ -56,5 +59,6 @@ jobs:
             work/drawio-low-assisted-replay/
             work/drawio-low-isolated-replay/
             work/drawio-portable-replay/
+            work/drawio-recovery-original/
           include-hidden-files: true
           if-no-files-found: warn

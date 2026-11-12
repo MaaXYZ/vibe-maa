@@ -24,6 +24,7 @@ class Service:
         self.persist_report = True
         self.start_hit = True
         self.start_checks = []
+        self.runtime_info = {}
 
     def _session(self, session_id):
         assert session_id == "session-one"
@@ -48,6 +49,7 @@ class Service:
             "device": self.session.device,
             "scope": "fixture" if self.session.kind == "demo" else "device",
             "after_observation": "obs_after",
+            "runtime": self.runtime_info,
         }
         if self.persist_report:
             write_json(Path(result["report_path"]), result)
@@ -392,6 +394,124 @@ def test_scenario_proofs_cannot_mix_fixture_and_device(project):
     assert result["context"]["scope"] == "device"
     assert result["context"]["completed_scenarios"] == ["popup"]
     assert result["context"]["missing_scenarios"] == ["home"]
+
+
+def test_browser_start_urls_explain_why_accepted_scenarios_do_not_combine(project):
+    manager = TaskManager(project)
+    create(manager, scenarios={"blank": "HomeStart", "splash": "PopupStart"})
+    service = Service(project)
+    service.session.kind = "browser"
+    service.session.device = "http://127.0.0.1:8080/?splash=1"
+    first = manager.run(service, "session-one", "mail", scenario="splash")
+    assert first["attempt"]["accepted"] is True
+    service.session.device = "http://127.0.0.1:8080/?splash=0"
+    second = manager.run(service, "session-one", "mail", scenario="blank")
+    context = TaskManager(project).context("mail")
+    assert second["attempt"]["accepted"] is True
+    assert context["state"] == "needs_validation"
+    assert context["completed_scenarios"] == ["blank"]
+    assert context["missing_scenarios"] == ["splash"]
+    assert context["acceptance_target"]["device"].endswith("splash=0")
+    excluded = context["excluded_target_attempts"]
+    assert len(excluded) == 1
+    assert excluded[0]["scenario"] == "splash"
+    assert excluded[0]["attempt_id"] == first["attempt"]["attempt_id"]
+    assert excluded[0]["run_id"] == first["attempt"]["run_id"]
+    assert excluded[0]["target"]["device"].endswith("splash=1")
+    assert excluded[0]["reason"] == "different_acceptance_target"
+    assert "separate tasks per starting URL" in context["next_action"]
+    service.session.device = "http://127.0.0.1:8080/?splash=0"
+    final = manager.run(service, "session-one", "mail", scenario="splash")
+    assert final["context"]["state"] == "accepted"
+
+
+def test_explicit_browser_scenario_urls_combine_only_fresh_declared_starts(project):
+    manager = TaskManager(project)
+    urls = {"blank": "http://127.0.0.1:8080/?splash=0", "splash": "http://127.0.0.1:8080/?splash=1"}
+    create(manager, scenarios={"blank": "HomeStart", "splash": "PopupStart"}, scenario_urls=urls)
+    service = Service(project)
+    service.session.kind = "browser"
+    service.session.device = urls["splash"]
+    first = manager.run(service, "session-one", "mail", scenario="splash")
+    assert first["attempt"]["accepted"] is True
+    service.session.device = urls["blank"]
+    final = manager.run(service, "session-one", "mail", scenario="blank")
+    assert final["context"]["state"] == "accepted"
+    restored = TaskManager(project).context("mail")
+    assert restored["state"] == "accepted"
+    assert set(restored["completed_scenarios"]) == {"blank", "splash"}
+    assert restored["excluded_target_attempts"] == []
+    # An edit to the declaration requires new evidence, even when the source is unchanged.
+    path = project / "dev/tasks/mail.json"
+    spec = json.loads(path.read_text())
+    spec["scenario_urls"]["splash"] += "&changed=1"
+    write_json(path, spec)
+    assert manager.context("mail")["state"] == "needs_validation"
+
+
+@pytest.mark.parametrize(
+    "backend,device",
+    [
+        ("browser", "http://127.0.0.1:8080/?splash=0&unexpected=1"),
+        ("demo", "http://127.0.0.1:8080/?splash=0"),
+    ],
+)
+def test_scenario_target_mismatch_is_recorded_before_any_input(project, backend, device):
+    manager = TaskManager(project)
+    create(
+        manager,
+        scenarios={"blank": "HomeStart"},
+        scenario_urls={"blank": "http://127.0.0.1:8080/?splash=0"},
+    )
+    service = Service(project)
+    service.session.kind, service.session.device = backend, device
+    result = manager.run(service, "session-one", "mail", scenario="blank")
+    assert result["attempt"]["error"]["code"] == "TASK_TARGET_MISMATCH"
+    assert result["attempt"]["accepted"] is False
+    assert result["context"]["attempt_count"] == 1
+    assert service.calls == [] and service.start_checks == []
+
+
+def test_declared_urls_still_require_matching_browser_runtimes(project):
+    manager = TaskManager(project)
+    urls = {"blank": "http://127.0.0.1:8080/?splash=0", "splash": "http://127.0.0.1:8080/?splash=1"}
+    create(manager, scenarios={"blank": "HomeStart", "splash": "PopupStart"}, scenario_urls=urls)
+    service = Service(project)
+    service.session.kind = "browser"
+    service.session.device = urls["splash"]
+    service.runtime_info = {"browser_version": "first"}
+    assert manager.run(service, "session-one", "mail", scenario="splash")["attempt"]["accepted"]
+    service.session.device = urls["blank"]
+    service.runtime_info = {"browser_version": "second"}
+    result = manager.run(service, "session-one", "mail", scenario="blank")
+    assert result["attempt"]["accepted"] is True
+    assert result["context"]["state"] == "needs_validation"
+    assert result["context"]["missing_scenarios"] == ["splash"]
+
+
+@pytest.mark.parametrize(
+    "urls",
+    [
+        {"blank": "http://127.0.0.1:8080/?splash=0"},
+        {"blank": "http://127.0.0.1:8080/?splash=0", "splash": "http://other.invalid/?splash=1"},
+        {
+            "blank": "http://127.0.0.1:8080/?splash=0",
+            "splash": "http://127.0.0.1:8080/other?splash=1",
+        },
+        {
+            "blank": "http://user:password@127.0.0.1/?splash=0",
+            "splash": "http://127.0.0.1/?splash=1",
+        },
+        {"blank": "http://127.0.0.1/?splash=0", "splash": None},
+    ],
+)
+def test_scenario_url_declarations_cannot_silently_broaden_the_application(project, urls):
+    with pytest.raises(DevError, match="scenario_urls"):
+        create(
+            TaskManager(project),
+            scenarios={"blank": "HomeStart", "splash": "PopupStart"},
+            scenario_urls=urls,
+        )
 
 
 @pytest.mark.parametrize("scenarios", [{"bad label": "HomeStart"}, {"home": ""}, ["home"]])

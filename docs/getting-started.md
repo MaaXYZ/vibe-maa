@@ -149,6 +149,10 @@ CLI 在 stdout 返回一个版本化 JSON 对象。请求处理、原生执行�
 
 任务的 `accepted` 只表示当前源文件、任务定义及所选用例满足已配置检查，且证据标记了 `fixture/device` 范围。修改其中任何一项后需重新验证。异常或中断的尝试会留痕并消耗预算；响应丢失时先检查记录，不能假定输入未发生。
 
+多个场景的通过记录必须属于同一目标，包括完整设备地址、资源路径及运行时。浏览器的不同启动 URL 可以用重复的 `--scenario-url NAME=URL` 显式声明（或在任务 JSON 写入 `scenario_urls`），与每个 `--scenario NAME=START_NODE` 一一对应。所有 URL 必须是同一应用的 origin/path；每次会话必须精确匹配该场景声明的 URL，运行时和资源仍须一致。声明改变后重新验证，旧记录不会追溯合并。
+
+未声明时，`splash=0` 与 `splash=1` 的尝试仍属于不同目标。`task context` 的 `acceptance_target`、`excluded_target_attempts` 会说明当前目标及未计入的记录。请先检查原因，不要反复执行已经通过的尝试。
+
 离线样本清单使用完整截图，路径相对于清单文件：
 
 ```json

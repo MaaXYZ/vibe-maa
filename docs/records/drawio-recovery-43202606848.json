@@ -1,0 +1,351 @@
+{
+  "schema_version": 1,
+  "target": "drawio-recovery",
+  "agent": {
+    "returncode": 0,
+    "timed_out": false,
+    "harness": "openai/codex",
+    "harness_version": "codex-cli 0.167.2",
+    "wall_time_budget_seconds": 600,
+    "elapsed_seconds": 446.007,
+    "budget_scope": "wall_time_only_not_a_currency_or_token_limit",
+    "error": null,
+    "infrastructure_error": null,
+    "tool_service": {
+      "project": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project",
+      "pid": 3109,
+      "version": "0.3.0",
+      "build_id": "3fe14cbd2de286aed98a2f379f207766b4b7c7ed9f4092928bfd463815d34d6b",
+      "ownership": "harness"
+    },
+    "source_isolation": {
+      "scope": "checkout_runtime_allowlist",
+      "profile": "vibe_agent",
+      "rules_sha256": "f7b4ac065291e1cae56a098d9b43b5d9403c06faa1025a06648c01e0c14ddcb4",
+      "network_egress": "not_isolated_by_this_filesystem_policy"
+    },
+    "usage": {
+      "input_tokens": 6370060,
+      "cached_input_tokens": 6285696,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 42690,
+      "reasoning_output_tokens": 13049
+    },
+    "usage_last_turn": {
+      "input_tokens": 6370060,
+      "cached_input_tokens": 6285696,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 42690,
+      "reasoning_output_tokens": 13049
+    },
+    "completed_turns": 1,
+    "usage_measurement": "sum_of_reported_turn.completed_events",
+    "terminal_state": "completed",
+    "activity_trace": "agent-activity.json",
+    "historical_error_count": 0,
+    "tool_items": 84,
+    "failed_command_items": 2,
+    "command_failure_measurement": "retained_completed_command_items",
+    "activity_truncated_records": 0
+  },
+  "configuration": {
+    "model": "deepseek-flash",
+    "base_url": "https://api.deepseek.com",
+    "authentication": "api_key",
+    "wire_api": "responses",
+    "reasoning_effort_requested": "low",
+    "configuration_source": {
+      "authentication": "api_key_environment",
+      "model": "environment",
+      "base_url": "environment",
+      "reasoning_effort": "run_override"
+    }
+  },
+  "source_revision": "a3bd50ba59193fa53b8a3c5b4ac91924e737ca04",
+  "upstream": {
+    "name": "diagrams.net / draw.io",
+    "repository": "https://github.com/jgraph/drawio",
+    "release": "v32.6.10",
+    "commit": "c72c9a98b7a6ce392556ed04c05e0ff19f43f5c3",
+    "archive_url": "https://github.com/jgraph/drawio/releases/download/v32.6.10/draw.war",
+    "archive_sha256": "a57b06b3b6a876a351dacfe65d027d9509319cd030e9bacf6ae04a034d66a38f",
+    "archive_size": 49729549,
+    "launch_path": "/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0",
+    "license": "Apache-2.0",
+    "license_url": "https://github.com/jgraph/drawio/blob/c72c9a98b7a6ce392556ed04c05e0ff19f43f5c3/LICENSE",
+    "attribution": "Copyright JGraph Ltd and draw.io AG; diagrams.net/draw.io is an independent upstream project. Other bundled assets retain their upstream licenses."
+  },
+  "grade": {
+    "passed": true,
+    "target": "drawio",
+    "scope": "application",
+    "starting_states": [
+      "blank",
+      "splash"
+    ],
+    "repetitions_per_state": 3,
+    "checks": [
+      {
+        "starting_state": "blank",
+        "repetition": 1,
+        "initial_state": {
+          "current_file": true,
+          "graph_enabled": true,
+          "dialog_count": 0
+        },
+        "final_state": {
+          "current_file": true,
+          "graph_enabled": true,
+          "dialog_count": 0
+        },
+        "execution_status": "succeeded",
+        "label_in_canvas": true,
+        "document": [
+          {
+            "label": "Vibe Maa",
+            "style": "rounded=0;whiteSpace=wrap;html=1;",
+            "shape": "label",
+            "rectangle_renderer": true,
+            "ellipse_renderer": false,
+            "width": 120,
+            "height": 60
+          }
+        ],
+        "run_id": "run_e2acefbb6ce54a1a9381f60b5f688499",
+        "passed": true
+      },
+      {
+        "starting_state": "blank",
+        "repetition": 2,
+        "initial_state": {
+          "current_file": true,
+          "graph_enabled": true,
+          "dialog_count": 0
+        },
+        "final_state": {
+          "current_file": true,
+          "graph_enabled": true,
+          "dialog_count": 0
+        },
+        "execution_status": "succeeded",
+        "label_in_canvas": true,
+        "document": [
+          {
+            "label": "Vibe Maa",
+            "style": "rounded=0;whiteSpace=wrap;html=1;",
+            "shape": "label",
+            "rectangle_renderer": true,
+            "ellipse_renderer": false,
+            "width": 120,
+            "height": 60
+          }
+        ],
+        "run_id": "run_66021920637f4c2eaa73e78fa34846f2",
+        "passed": true
+      },
+      {
+        "starting_state": "blank",
+        "repetition": 3,
+        "initial_state": {
+          "current_file": true,
+          "graph_enabled": true,
+          "dialog_count": 0
+        },
+        "final_state": {
+          "current_file": true,
+          "graph_enabled": true,
+          "dialog_count": 0
+        },
+        "execution_status": "succeeded",
+        "label_in_canvas": true,
+        "document": [
+          {
+            "label": "Vibe Maa",
+            "style": "rounded=0;whiteSpace=wrap;html=1;",
+            "shape": "label",
+            "rectangle_renderer": true,
+            "ellipse_renderer": false,
+            "width": 120,
+            "height": 60
+          }
+        ],
+        "run_id": "run_03117652dec648d78aae81f30ded7413",
+        "passed": true
+      },
+      {
+        "starting_state": "splash",
+        "repetition": 1,
+        "initial_state": {
+          "current_file": false,
+          "graph_enabled": false,
+          "dialog_count": 1
+        },
+        "final_state": {
+          "current_file": true,
+          "graph_enabled": true,
+          "dialog_count": 0
+        },
+        "execution_status": "succeeded",
+        "label_in_canvas": true,
+        "document": [
+          {
+            "label": "Vibe Maa",
+            "style": "rounded=0;whiteSpace=wrap;html=1;",
+            "shape": "label",
+            "rectangle_renderer": true,
+            "ellipse_renderer": false,
+            "width": 120,
+            "height": 60
+          }
+        ],
+        "run_id": "run_56908bc571a54abf99f4c21af1f60db7",
+        "passed": true
+      },
+      {
+        "starting_state": "splash",
+        "repetition": 2,
+        "initial_state": {
+          "current_file": false,
+          "graph_enabled": false,
+          "dialog_count": 1
+        },
+        "final_state": {
+          "current_file": true,
+          "graph_enabled": true,
+          "dialog_count": 0
+        },
+        "execution_status": "succeeded",
+        "label_in_canvas": true,
+        "document": [
+          {
+            "label": "Vibe Maa",
+            "style": "rounded=0;whiteSpace=wrap;html=1;",
+            "shape": "label",
+            "rectangle_renderer": true,
+            "ellipse_renderer": false,
+            "width": 120,
+            "height": 60
+          }
+        ],
+        "run_id": "run_b0205b6277b74174b2dcbc22bab367ff",
+        "passed": true
+      },
+      {
+        "starting_state": "splash",
+        "repetition": 3,
+        "initial_state": {
+          "current_file": false,
+          "graph_enabled": false,
+          "dialog_count": 1
+        },
+        "final_state": {
+          "current_file": true,
+          "graph_enabled": true,
+          "dialog_count": 0
+        },
+        "execution_status": "succeeded",
+        "label_in_canvas": true,
+        "document": [
+          {
+            "label": "Vibe Maa",
+            "style": "rounded=0;whiteSpace=wrap;html=1;",
+            "shape": "label",
+            "rectangle_renderer": true,
+            "ellipse_renderer": false,
+            "width": 120,
+            "height": 60
+          }
+        ],
+        "run_id": "run_a2f790f6c09e48e480725880046e63c9",
+        "passed": true
+      }
+    ],
+    "blocked_external_requests": [],
+    "oracle": "fresh real application canvas DOM, independent from agent-supplied goals"
+  },
+  "recovery": {
+    "mode": "maintenance_of_authorized_seed_not_independent_from_scratch",
+    "seed": "examples/agent-generated/drawio-low-isolated",
+    "seed_workflow": "https://github.com/MaaXYZ/vibe-maa/actions/runs/43198829628",
+    "seed_manifest": {
+      "present": true,
+      "verified_files": 10,
+      "manifest_sha256": "88eb4b62045e4925feacaee061d4ab41ab598dfd6008d2b9912d0d975488414d"
+    },
+    "seed_files": [
+      {
+        "path": "dev/assets/rectangle_tool.json",
+        "sha256": "bcc18a0e879a8056fb2898dec369a61dd307a4e8f8cf3136ef222bbfc04a7b89",
+        "size": 331
+      },
+      {
+        "path": "dev/assets/vibe_maa_rectangle.json",
+        "sha256": "7dd703be083b136f8b18b418e59fa46c3e4dad4731ff82eca7e8fa4a78f7303e",
+        "size": 337
+      },
+      {
+        "path": "dev/cases/AgentCanvas.json",
+        "sha256": "d7db64e1a14983260e25ebbce925ee57b6b45970805d0f5dc5150d0bf2154f77",
+        "size": 206
+      },
+      {
+        "path": "dev/cases/VibeMaa_negative.png",
+        "sha256": "27ad41c93ab0dad2202ed282737aef3071245921fc50252f6f2d71f32fc1e0a9",
+        "size": 68204
+      },
+      {
+        "path": "dev/cases/VibeMaa_positive.png",
+        "sha256": "9ff0f063d8b05309d4b903e8dc7a4038b6359218d0d309c2e55acf6b6adca744",
+        "size": 72424
+      },
+      {
+        "path": "dev/tasks/AgentCanvas.json",
+        "sha256": "4633afaad1c797f8d8916275e541dcd48ea8495297da1a366602229d97092f95",
+        "size": 637
+      },
+      {
+        "path": "interface.json",
+        "sha256": "e956be3236bf2397c1d0e340847f4e330ecbc2002e439269cca06404c44f7c9e",
+        "size": 369
+      },
+      {
+        "path": "resource/image/rectangle_tool.png",
+        "sha256": "f7e4346d55dcbc892667bb4ffbb0a475eef29d3dfb82c2554c66d94a44d0b46f",
+        "size": 114
+      },
+      {
+        "path": "resource/image/vibe_maa_rectangle.png",
+        "sha256": "ca8b2f24f8d279016963ca88e5a96e1d97d4a5f9d75e17a353cdd3115180d2ad",
+        "size": 1203
+      },
+      {
+        "path": "resource/pipeline/agent_task.json",
+        "sha256": "eec5781e9a947474814bb2bd6bab08dd63859e0a7ba74fcca283958df864102d",
+        "size": 1626
+      }
+    ],
+    "starting_states": [
+      "blank",
+      "splash"
+    ],
+    "repetitions_per_state": 3,
+    "baseline": "baseline.json",
+    "baseline_run_ids": [
+      "run_41a21341fb3447db94dcafe8a5e44805",
+      "run_19e157dcd1d04491b35f2333c3df759e"
+    ]
+  },
+  "development_run_ids": [
+    "run_5f4c9ccabe48422fa3003cb3ca70fda5",
+    "run_cafbcbc2e2304f57811b71d70dde7229",
+    "run_80300f0a88774cb38abe7aa6aa597d88",
+    "run_9745533d31654bd7aa130349dfbf73aa",
+    "run_1a170d6318cd469c9a95f94d7c3ccf9e",
+    "run_8726a440528c480ab6078024ddde08fe",
+    "run_bee86e23f76e43be9a3cd7cf9e05880d",
+    "run_41906ff32a544755a4d61afcc1805cfa",
+    "run_85543282e74c4ad9984771965a57bdac",
+    "run_eb66eec01a48470da9b3443cd8ddab28",
+    "run_7b32b25588f846d685e632a549f87acc"
+  ]
+}

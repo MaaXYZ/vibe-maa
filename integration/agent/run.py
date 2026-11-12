@@ -28,13 +28,15 @@ from grader import (
     write_result,
 )
 from isolation import policy_metadata, profile_arguments
-from recovery import initialize_recovery, record_baseline
+from recovery import initialize_recovery, record_baseline, validate_change_contract
+from rendering import changed_rendering, fontconfig_environment
 
 from vibe_maa.bootstrap import initialize_demo, skill_install
 from vibe_maa.cli import initialize
 from vibe_maa.daemon import daemon_status, ensure_daemon, stop_daemon
 from vibe_maa.errors import DevError
 from vibe_maa.reports import Reports
+from vibe_maa.tasks import TaskManager
 
 ROOT = Path(__file__).resolve().parents[2]
 HARNESS_VERSION = "0.167.2"
@@ -168,7 +170,7 @@ def prompt_for(target: str, project: Path, url: str | None, seconds: int = 600) 
         "Vibe Maa. Deliver a standard MaaFramework Pipeline with entry AgentTask that repeats this "
         "from a fresh blank document. Use the browser backend at this URL: " + str(url)
     )
-    if target == "drawio-recovery":
+    if target in {"drawio-recovery", "drawio-change"}:
         task = (
             "Maintain the existing MaaFramework project; do not start over. It is an authorized "
             "copy of an earlier agent deliverable that passed on a fresh blank draw.io document. "
@@ -187,11 +189,33 @@ def prompt_for(target: str, project: Path, url: str | None, seconds: int = 600) 
             "Use context and task context to resume, and save the new constraints and actual "
             "verification in the project's durable task."
         )
+        if target == "drawio-change":
+            task = (
+                "Maintain the existing MaaFramework project; do not start over. It previously "
+                "handled both starting URLs, but the real target's appearance has changed and "
+                "execution now fails. Resume AgentCanvas and inspect retained failed run reports, "
+                "original screenshots and new labelled regression frames before editing. "
+                "Re-observe the current real application, investigate the failure, autonomously "
+                "repair the Pipeline or assets, then rerun the saved task. No repair is supplied. "
+                "Preserve all existing positive/negative labels and screenshots, attempt budget, "
+                "entry AgentTask and the objective: exactly one rectangle labelled exactly Vibe Maa, "
+                "with no modal left open. Preserve earlier working behaviour as well as the changed "
+                "target. The independent oracle repeats both starts in the current and reference "
+                "environments; claims and edited goals do not replace it. "
+                "Starting URLs: blank "
+                + drawio_start_url(str(url), "blank")
+                + " ; splash "
+                + drawio_start_url(str(url), "splash")
+                + ". Deliver the current source and a durable AgentCanvas task that is accepted "
+                "for both explicitly declared starting URLs, using the installed task contract. "
+                "Read task context and capability schemas to diagnose incomplete acceptance; "
+                "do not repeatedly run passing attempts or change the goal to bypass it."
+            )
     deadline = (datetime.now(timezone.utc) + timedelta(seconds=seconds)).isoformat()
     browser_contract = (
         "Browser viewport contract: 1280 by 720 controller pixels. Open browser sessions with "
         "--width 1280 --height 720; the independent grader uses that same viewport.\n"
-        if target in {"drawio", "drawio-recovery"}
+        if target in {"drawio", "drawio-recovery", "drawio-change"}
         else ""
     )
     return (
@@ -419,6 +443,57 @@ def execute(
     }
 
 
+def complete_change_grade(
+    grade: dict[str, Any],
+    project: Path,
+    url: str,
+    seed: Path,
+    reference_fonts: str | None,
+    browser_executable: str | None,
+    published: Path,
+) -> dict[str, Any]:
+    """Preserve native evidence if a later contract or task validation fails."""
+    for check in grade.get("checks", []):
+        check["environment"] = "changed"
+    try:
+        with fontconfig_environment(reference_fonts):
+            reference = grade_drawio(
+                project,
+                url,
+                browser_executable,
+                starting_states=DRAWIO_STARTING_STATES,
+                repetitions=3,
+            )
+        for check in reference["checks"]:
+            check["environment"] = "reference"
+        grade["checks"].extend(reference["checks"])
+        grade["blocked_external_requests"].extend(reference["blocked_external_requests"])
+        grade["passed"] = grade["passed"] and reference["passed"]
+    except Exception as exc:
+        grade["reference_error"] = {"type": type(exc).__name__, "message": str(exc)}
+        grade["passed"] = False
+    try:
+        contract = validate_change_contract(
+            project,
+            seed,
+            {state + "_start": drawio_start_url(url, state) for state in DRAWIO_STARTING_STATES},
+        )
+        grade["preserved_contract"] = contract
+        grade["passed"] = grade["passed"] and contract["passed"]
+    except Exception as exc:
+        grade["contract_error"] = {"type": type(exc).__name__, "message": str(exc)}
+        grade["passed"] = False
+    try:
+        context = TaskManager(project).context("AgentCanvas")
+        write_result(published / "task-context.json", context)
+        grade["task_state"] = context["state"]
+        grade["passed"] = grade["passed"] and context["state"] == "accepted"
+    except Exception as exc:
+        grade["task_error"] = {"type": type(exc).__name__, "message": str(exc)}
+        grade["passed"] = False
+    return grade
+
+
 def run(arguments: argparse.Namespace) -> dict[str, Any]:
     config = configuration(arguments.local_auth, arguments.reasoning_effort)
     binary = harness(arguments.local_auth)
@@ -431,19 +506,40 @@ def run(arguments: argparse.Namespace) -> dict[str, Any]:
     recovery = None
     if arguments.target == "mailbox":
         initialize_demo(project, starter=True)
-    elif arguments.target == "drawio-recovery":
-        recovery = initialize_recovery(project, published)
+    elif arguments.target in {"drawio-recovery", "drawio-change"}:
+        seed = (
+            ROOT
+            / "examples/agent-generated"
+            / (
+                "drawio-recovery-low"
+                if arguments.target == "drawio-change"
+                else "drawio-low-isolated"
+            )
+        )
+        recovery = initialize_recovery(project, published, seed)
+        if arguments.target == "drawio-change":
+            from recovery import prepare_change_inputs
+
+            recovery["change_inputs"] = prepare_change_inputs(project, published)
     else:
         initialize(project)
     skill_install(project, "codex")
     server = (
         drawio_server(arguments.cache.resolve())
-        if arguments.target in {"drawio", "drawio-recovery"}
+        if arguments.target in {"drawio", "drawio-recovery", "drawio-change"}
         else contextlib.nullcontext((None, None))
     )
+    reference_fonts = os.environ.get("FONTCONFIG_FILE")
+    environment = (
+        changed_rendering(private)
+        if arguments.target == "drawio-change"
+        else contextlib.nullcontext(None)
+    )
     try:
-        with server as (url, upstream):
+        with environment as rendering, server as (url, upstream):
             if recovery is not None:
+                if rendering is not None:
+                    recovery["environment_change"] = rendering
                 baseline = record_baseline(project, published, url, arguments.browser_executable)
                 recovery["baseline"] = "baseline.json"
                 recovery["baseline_run_ids"] = [c["run_id"] for c in baseline["checks"]]
@@ -480,6 +576,16 @@ def run(arguments: argparse.Namespace) -> dict[str, Any]:
                         repetitions=3 if recovery else 2,
                     )
                 )
+                if arguments.target == "drawio-change":
+                    grade = complete_change_grade(
+                        grade,
+                        project,
+                        url,
+                        seed,
+                        reference_fonts,
+                        arguments.browser_executable,
+                        published,
+                    )
             except Exception as exc:
                 grade = {
                     "passed": False,
@@ -503,20 +609,26 @@ def run(arguments: argparse.Namespace) -> dict[str, Any]:
                 "recovery": recovery,
                 "development_run_ids": development_ids,
             }
+            export_errors = []
             try:
                 Reports(project).export_project(str(published / "automation.zip"))
-                for run_id in development_ids:
-                    Reports(project).export_run(
-                        run_id, str(published / f"agent-evidence-{run_id}.zip")
-                    )
-                for check in grade.get("checks", []):
-                    if check.get("run_id"):
-                        run_id = check["run_id"]
-                        Reports(project).export_run(
-                            run_id, str(published / f"evidence-{run_id}.zip")
-                        )
             except Exception as exc:
-                result["export_error"] = str(exc)
+                export_errors.append({"artifact": "automation.zip", "message": str(exc)})
+            exports = [(run_id, "agent-evidence") for run_id in development_ids]
+            exports += [
+                (check["run_id"], "evidence")
+                for check in grade.get("checks", [])
+                if check.get("run_id")
+            ]
+            for run_id, prefix in exports:
+                try:
+                    Reports(project).export_run(run_id, str(published / f"{prefix}-{run_id}.zip"))
+                except Exception as exc:
+                    export_errors.append(
+                        {"artifact": f"{prefix}-{run_id}.zip", "message": str(exc)}
+                    )
+            if export_errors:
+                result["export_errors"] = export_errors
                 grade["passed"] = False
             verify_publication(published, os.environ.get("VIBE_MAA_LLM_API_KEY"))
             write_result(published / "acceptance.json", result)
@@ -530,7 +642,9 @@ def run(arguments: argparse.Namespace) -> dict[str, Any]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--target", choices=["drawio", "drawio-recovery", "mailbox"], default="drawio"
+        "--target",
+        choices=["drawio", "drawio-recovery", "drawio-change", "mailbox"],
+        default="drawio",
     )
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--cache", type=Path, default=ROOT / "work/upstream")

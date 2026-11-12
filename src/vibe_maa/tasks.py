@@ -7,6 +7,7 @@ import json
 import re
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 import json5
 
@@ -80,6 +81,33 @@ class TaskManager:
             raise DevError(
                 "INVALID_TASK", "scenarios must map valid labels to start recognition nodes"
             )
+        urls = spec.get("scenario_urls")
+        if urls is not None:
+            if not scenarios or not isinstance(urls, dict) or set(urls) != set(scenarios):
+                raise DevError("INVALID_TASK", "scenario_urls must declare every scenario exactly")
+            applications = set()
+            for url in urls.values():
+                try:
+                    parsed = urlsplit(url)
+                    if (
+                        not isinstance(url, str)
+                        or parsed.scheme not in {"http", "https"}
+                        or not parsed.hostname
+                        or parsed.username is not None
+                        or parsed.password is not None
+                        or any(ord(char) < 32 for char in url)
+                    ):
+                        raise ValueError("Invalid browser URL")
+                    applications.add((parsed.scheme, parsed.hostname, parsed.port, parsed.path))
+                except (TypeError, ValueError, AttributeError) as exc:
+                    raise DevError(
+                        "INVALID_TASK", "scenario_urls need absolute browser URLs"
+                    ) from exc
+            if len(applications) != 1:
+                raise DevError(
+                    "INVALID_TASK",
+                    "scenario_urls must address the same application origin and path",
+                )
 
     def create(
         self,
@@ -91,6 +119,7 @@ class TaskManager:
         constraints: list[str] | None = None,
         max_attempts: int = 10,
         scenarios: dict[str, str] | None = None,
+        scenario_urls: dict[str, str] | None = None,
     ) -> dict[str, Any]:
         path = self._path(name)
         if path.exists():
@@ -109,6 +138,8 @@ class TaskManager:
             "scenarios": scenarios,
             "created_at": now(),
         }
+        if scenario_urls is not None:
+            spec["scenario_urls"] = scenario_urls
         self._validate(spec)
         write_json(path, spec)
         return self.context(name)
@@ -172,10 +203,26 @@ class TaskManager:
         return spec.get("scenarios") or {"default": None}
 
     @staticmethod
-    def _target(record: dict[str, Any]) -> tuple[str, ...]:
+    def _target(record: dict[str, Any], spec: dict[str, Any] | None = None) -> tuple[str, ...]:
+        device = record.get("device", "unknown")
+        urls = (spec or {}).get("scenario_urls")
+        if (
+            urls
+            and record.get("backend") == "browser"
+            and device == urls.get(record.get("scenario"))
+        ):
+            device = json.dumps({"declared_scenario_urls": urls}, sort_keys=True)
         return tuple(
-            record.get(key, "unknown") for key in ("scope", "backend", "device", "resource_path")
+            device if key == "device" else record.get(key, "unknown")
+            for key in ("scope", "backend", "device", "resource_path")
         ) + (json.dumps(record.get("runtime", {}), sort_keys=True),)
+
+    @staticmethod
+    def _target_details(record: dict[str, Any]) -> dict[str, Any]:
+        return {
+            key: record.get(key, "unknown")
+            for key in ("scope", "backend", "device", "resource_path")
+        } | {"runtime": record.get("runtime", {})}
 
     def _report_current(self, record: dict[str, Any]) -> bool:
         try:
@@ -290,17 +337,18 @@ class TaskManager:
         state, freshness, scope = "draft", "unverified", "unknown"
         proofs: dict[str, dict[str, Any]] = {}
         scenario_attempts: dict[str, dict[str, Any]] = {}
+        other_target_attempts: dict[tuple[tuple[str, ...], str], dict[str, Any]] = {}
+        current_inputs, current_cases = None, None
         if latest:
             scope = latest.get("scope", "unknown")
-            target = self._target(latest)
+            target = self._target(latest, spec)
             for attempt in attempts:
                 label = attempt.get("scenario", "default")
-                if (
-                    label in scenarios
-                    and attempt.get("spec_sha256") == spec_sha
-                    and self._target(attempt) == target
-                ):
-                    scenario_attempts[label] = attempt
+                if label in scenarios and attempt.get("spec_sha256") == spec_sha:
+                    if self._target(attempt, spec) == target:
+                        scenario_attempts[label] = attempt
+                    else:
+                        other_target_attempts[(self._target(attempt, spec), label)] = attempt
             try:
                 current_inputs = self._resource_snapshot(latest.get("resource_path", "resource"))
                 current_cases = self._case_snapshot(spec.get("cases"))
@@ -344,6 +392,31 @@ class TaskManager:
             next_action = "Inspect pending attempt evidence; an interrupted request may already have changed the device."
         else:
             next_action = "Inspect the task and latest evidence, edit resources, then run the task on the intended session."
+        excluded = [
+            {
+                "scenario": label,
+                "attempt_id": attempt.get("attempt_id"),
+                "run_id": attempt.get("run_id"),
+                "target": self._target_details(attempt),
+                "reason": "different_acceptance_target",
+                "attempt_accepted": True,
+            }
+            for (_target, label), attempt in other_target_attempts.items()
+            if attempt.get("accepted") is True
+            and attempt.get("inputs") == current_inputs
+            and attempt.get("case_inputs") == current_cases
+            and self._report_current(attempt)
+            and self._start_current(attempt, scenarios[label])
+        ]
+        if state == "needs_validation" and excluded:
+            next_action = (
+                "Accepted attempts on other targets do not complete this target's scenarios. "
+                "Target identity includes the complete device URL, resource path and runtime. "
+                "For one browser application, explicitly declare all scenario_urls to validate "
+                "its different startup URLs together, then run fresh checks. Otherwise prepare "
+                "states at one address or use separate tasks per starting URL. "
+                "Inspect excluded_target_attempts before repeating accepted runs."
+            )
         return {
             **spec,
             "spec_sha256": spec_sha,
@@ -361,6 +434,9 @@ class TaskManager:
             "completed_scenarios": [label for label in scenarios if label in proofs],
             "missing_scenarios": [label for label in scenarios if label not in proofs],
             "proofs": proofs,
+            "acceptance_target": self._target_details(latest) if latest else None,
+            "excluded_target_attempts": excluded[-20:],
+            "excluded_target_attempts_omitted": max(0, len(excluded) - 20),
             "task_path": str(self._path(name)),
             "next_action": next_action,
         }
@@ -416,6 +492,20 @@ class TaskManager:
         }
         write_json(path, record)
         try:
+            expected_url = (spec.get("scenario_urls") or {}).get(scenario)
+            if expected_url is not None and (
+                session.kind != "browser" or session.device != expected_url
+            ):
+                raise DevError(
+                    "TASK_TARGET_MISMATCH",
+                    "Session must use this scenario's explicitly declared browser URL",
+                    {
+                        "scenario": scenario,
+                        "expected_url": expected_url,
+                        "actual_backend": session.kind,
+                        "actual_device": session.device,
+                    },
+                )
             record["case_inputs"] = self._case_snapshot(spec.get("cases"))
             start_node = scenarios[scenario]
             if start_node is not None:

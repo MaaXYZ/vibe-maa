@@ -1,0 +1,92 @@
+{
+  "files": [
+    {
+      "path": "dev/assets/device_create_new.json",
+      "sha256": "7e46bf5fea6d1abd452752edd2e592f26813c59f21e2e7b43ae3536af34e122c",
+      "size": 336
+    },
+    {
+      "path": "dev/assets/rectangle_tool.json",
+      "sha256": "bcc18a0e879a8056fb2898dec369a61dd307a4e8f8cf3136ef222bbfc04a7b89",
+      "size": 331
+    },
+    {
+      "path": "dev/assets/save_diagrams_title.json",
+      "sha256": "131a672ff59a4c9589df378be1a0fe51bea2c78cb095ca53c3f640053304c2b7",
+      "size": 338
+    },
+    {
+      "path": "dev/assets/vibe_maa_rectangle.json",
+      "sha256": "7dd703be083b136f8b18b418e59fa46c3e4dad4731ff82eca7e8fa4a78f7303e",
+      "size": 337
+    },
+    {
+      "path": "dev/cases/AgentCanvas.json",
+      "sha256": "510b5cd6b9c32001ae37860bb46fe85206daf01a1c7bf4a7732f0ff7012f200e",
+      "size": 521
+    },
+    {
+      "path": "dev/cases/SplashOpen_positive.png",
+      "sha256": "ec08b21ffd254748a0a7e5251f2596f3d960e8a4bdb5a6804bafd205d2ba6e28",
+      "size": 37040
+    },
+    {
+      "path": "dev/cases/VibeMaa_blank_positive.png",
+      "sha256": "7922f9921beb3fd56573438f9066e2147ce30b38829f9974cbb84461ed80cb12",
+      "size": 72436
+    },
+    {
+      "path": "dev/cases/VibeMaa_negative.png",
+      "sha256": "27ad41c93ab0dad2202ed282737aef3071245921fc50252f6f2d71f32fc1e0a9",
+      "size": 68204
+    },
+    {
+      "path": "dev/cases/VibeMaa_positive.png",
+      "sha256": "9ff0f063d8b05309d4b903e8dc7a4038b6359218d0d309c2e55acf6b6adca744",
+      "size": 72424
+    },
+    {
+      "path": "dev/cases/VibeMaa_splash_positive.png",
+      "sha256": "7922f9921beb3fd56573438f9066e2147ce30b38829f9974cbb84461ed80cb12",
+      "size": 72436
+    },
+    {
+      "path": "dev/tasks/AgentCanvas.json",
+      "sha256": "93e0d92372fd792beaa938561392c7b3284b6aed8091b1d2540429acf707be8a",
+      "size": 2425
+    },
+    {
+      "path": "interface.json",
+      "sha256": "e956be3236bf2397c1d0e340847f4e330ecbc2002e439269cca06404c44f7c9e",
+      "size": 369
+    },
+    {
+      "path": "resource/image/device_create_new.png",
+      "sha256": "968ddbe0bd501243368dabba3382fee2456cbb7b483c26c07b1661b980c7e14e",
+      "size": 2726
+    },
+    {
+      "path": "resource/image/rectangle_tool.png",
+      "sha256": "f7e4346d55dcbc892667bb4ffbb0a475eef29d3dfb82c2554c66d94a44d0b46f",
+      "size": 114
+    },
+    {
+      "path": "resource/image/save_diagrams_title.png",
+      "sha256": "9e49056b2f4fd63ec14e6957ed51f73ffa71f29d39baa82480be037379e3ebf6",
+      "size": 3684
+    },
+    {
+      "path": "resource/image/vibe_maa_rectangle.png",
+      "sha256": "ca8b2f24f8d279016963ca88e5a96e1d97d4a5f9d75e17a353cdd3115180d2ad",
+      "size": 1203
+    },
+    {
+      "path": "resource/pipeline/agent_task.json",
+      "sha256": "2283e77fac68c660fd09812f7679f544cecf0cb6987ed0fb88136c658ee4c6e9",
+      "size": 2352
+    }
+  ],
+  "kind": "maa_project",
+  "schema_version": 1,
+  "verification": "Packaging alone does not establish task acceptance."
+}

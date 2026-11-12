@@ -72,6 +72,35 @@ def invoke(project: Path, *arguments: str) -> subprocess.CompletedProcess:
     )
 
 
+def test_create_task_declares_exact_urls_with_query_equals_signs(tmp_path):
+    result = invoke(
+        tmp_path,
+        "task",
+        "create",
+        "web",
+        "--objective",
+        "Create rectangle",
+        "--entry",
+        "AgentTask",
+        "--goal",
+        "Visible",
+        "--scenario",
+        "blank=Blank",
+        "--scenario",
+        "splash=Splash",
+        "--scenario-url",
+        "blank=http://127.0.0.1:8765/?splash=0&offline=1",
+        "--scenario-url",
+        "splash=http://127.0.0.1:8765/?splash=1&offline=1",
+    )
+    assert result.returncode == 0, result.stdout
+    spec = json.loads((tmp_path / "dev/tasks/web.json").read_text())
+    assert spec["scenario_urls"] == {
+        "blank": "http://127.0.0.1:8765/?splash=0&offline=1",
+        "splash": "http://127.0.0.1:8765/?splash=1&offline=1",
+    }
+
+
 def test_independent_cli_processes_share_daemon_state(running_daemon):
     project, _ = running_daemon
     # Windows venv launchers can redirect to a child interpreter with a different PID.

@@ -82,6 +82,18 @@ The [original source](../examples/agent-generated/drawio-low-isolated/README.md)
 
 This is one successful constrained draw.io task, not a statistical success rate or evidence that arbitrary game dailies are solved. The earlier infrastructure-blocked and reference-assisted trials remain visible. Tooling, references, lifecycle and permission policies changed between trials, so elapsed time or token differences cannot be attributed only to reasoning effort.
 
-## Next acceptance work
+## Startup recovery, then another observed change
+
+[Run 43202606848](https://github.com/MaaXYZ/vibe-maa/actions/runs/43202606848), source `a3bd50b`, continued the isolated low-model project. Before model execution, the original source passed blank startup and failed the real Device startup modal. `deepseek-flash`, explicit `low`, used **446.007 seconds** of a 600-second wall-time budget. The independent oracle passed both starts three times each. The original goal node, templates, old positive/negative frames and labels, and attempt budget were preserved. The [unaltered submission](../examples/agent-generated/drawio-recovery-low/README.md), [result](records/drawio-recovery-43202606848.json), [activity](records/drawio-recovery-43202606848-activity.json), [baseline](records/drawio-recovery-43202606848-baseline.json) and [complete published evidence](records/archives/drawio-recovery-43202606848.zip) remain separate.
+
+Eleven native development runs and six independent runs used the repaired source. The model encountered two stale-observation rejections, recovered with new observations, and retried an initial starting-state mismatch after waiting for the UI. The bounded trace shows reading the failure reports and screenshot observation/input calls, but does not retain image-view items and cannot prove exactly which images were viewed. It shows no other solution, grader, DOM/Playwright or network-answer access. This is maintenance of an authorized seed, not development from scratch.
+
+The original aggregate task remained `needs_validation` because its two URLs were treated as different targets. The new optional `scenario_urls` contract explicitly binds every starting URL to one application; exact per-scenario URLs, start recognition, runtime/resource equality and current-source evidence still apply. Old records are not retroactively marked accepted.
+
+A second Linux host passed blank **3/3** but failed splash **0/3** at `SplashStorage` (best match about 0.423 against 0.92). [The failed replay](records/drawio-recovery-local-replay.json), [actual frame](records/drawio-recovery-local-failure.png) and [native evidence](records/archives/drawio-recovery-local-replay.zip) are retained unchanged. A manual diagnostic adaptation is not counted as another model success. This observed change is the input to the next autonomous redevelopment trial; a controlled real-browser rendering environment reproduces the failure before any further model call.
+
+Reported usage: input including cache 6,370,060; cached input 6,285,696; output 42,690; reasoning output 13,049. These are provider counters for one observation, not a cost estimate or a general success rate.
+
+## Remaining acceptance work
 
 Expand application and unseen-start-state coverage, retain original outputs and failure evidence, and improve tool ergonomics from observed command errors. Keep offline recognition cases, fixture results and real application outcomes distinct.

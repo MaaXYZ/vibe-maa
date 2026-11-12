@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0 (unreleased)
+
+- Bind browser starting scenarios to explicitly declared URLs for one application, while retaining exact per-scenario address checks and matching runtime/resource evidence.
+- Explain accepted attempts excluded from the current task target, preserving fresh-source checks and attempt budgets.
+- Extend real-agent acceptance from a blank UI to startup recovery and changed-target redevelopment, retaining original failures, model outputs and independent regression evidence separately.
+- Export native development-run evidence alongside final independent grading, and support repeated model-free starting-state replay.
+
 ## 0.3.0
 
 - Add compact capability discovery with method-specific JSON Schemas, examples, prerequisites and recovery guidance; include a generic ProjectInterface handoff reference and explicit browser display flags.

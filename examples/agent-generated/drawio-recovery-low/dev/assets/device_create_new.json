@@ -1,0 +1,12 @@
+{
+  "box": [
+    470,
+    318,
+    340,
+    40
+  ],
+  "image_path": "resource/image/device_create_new.png",
+  "observation_id": "obs_7293cbd34809440597c098cd3db3f597",
+  "sha256": "968ddbe0bd501243368dabba3382fee2456cbb7b483c26c07b1661b980c7e14e",
+  "source_sha256": "ec08b21ffd254748a0a7e5251f2596f3d960e8a4bdb5a6804bafd205d2ba6e28"
+}

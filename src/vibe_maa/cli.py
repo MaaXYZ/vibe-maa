@@ -178,6 +178,14 @@ def _parser() -> argparse.ArgumentParser:
     create.add_argument(
         "--scenario", action="append", dest="scenarios", default=[], metavar="NAME=START_NODE"
     )
+    create.add_argument(
+        "--scenario-url",
+        action="append",
+        dest="scenario_urls",
+        default=[],
+        metavar="NAME=URL",
+        help="Explicit browser starting URL for each scenario of the same application.",
+    )
     task_commands.add_parser("list")
     context = task_commands.add_parser("context")
     context.add_argument("name")
@@ -327,14 +335,18 @@ def main(argv: list[str] | None = None) -> int:
 
             operation = arguments.pop("operation")
             if operation == "create":
-                values = arguments.pop("scenarios")
-                if values:
-                    if any("=" not in value for value in values):
-                        raise DevError("INVALID_ARGUMENT", "Scenarios use NAME=START_NODE")
-                    scenarios = dict(value.split("=", 1) for value in values)
-                    if len(scenarios) != len(values):
-                        raise DevError("INVALID_ARGUMENT", "Scenario names must be unique")
-                    arguments["scenarios"] = scenarios
+                for field, syntax in (
+                    ("scenarios", "NAME=START_NODE"),
+                    ("scenario_urls", "NAME=URL"),
+                ):
+                    values = arguments.pop(field)
+                    if values:
+                        if any("=" not in value for value in values):
+                            raise DevError("INVALID_ARGUMENT", f"{field} use {syntax}")
+                        mapping = dict(value.split("=", 1) for value in values)
+                        if len(mapping) != len(values):
+                            raise DevError("INVALID_ARGUMENT", "Scenario names must be unique")
+                        arguments[field] = mapping
             with project_lock(project / ".maa-dev/task-edit.lock"):
                 response = envelope(getattr(TaskManager(project), operation)(**arguments))
         elif command in {"report", "export"}:

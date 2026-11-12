@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "origin": "coding_agent_maintenance_unmodified_submission",
+  "original_workflow": "https://github.com/MaaXYZ/vibe-maa/actions/runs/43202606848",
+  "source_revision": "a3bd50ba59193fa53b8a3c5b4ac91924e737ca04",
+  "model": "deepseek-flash",
+  "reasoning_effort_requested": "low",
+  "wall_time_budget_seconds": 600,
+  "elapsed_seconds": 446.007,
+  "source_archive_sha256": "7d971f6d0b4d1c5aa1224715e5295c240eb2d6316ce1f316e58fa4febd003e4c",
+  "artifact_sha256": "9d8c9a0306a03927ed1b4d1e74beeb1b01eef1bf618924ddedcc6c12809c6df9",
+  "original_files_unchanged": true,
+  "original_files": 17,
+  "grade": {
+    "scope": "real_application",
+    "fresh_context_checks": 6,
+    "passed": true
+  },
+  "durable_task_final_state": "needs_validation_due_to_different_startup_urls",
+  "second_linux_host": {
+    "blank_passed": 3,
+    "splash_passed": 0,
+    "source_unchanged": true
+  },
+  "usage": {
+    "input_tokens": 6370060,
+    "cached_input_tokens": 6285696,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 42690,
+    "reasoning_output_tokens": 13049
+  },
+  "preservation_note": "manifest.json and all 17 listed files are unchanged; this ORIGIN and README are maintainer provenance outside the original manifest."
+}

@@ -173,6 +173,7 @@ _METHODS = {
         },
         "notes": [
             "scenarios maps required scenario names to observable start-recognition nodes.",
+            "Optional scenario_urls declares every browser scenario's exact URL at one origin/path; different queries can then share acceptance while backend/resource/runtime must still match.",
             "Natural-language constraints are recorded, not automatically verified policies.",
         ],
     },
@@ -195,6 +196,8 @@ _METHODS = {
             "latest_attempt",
             "remaining_attempts",
             "missing_scenarios",
+            "acceptance_target",
+            "excluded_target_attempts",
             "next_action",
         ],
         "example": {"name": "mailbox"},
@@ -217,7 +220,7 @@ _METHODS = {
         "example": {"session_id": "session_ID", "name": "mailbox", "timeout_seconds": 20},
         "notes": [
             "Select scenario when multiple starts are configured; it must pass its start check.",
-            "All required scenarios need current proofs for the same backend/device/runtime.",
+            "All required scenarios need current proofs for the same backend/resource/runtime and device; explicit scenario_urls allows only its exact per-scenario browser URLs.",
             "Unlike run, this accepts no temporary override. Save intended source edits first.",
         ],
     },
@@ -263,6 +266,10 @@ _RECOVERY = {
     "TASK_NOT_FOUND": {
         "next": "task.list",
         "instruction": "Use the saved task's exact name, or create the intended acceptance contract first.",
+    },
+    "TASK_TARGET_MISMATCH": {
+        "next": "session.open",
+        "instruction": "Use the exact browser URL declared for this scenario; no inputs were executed. Changing scenario_urls requires fresh task validation.",
     },
     "DAEMON_VERSION_MISMATCH": {
         "next": "context",
@@ -324,7 +331,12 @@ _ERRORS = {
     "probe": ["SESSION_NOT_FOUND", "NODE_NOT_FOUND", "UNSUPPORTED_PROBE"],
     "run": ["SESSION_NOT_FOUND", "NODE_NOT_FOUND", "DAEMON_UNAVAILABLE"],
     "case.check": ["SESSION_NOT_FOUND", "NODE_NOT_FOUND", "UNSUPPORTED_PROBE"],
-    "task.run": ["SESSION_NOT_FOUND", "TASK_BUDGET_EXHAUSTED", "DAEMON_UNAVAILABLE"],
+    "task.run": [
+        "SESSION_NOT_FOUND",
+        "TASK_BUDGET_EXHAUSTED",
+        "TASK_TARGET_MISMATCH",
+        "DAEMON_UNAVAILABLE",
+    ],
     "task.context": ["TASK_NOT_FOUND"],
 }
 
@@ -475,6 +487,10 @@ def _schema(method: str) -> dict[str, Any]:
         properties["scenarios"]["anyOf"][0].update(
             propertyNames={"pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$"},
             additionalProperties={"type": "string", "pattern": r"\S"},
+        )
+        properties["scenario_urls"]["anyOf"][0].update(
+            propertyNames={"pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$"},
+            additionalProperties={"type": "string", "pattern": r"^https?://"},
         )
         properties["constraints"]["anyOf"][0]["items"]["pattern"] = r"\S"
     return schema

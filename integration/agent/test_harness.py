@@ -587,6 +587,45 @@ def test_recovery_prompt_resumes_seed_and_preserves_the_business_goal(monkeypatc
     assert "Create New Diagram" not in prompt  # The repair remains the agent's work.
 
 
+def test_change_prompt_requires_redevelopment_without_giving_the_repair(monkeypatch, tmp_path):
+    monkeypatch.syspath_prepend(str(DIRECTORY))
+    module = _module("run")
+    prompt = module.prompt_for("drawio-change", tmp_path, "http://127.0.0.1:1234/?splash=0", 600)
+    assert "appearance has changed" in prompt
+    assert "autonomously repair" in prompt
+    assert "reference environments" in prompt
+    assert "accepted for both explicitly declared starting URLs" in prompt
+    for answer in ("DejaVu", "storage_device_icon", "system-font", "replace the title", "610,323"):
+        assert answer not in prompt
+
+
+def test_change_contract_rejects_mutating_the_ground_truth(tmp_path, monkeypatch):
+    import json
+    import shutil
+
+    monkeypatch.syspath_prepend(str(DIRECTORY))
+    module = _module("recovery")
+    published = tmp_path / "published"
+    published.mkdir()
+    project = tmp_path / "project"
+    seed = module.ROOT / "examples/agent-generated/drawio-recovery-low"
+    module.initialize_recovery(project, published, seed)
+    module.prepare_change_inputs(project, published)
+    assert module.validate_change_contract(project, seed)["passed"] is True
+    path = project / "dev/cases/AgentCanvas.json"
+    cases = json.loads(path.read_text())
+    cases[-1]["expected_hit"] = False
+    path.write_text(json.dumps(cases))
+    result = module.validate_change_contract(project, seed)
+    assert result["passed"] is False and "regression case" in result["violations"][0]
+    cases[-1]["expected_hit"] = True
+    path.write_text(json.dumps(cases))
+    shutil.copyfile(
+        project / "dev/cases/PreviousDialog.png", project / "dev/cases/ChangedDialog.png"
+    )
+    assert module.validate_change_contract(project, seed)["passed"] is False
+
+
 def test_drawio_start_selection_preserves_pinned_launch_contract():
     grader = _module("grader")
     from urllib.parse import parse_qs, urlsplit
@@ -598,6 +637,43 @@ def test_drawio_start_selection_preserves_pinned_launch_contract():
     assert grader.drawio_start_url(selected, "blank") == url
     with pytest.raises(ValueError, match="Unknown"):
         grader.drawio_start_url(url, "unregistered-state")
+
+
+def test_invalid_task_keeps_all_completed_native_grading_evidence(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+
+    monkeypatch.syspath_prepend(str(DIRECTORY))
+    module = _module("run")
+    grade = {
+        "passed": True,
+        "checks": [{"run_id": f"changed-{i}"} for i in range(6)],
+        "blocked_external_requests": [],
+    }
+    monkeypatch.setattr(
+        module,
+        "grade_drawio",
+        lambda *a, **k: {
+            "passed": True,
+            "checks": [{"run_id": f"reference-{i}"} for i in range(6)],
+            "blocked_external_requests": [],
+        },
+    )
+    monkeypatch.setattr(module, "validate_change_contract", lambda *a: {"passed": True})
+
+    def invalid_task(name):
+        raise ValueError("Invalid edited task JSON")
+
+    monkeypatch.setattr(module, "TaskManager", lambda p: SimpleNamespace(context=invalid_task))
+    result = module.complete_change_grade(
+        grade, tmp_path, "http://127.0.0.1:1234", tmp_path, None, None, tmp_path
+    )
+    assert result["passed"] is False
+    assert len(result["checks"]) == 12
+    assert {c["run_id"] for c in result["checks"]} == {
+        *(f"changed-{i}" for i in range(6)),
+        *(f"reference-{i}" for i in range(6)),
+    }
+    assert result["task_error"]["message"] == "Invalid edited task JSON"
 
 
 def test_recovery_baseline_rejects_external_requests_before_model_calls(tmp_path, monkeypatch):

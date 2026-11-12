@@ -60,7 +60,7 @@ class _QuietHandler(http.server.SimpleHTTPRequestHandler):
 
 
 @contextlib.contextmanager
-def drawio_server(cache: Path) -> Iterator[tuple[str, dict[str, Any]]]:
+def drawio_server(cache: Path, port: int = 0) -> Iterator[tuple[str, dict[str, Any]]]:
     source = ROOT / "integration/targets/drawio/prepare.py"
     spec = importlib.util.spec_from_file_location("vibe_drawio_prepare", source)
     if spec is None or spec.loader is None:
@@ -70,7 +70,7 @@ def drawio_server(cache: Path) -> Iterator[tuple[str, dict[str, Any]]]:
     webroot = module.provision(cache)
     metadata = module.manifest()
     handler = functools.partial(_QuietHandler, directory=str(webroot))
-    server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
+    server = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     try:
