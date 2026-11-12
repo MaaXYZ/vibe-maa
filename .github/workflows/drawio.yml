@@ -49,6 +49,15 @@ jobs:
       - name: Replay the original low-model recovery submission
         if: runner.os == 'Linux'
         run: uv run python integration/agent/regrade.py --project examples/agent-generated/drawio-recovery-low --starting-states blank splash --repetitions 3 --output work/drawio-recovery-original --cache .cache/drawio
+      - name: Replay the autonomous redevelopment artifact without another model call
+        run: uv run python integration/agent/regrade.py --project examples/agent-generated/drawio-change-low --starting-states blank splash --repetitions 3 --output work/drawio-change-replay --cache .cache/drawio
+      - name: Build an isolated installed runtime with locked browser dependencies
+        run: |
+          uv build
+          uv export --locked --no-dev --extra browser --no-emit-project --output-file work/runtime-requirements.txt
+      - name: Validate and resume the delivered task using the installed wheel
+        shell: bash
+        run: uv run --isolated --no-project --with dist/*.whl --with-requirements work/runtime-requirements.txt python integration/agent/validate_recovery.py --require-installed --project examples/agent-generated/drawio-change-low --output work/drawio-change-installed-task --cache .cache/drawio
       - if: always()
         uses: actions/upload-artifact@v7.0.2
         with:
@@ -60,5 +69,7 @@ jobs:
             work/drawio-low-isolated-replay/
             work/drawio-portable-replay/
             work/drawio-recovery-original/
+            work/drawio-change-replay/
+            work/drawio-change-installed-task/
           include-hidden-files: true
           if-no-files-found: warn

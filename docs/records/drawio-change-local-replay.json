@@ -1,0 +1,234 @@
+{
+  "schema_version": 1,
+  "mode": "replay_no_model_calls",
+  "grade": {
+    "passed": true,
+    "target": "drawio",
+    "scope": "application",
+    "starting_states": [
+      "blank",
+      "splash"
+    ],
+    "repetitions_per_state": 3,
+    "checks": [
+      {
+        "starting_state": "blank",
+        "repetition": 1,
+        "initial_state": {
+          "current_file": true,
+          "graph_enabled": true,
+          "dialog_count": 0
+        },
+        "final_state": {
+          "current_file": true,
+          "graph_enabled": true,
+          "dialog_count": 0
+        },
+        "execution_status": "succeeded",
+        "label_in_canvas": true,
+        "document": [
+          {
+            "label": "Vibe Maa",
+            "style": "rounded=0;whiteSpace=wrap;html=1;",
+            "shape": "label",
+            "rectangle_renderer": true,
+            "ellipse_renderer": false,
+            "width": 120,
+            "height": 60
+          }
+        ],
+        "run_id": "run_4372bbd61b5744079e6a8f4a6ab5dab5",
+        "passed": true
+      },
+      {
+        "starting_state": "blank",
+        "repetition": 2,
+        "initial_state": {
+          "current_file": true,
+          "graph_enabled": true,
+          "dialog_count": 0
+        },
+        "final_state": {
+          "current_file": true,
+          "graph_enabled": true,
+          "dialog_count": 0
+        },
+        "execution_status": "succeeded",
+        "label_in_canvas": true,
+        "document": [
+          {
+            "label": "Vibe Maa",
+            "style": "rounded=0;whiteSpace=wrap;html=1;",
+            "shape": "label",
+            "rectangle_renderer": true,
+            "ellipse_renderer": false,
+            "width": 120,
+            "height": 60
+          }
+        ],
+        "run_id": "run_f9441b98b6cc430dbf024fad7129283e",
+        "passed": true
+      },
+      {
+        "starting_state": "blank",
+        "repetition": 3,
+        "initial_state": {
+          "current_file": true,
+          "graph_enabled": true,
+          "dialog_count": 0
+        },
+        "final_state": {
+          "current_file": true,
+          "graph_enabled": true,
+          "dialog_count": 0
+        },
+        "execution_status": "succeeded",
+        "label_in_canvas": true,
+        "document": [
+          {
+            "label": "Vibe Maa",
+            "style": "rounded=0;whiteSpace=wrap;html=1;",
+            "shape": "label",
+            "rectangle_renderer": true,
+            "ellipse_renderer": false,
+            "width": 120,
+            "height": 60
+          }
+        ],
+        "run_id": "run_d3819576b8e645bab806bc168572b366",
+        "passed": true
+      },
+      {
+        "starting_state": "splash",
+        "repetition": 1,
+        "initial_state": {
+          "current_file": false,
+          "graph_enabled": false,
+          "dialog_count": 1
+        },
+        "final_state": {
+          "current_file": true,
+          "graph_enabled": true,
+          "dialog_count": 0
+        },
+        "execution_status": "succeeded",
+        "label_in_canvas": true,
+        "document": [
+          {
+            "label": "Vibe Maa",
+            "style": "rounded=0;whiteSpace=wrap;html=1;",
+            "shape": "label",
+            "rectangle_renderer": true,
+            "ellipse_renderer": false,
+            "width": 120,
+            "height": 60
+          }
+        ],
+        "run_id": "run_b2c34d04bf1548f8847ab350a928ee51",
+        "passed": true
+      },
+      {
+        "starting_state": "splash",
+        "repetition": 2,
+        "initial_state": {
+          "current_file": false,
+          "graph_enabled": false,
+          "dialog_count": 1
+        },
+        "final_state": {
+          "current_file": true,
+          "graph_enabled": true,
+          "dialog_count": 0
+        },
+        "execution_status": "succeeded",
+        "label_in_canvas": true,
+        "document": [
+          {
+            "label": "Vibe Maa",
+            "style": "rounded=0;whiteSpace=wrap;html=1;",
+            "shape": "label",
+            "rectangle_renderer": true,
+            "ellipse_renderer": false,
+            "width": 120,
+            "height": 60
+          }
+        ],
+        "run_id": "run_6b01cbd131534b85801060218c5363ae",
+        "passed": true
+      },
+      {
+        "starting_state": "splash",
+        "repetition": 3,
+        "initial_state": {
+          "current_file": false,
+          "graph_enabled": false,
+          "dialog_count": 1
+        },
+        "final_state": {
+          "current_file": true,
+          "graph_enabled": true,
+          "dialog_count": 0
+        },
+        "execution_status": "succeeded",
+        "label_in_canvas": true,
+        "document": [
+          {
+            "label": "Vibe Maa",
+            "style": "rounded=0;whiteSpace=wrap;html=1;",
+            "shape": "label",
+            "rectangle_renderer": true,
+            "ellipse_renderer": false,
+            "width": 120,
+            "height": 60
+          }
+        ],
+        "run_id": "run_5770abbf25144901bde990e3fab5d5e6",
+        "passed": true
+      }
+    ],
+    "blocked_external_requests": [],
+    "oracle": "fresh real application canvas DOM, independent from agent-supplied goals"
+  },
+  "source_unchanged": true,
+  "source_hashes": {
+    "dev/assets/device_create_new.json": "7e46bf5fea6d1abd452752edd2e592f26813c59f21e2e7b43ae3536af34e122c",
+    "dev/assets/rectangle_tool.json": "bcc18a0e879a8056fb2898dec369a61dd307a4e8f8cf3136ef222bbfc04a7b89",
+    "dev/assets/save_diagrams_title.json": "131a672ff59a4c9589df378be1a0fe51bea2c78cb095ca53c3f640053304c2b7",
+    "dev/assets/vibe_maa_rectangle.json": "7dd703be083b136f8b18b418e59fa46c3e4dad4731ff82eca7e8fa4a78f7303e",
+    "dev/cases/AgentCanvas.json": "2fd3866841ebd1a9948358b4b5a20398e40f6c3de1bcfcdb8a9fa6efffda7ba3",
+    "dev/cases/ChangedDialog.png": "225de74ec9ecfbd24a0f81d2183724e1a97b39c38503e706dd1c8ef6a1be89af",
+    "dev/cases/PreviousDialog.png": "bd46f835597120cdf69162efbdd9064ab4a97ff0f73d5e628c9bdff17ee2b8ae",
+    "dev/cases/SplashOpen_positive.png": "ec08b21ffd254748a0a7e5251f2596f3d960e8a4bdb5a6804bafd205d2ba6e28",
+    "dev/cases/VibeMaa_blank_positive.png": "7922f9921beb3fd56573438f9066e2147ce30b38829f9974cbb84461ed80cb12",
+    "dev/cases/VibeMaa_negative.png": "27ad41c93ab0dad2202ed282737aef3071245921fc50252f6f2d71f32fc1e0a9",
+    "dev/cases/VibeMaa_positive.png": "9ff0f063d8b05309d4b903e8dc7a4038b6359218d0d309c2e55acf6b6adca744",
+    "dev/cases/VibeMaa_splash_positive.png": "7922f9921beb3fd56573438f9066e2147ce30b38829f9974cbb84461ed80cb12",
+    "dev/tasks/AgentCanvas.json": "f5710959317573c0980e8d3d412721e0336b75d236ea69e3078bee186f495400",
+    "interface.json": "e956be3236bf2397c1d0e340847f4e330ecbc2002e439269cca06404c44f7c9e",
+    "manifest.json": "d8accf16be87469345a2d397c5873056fa9f43219c0c3be8c42a5ec475311230",
+    "resource/image/device_create_new.png": "968ddbe0bd501243368dabba3382fee2456cbb7b483c26c07b1661b980c7e14e",
+    "resource/image/rectangle_tool.png": "f7e4346d55dcbc892667bb4ffbb0a475eef29d3dfb82c2554c66d94a44d0b46f",
+    "resource/image/save_diagrams_title.png": "9e49056b2f4fd63ec14e6957ed51f73ffa71f29d39baa82480be037379e3ebf6",
+    "resource/image/vibe_maa_rectangle.png": "ca8b2f24f8d279016963ca88e5a96e1d97d4a5f9d75e17a353cdd3115180d2ad",
+    "resource/pipeline/agent_task.json": "2776f807f679e229c1328880796a7ead6a8470cb5f58cab19c7a991bd2beb475"
+  },
+  "upstream": {
+    "name": "diagrams.net / draw.io",
+    "repository": "https://github.com/jgraph/drawio",
+    "release": "v32.6.10",
+    "commit": "c72c9a98b7a6ce392556ed04c05e0ff19f43f5c3",
+    "archive_url": "https://github.com/jgraph/drawio/releases/download/v32.6.10/draw.war",
+    "archive_sha256": "a57b06b3b6a876a351dacfe65d027d9509319cd030e9bacf6ae04a034d66a38f",
+    "archive_size": 49729549,
+    "launch_path": "/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0",
+    "license": "Apache-2.0",
+    "license_url": "https://github.com/jgraph/drawio/blob/c72c9a98b7a6ce392556ed04c05e0ff19f43f5c3/LICENSE",
+    "attribution": "Copyright JGraph Ltd and draw.io AG; diagrams.net/draw.io is an independent upstream project. Other bundled assets retain their upstream licenses."
+  },
+  "original_manifest": {
+    "present": true,
+    "verified_files": 19,
+    "manifest_sha256": "d8accf16be87469345a2d397c5873056fa9f43219c0c3be8c42a5ec475311230"
+  },
+  "source_archive_sha256": "e1a941e621efa85ac1d7b5e14a37f3343ed7c5dafd2f5767b1f2e843225aea5f"
+}

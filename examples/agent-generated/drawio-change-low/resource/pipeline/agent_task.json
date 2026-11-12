@@ -1,0 +1,102 @@
+{
+  "AgentTask": {
+    "recognition": "DirectHit",
+    "action": "DoNothing",
+    "post_delay": 300,
+    "timeout": 10000,
+    "next": ["SplashOpen", "StartBlank"]
+  },
+  "SplashOpen": {
+    "recognition": "TemplateMatch",
+    "template": "device_create_new.png",
+    "roi": [440, 300, 400, 80],
+    "threshold": 0.92,
+    "action": "Click",
+    "target": [640, 464],
+    "post_delay": 350,
+    "timeout": 3000,
+    "next": ["SplashStorage"]
+  },
+  "SplashStorage": {
+    "recognition": "ColorMatch",
+    "roi": [500, 430, 280, 55],
+    "lower": [240, 240, 240],
+    "upper": [255, 255, 255],
+    "count": 14000,
+    "action": "Click",
+    "target": [640, 454],
+    "post_delay": 450,
+    "timeout": 3000,
+    "next": ["StartBlank"]
+  },
+  "StartBlank": {
+    "recognition": "TemplateMatch",
+    "template": "rectangle_tool.png",
+    "roi": [0, 140, 220, 60],
+    "threshold": 0.9,
+    "action": "Click",
+    "target": [633, 400],
+    "post_delay": 300,
+    "timeout": 10000,
+    "next": ["ClearExisting"]
+  },
+  "ClearExisting": {
+    "recognition": "DirectHit",
+    "action": "ClickKey",
+    "key": 46,
+    "target": [633, 400],
+    "post_delay": 300,
+    "timeout": 3000,
+    "next": ["DrawRectangle"]
+  },
+  "DrawRectangle": {
+    "recognition": "DirectHit",
+    "action": "Click",
+    "target": [36, 177],
+    "post_delay": 350,
+    "timeout": 3000,
+    "next": ["SelectRectangle"]
+  },
+  "SelectRectangle": {
+    "recognition": "DirectHit",
+    "action": "Click",
+    "target": [633, 400],
+    "post_delay": 300,
+    "timeout": 3000,
+    "next": ["EditLabel"]
+  },
+  "EditLabel": {
+    "recognition": "DirectHit",
+    "action": "ClickKey",
+    "key": 113,
+    "target": [633, 400],
+    "post_delay": 450,
+    "timeout": 3000,
+    "next": ["EnterLabel"]
+  },
+  "EnterLabel": {
+    "recognition": "DirectHit",
+    "action": "InputText",
+    "input_text": "Vibe Maa",
+    "target": [633, 400],
+    "post_delay": 450,
+    "timeout": 3000,
+    "next": ["CommitLabel"]
+  },
+  "CommitLabel": {
+    "recognition": "DirectHit",
+    "action": "Click",
+    "target": [885, 555],
+    "post_delay": 500,
+    "timeout": 3000,
+    "next": ["VibeMaaVisible"]
+  },
+  "VibeMaaVisible": {
+    "recognition": "TemplateMatch",
+    "template": "vibe_maa_rectangle.png",
+    "roi": [480, 260, 360, 240],
+    "threshold": 0.85,
+    "action": "DoNothing",
+    "timeout": 3000
+  }
+}

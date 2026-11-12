@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "origin": "coding_agent_autonomous_redevelopment_after_observed_target_change",
+  "original_workflow": "https://github.com/MaaXYZ/vibe-maa/actions/runs/43208826944",
+  "source_revision": "8bb616c069f9f6bab10103eda24877f1c84ca3c3",
+  "model": "deepseek-flash",
+  "reasoning_effort_requested": "low",
+  "wall_time_budget_seconds": 600,
+  "elapsed_seconds": 172.282,
+  "source_archive_sha256": "e1a941e621efa85ac1d7b5e14a37f3343ed7c5dafd2f5767b1f2e843225aea5f",
+  "artifact_sha256": "a0d592e3567deb2b545a4db6f26c25324b48a39857c13c558a33e22f6b73051d",
+  "original_files_unchanged": true,
+  "original_files": 19,
+  "grade": {
+    "scope": "real_application",
+    "fresh_context_checks": 12,
+    "passed": true,
+    "matrix": "changed/reference x blank/splash x three fresh contexts"
+  },
+  "durable_task_final_state": "accepted",
+  "attempt_count": 2,
+  "remaining_attempts": 8,
+  "second_linux_host": {
+    "blank_passed": 3,
+    "splash_passed": 3,
+    "source_unchanged": true
+  },
+  "recognition_change": "The model replaced SplashStorage title TemplateMatch with ColorMatch based on screenshot pixels. The other ten nodes and original templates/cases were unchanged.",
+  "recognition_limit": "ColorMatch is context-dependent on the SplashOpen branch; it also matches light regions in unrelated blank/Device frames. It is not a general popup classifier.",
+  "usage": {
+    "input_tokens": 1958783,
+    "cached_input_tokens": 1893376,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 20864,
+    "reasoning_output_tokens": 6944
+  },
+  "preservation_note": "manifest.json and all listed files are unchanged. ORIGIN.json and README.md are maintainer-added provenance outside that original manifest."
+}

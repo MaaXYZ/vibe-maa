@@ -18,6 +18,8 @@
 
 ## Next acceptance work
 
+- The startup-recovery and subsequent changed-target redevelopment trials are recorded in [benchmarks](docs/benchmarks.md). They preserve original failures and model outputs, plus independent fresh-context checks. Explicit browser scenario URLs now support evidence-backed aggregate task acceptance. These are concrete development-loop observations, not a general adaptation success rate.
+
 1. Repeat the filesystem-isolated `low` acceptance across runs and additional applications; retain run links, tool activity, original deliverables and token usage. The first constrained draw.io success and earlier blocked/assisted trials are recorded in [benchmarks](docs/benchmarks.md).
 2. Add unseen application states to the benchmark while keeping the grader and task contract independent from agent edits.
 3. Turn observed failures into smaller tool responses, better local references and reusable recognition cases. Do not compensate by silently changing models or weakening acceptance.

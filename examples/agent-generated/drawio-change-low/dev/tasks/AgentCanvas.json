@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "name": "AgentCanvas",
+  "objective": "In diagrams.net, create a rectangle on the application canvas labeled exactly Vibe Maa from a fresh blank document, repeatably.",
+  "entry": "AgentTask",
+  "goal": "VibeMaaVisible",
+  "cases": "dev/cases/AgentCanvas.json",
+  "constraints": [
+    "Use standard MaaFramework Pipeline actions only; no Shell, Command, or Custom actions.",
+    "Expose entry AgentTask through interface.json for normal MaaFW handoff.",
+    "Each run must create the result from a fresh blank document at 1280x720.",
+    "The AgentTask entry must handle both fresh start URLs without external setup inputs: splash=0 starts on a blank canvas and splash=1 starts with the Device modal.",
+    "For splash=1, dismiss the Device storage chooser with Change Storage then Decide Later, leaving no modal open.",
+    "The final canvas must contain exactly one rectangle labelled exactly Vibe Maa, and the established VibeMaaVisible completion condition must remain unchanged."
+  ],
+  "max_attempts": 10,
+  "scenarios": {
+    "blank_start": "StartBlank",
+    "splash_start": "SplashOpen"
+  },
+  "scenario_urls": {
+    "blank_start": "http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0",
+    "splash_start": "http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0"
+  },
+  "created_at": "2026-11-12T10:18:22.121731+00:00",
+  "verification": {
+    "verified_at": "2026-11-12T10:48:56.681487+00:00",
+    "viewport": "1280x720",
+    "fresh_blank": {
+      "url": "http://127.0.0.1:34175/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0",
+      "run_ids": [
+        "run_85543282e74c4ad9984771965a57bdac",
+        "run_1a170d6318cd469c9a95f94d7c3ccf9e",
+        "run_80300f0a88774cb38abe7aa6aa597d88"
+      ],
+      "task_attempt_id": "attempt_d2bfb21aa0c8446ba1c84565074cbc89",
+      "result": "3/3 fresh runs execution_status=succeeded, goal_status=passed; saved scenario attempt accepted",
+      "observed": "one rectangle labelled Vibe Maa, no modal"
+    },
+    "fresh_splash": {
+      "url": "http://127.0.0.1:34175/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0",
+      "run_ids": [
+        "run_eb66eec01a48470da9b3443cd8ddab28",
+        "run_8726a440528c480ab6078024ddde08fe",
+        "run_9745533d31654bd7aa130349dfbf73aa"
+      ],
+      "task_attempt_id": "attempt_681ddd2373894a15b5685d4f2efdb058",
+      "result": "3/3 fresh runs execution_status=succeeded, goal_status=passed; saved scenario attempt accepted",
+      "observed": "Device modal cleared through Change Storage then Decide Later; one rectangle labelled Vibe Maa, no modal"
+    }
+  }
+}

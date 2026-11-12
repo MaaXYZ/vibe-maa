@@ -1,0 +1,12 @@
+{
+  "box": [
+    24,
+    166,
+    24,
+    23
+  ],
+  "image_path": "resource/image/rectangle_tool.png",
+  "observation_id": "obs_69f3ad276e754a118c10620649f6dad1",
+  "sha256": "f7e4346d55dcbc892667bb4ffbb0a475eef29d3dfb82c2554c66d94a44d0b46f",
+  "source_sha256": "27ad41c93ab0dad2202ed282737aef3071245921fc50252f6f2d71f32fc1e0a9"
+}

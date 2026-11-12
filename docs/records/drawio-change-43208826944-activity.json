@@ -1,0 +1,858 @@
+{
+  "schema_version": 1,
+  "scope": "tool_activity_only_no_model_reasoning",
+  "event_count": 110,
+  "event_types": {
+    "thread.started": 1,
+    "item.completed": 60,
+    "turn.started": 1,
+    "item.started": 47,
+    "turn.completed": 1
+  },
+  "tool_items": 47,
+  "records": [
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_2",
+      "status": "in_progress",
+      "command": "/bin/bash -c \"sed -n '1,260p' .agents/skills/vibe-maa/SKILL.md\"",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_2",
+      "status": "completed",
+      "command": "/bin/bash -c \"sed -n '1,260p' .agents/skills/vibe-maa/SKILL.md\"",
+      "exit_code": 0,
+      "output": "---\nname: vibe-maa\ndescription: Develop and debug ordinary MaaFramework resources using persistent device sessions, same-frame observations, recognition-only probes, and recorded execution evidence.\n---\n\n# MaaFramework development workflow\n\nUse this workflow when the user asks to implement or repair a MaaFramework automation and `vibe-maa` is installed. Operate on the requested project. The CLI does not contain a model; you remain responsible for understanding the task, editing project files, and assessing evidence.\n\n## Establish the task\n\n1. Read the project's instructions. Run `vibe-maa capabilities` once to discover the installed methods, then `vibe-maa capabilities --method METHOD` only for the operation you need. The focused response gives exact request fields, CLI examples, prerequisites and result semantics without loading a full manual. `--help` lists local CLI commands.\n2. Run `vibe-maa --project PATH context` on entry, or `context --task NAME` when resuming a known task. This bounded, read-only snapshot covers project nodes, saved tasks, existing sessions and recent evidence without starting a service. Follow its next commands as needed. Read `task context NAME` for the full objective, constraints and authoritative acceptance details before continuing a task. A service restart expires device sessions, not the saved task.\n3. Establish the task's starting conditions and observable completion condition from the request or project. Ask only for information that cannot be obtained from the device or project. For a new task, use `task create NAME --objective \"OBJECTIVE\" --entry ENTRY --goal GOAL`, adding `--cases PATH`, repeated `--constraint \"REQUIREMENT\"`, and `--max-attempts N` as appropriate. Existing definitions are ordinary JSON files in `dev/tasks/`; edit them with your coding tools, then reread task context. There is no `task update` command. Changing a definition requires fresh validation.\n4. Start with a repeatable segment where possible. Existing rewards, resources, or server-side state may make a completed task impossible to repeat immediately. Natural-language constraints are requirements you must honor; the task ledger does not automatically enforce their business semantics.\n5. Check `doctor` for environment/project readiness and `devices` for discoverable Android targets. Follow an actionable failed check rather than guessing an address or treating missing OCR as an empty screen.\n6. Keep the service alive across tool calls. Run `daemon status` first and reuse a running compatible service. Otherwise, in a coding-agent sandbox, launch `vibe-maa --project PATH daemon serve` once in a long-lived exec or PTY session: let the execution tool yield while the command continues running. A stable host terminal or supervisor can also own it. Run `daemon status` in a separate call and confirm `running` and `compatible` before opening a session. Appending shell `&` is insufficient when the sandbox destroys a command's PID namespace after exit. Keep the foreground session alive until work finishes. If the harness declares the service externally managed, use that service, close only sessions you opened, and leave service shutdown/restart to its owner.\n7. Explicitly open the intended backend with `vibe-maa --project PATH session open --backend adb --device ADDRESS`. Backend selection is required. Use `--backend demo` only for the resettable fixture, and label fixture results as such.\n\nThe installed package includes the workflow and demo data. `agent show` returns these instructions; `agent install --target codex` or `agent install --target claude` installs a new project-local Skill without changing home directories or overwriting an existing Skill. Refresh the coding-agent session after installation. For a reproducible development exercise, `demo init --starter` creates a project with a genuinely missing announcement-handling branch, ready for source editing.\n\n## Observe and explore\n\n- Call `observe --session SESSION_ID`, then inspect the returned original image. OCR and element boxes refer to this exact observation's controller coordinate system.\n- Pass its observation ID with `act`; target references such as `e2` belong only to that observation. Use the returned new observation after an action.\n- Key/text inputs also require a target or guard box that identifies the relevant current UI region.\n- Context snapshots mark retained observations as historical; they do not authorize input. Observe the current device before acting. If input is rejected as stale, inspect the replacement observation or observe again. Do not bypass the check or retry old coordinates blindly.\n- Check action `status` separately from the JSON envelope's `ok`. Use structured `failure.code` and `observation_failure.code` when present. If input times out or the response is lost, inspect persisted evidence and observe the current state before retrying: the input may already have happened.\n- If `DAEMON_REQUIRES_SUPERVISOR` or `SESSION_OWNER_LOST` occurs, fix the service lifetime first and read saved context/evidence. Establish a new session only after a stable service exists, then observe its current state. Repeatedly opening replacement sessions does not repair process lifetime; never replay old inputs automatically.\n- Missing OCR models produce an explicit warning, not proof that the screen contains no text. Use original images or provision appropriate project models.\n\n## Implement and probe\n\n- Edit standard files under `resource/pipeline/` and related custom code using normal coding tools.\n- Use `probe --session SESSION_ID --observation OBS_ID --node NODE` to evaluate recognition on saved pixels without input. Check `result.hit`, not only candidate lists or scores.\n- Probe both relevant positive and negative screenshots. Offline Custom/context-dependent nodes may be unsupported; do not replace an unsupported result with a fabricated match.\n- Use `asset extract --observation OBS_ID --box X,Y,W,H --name NAME` to gener\n[truncated]"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_3",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'find . -maxdepth 4 -type f | sort'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_3",
+      "status": "completed",
+      "command": "/bin/bash -c 'find . -maxdepth 4 -type f | sort'",
+      "exit_code": 0,
+      "output": "./.agents/skills/vibe-maa/SKILL.md\n./.maa-dev/daemon.json\n./.maa-dev/daemon.log\n./.maa-dev/daemon.owner.lock\n./.maa-dev/daemon.start.lock\n./.maa-dev/native-logs/maafw.log\n./.maa-dev/observations/obs_006d480da07946a680928412087d5d2f/image.png\n./.maa-dev/observations/obs_006d480da07946a680928412087d5d2f/record.json\n./.maa-dev/observations/obs_5d3f65a8d4d1468ea6d5665f09e2ea1b/image.png\n./.maa-dev/observations/obs_5d3f65a8d4d1468ea6d5665f09e2ea1b/record.json\n./.maa-dev/observations/obs_66c9526ebd8f4ded8207e7cd3575b36b/image.png\n./.maa-dev/observations/obs_66c9526ebd8f4ded8207e7cd3575b36b/record.json\n./.maa-dev/observations/obs_67a3b41a2eba4df89984d8871d03a6be/image.png\n./.maa-dev/observations/obs_67a3b41a2eba4df89984d8871d03a6be/record.json\n./.maa-dev/runs/run_6965ac78a6fa4e1ebc6e1e11b7f8d1c3/events.jsonl\n./.maa-dev/runs/run_6965ac78a6fa4e1ebc6e1e11b7f8d1c3/frame-00011.png\n./.maa-dev/runs/run_6965ac78a6fa4e1ebc6e1e11b7f8d1c3/frame-00013.png\n./.maa-dev/runs/run_6965ac78a6fa4e1ebc6e1e11b7f8d1c3/frame-00069.png\n./.maa-dev/runs/run_6965ac78a6fa4e1ebc6e1e11b7f8d1c3/last-recognition.png\n./.maa-dev/runs/run_6965ac78a6fa4e1ebc6e1e11b7f8d1c3/record.json\n./.maa-dev/runs/run_9ef946b5baba4d28bd543ad53cbaf1bd/events.jsonl\n./.maa-dev/runs/run_9ef946b5baba4d28bd543ad53cbaf1bd/frame-00011.png\n./.maa-dev/runs/run_9ef946b5baba4d28bd543ad53cbaf1bd/frame-00019.png\n./.maa-dev/runs/run_9ef946b5baba4d28bd543ad53cbaf1bd/frame-00023.png\n./.maa-dev/runs/run_9ef946b5baba4d28bd543ad53cbaf1bd/frame-00027.png\n./.maa-dev/runs/run_9ef946b5baba4d28bd543ad53cbaf1bd/frame-00031.png\n./.maa-dev/runs/run_9ef946b5baba4d28bd543ad53cbaf1bd/last-recognition.png\n./.maa-dev/runs/run_9ef946b5baba4d28bd543ad53cbaf1bd/record.json\n./dev/assets/device_create_new.json\n./dev/assets/rectangle_tool.json\n./dev/assets/save_diagrams_title.json\n./dev/assets/vibe_maa_rectangle.json\n./dev/cases/AgentCanvas.json\n./dev/cases/ChangedDialog.png\n./dev/cases/PreviousDialog.png\n./dev/cases/SplashOpen_positive.png\n./dev/cases/VibeMaa_blank_positive.png\n./dev/cases/VibeMaa_negative.png\n./dev/cases/VibeMaa_positive.png\n./dev/cases/VibeMaa_splash_positive.png\n./dev/tasks/AgentCanvas.json\n./interface.json\n./resource/image/device_create_new.png\n./resource/image/rectangle_tool.png\n./resource/image/save_diagrams_title.png\n./resource/image/vibe_maa_rectangle.png\n./resource/pipeline/agent_task.json"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_4",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --help'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_4",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --help'",
+      "exit_code": 0,
+      "output": "usage: vibe-maa [-h] [--project PROJECT] [--version]\n                {init,capabilities,context,reference,daemon,session,observe,act,probe,run,asset,case,artifact,doctor,devices,browser,target,demo,agent,task,report,export}\n                ...\n\nJSON command-line client for the persistent project-local development service.\n\npositional arguments:\n  {init,capabilities,context,reference,daemon,session,observe,act,probe,run,asset,case,artifact,doctor,devices,browser,target,demo,agent,task,report,export}\n    init                Initialize a standard MaaFW project without\n                        overwrites.\n    capabilities        Discover operations and exact parameter schemas\n                        without connecting a device.\n    context             Read a bounded project/task snapshot for an AI without\n                        starting a device session.\n    reference           Read concise offline MaaFW protocol guidance.\n    daemon              Run the project daemon in the foreground, inspect it,\n                        or stop it.\n    doctor              Check local project and optional adapters.\n    devices             Discover available ADB devices.\n    browser             Install Chromium into this package's runtime.\n    target              Prepare a pinned open-source UI target.\n\noptions:\n  -h, --help            show this help message and exit\n  --project PROJECT\n  --version             show program's version number and exit"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_6",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . context --task AgentCanvas'",
+      "output": ""
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_7",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . task context AgentCanvas'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_7",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . task context AgentCanvas'",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"schema_version\": 1, \"name\": \"AgentCanvas\", \"objective\": \"In diagrams.net, create a rectangle on the application canvas labeled exactly Vibe Maa from a fresh blank document, repeatably.\", \"entry\": \"AgentTask\", \"goal\": \"VibeMaaVisible\", \"cases\": \"dev/cases/AgentCanvas.json\", \"constraints\": [\"Use standard MaaFramework Pipeline actions only; no Shell, Command, or Custom actions.\", \"Expose entry AgentTask through interface.json for normal MaaFW handoff.\", \"Each run must create the result from a fresh blank document at 1280x720.\", \"The AgentTask entry must handle both fresh start URLs without external setup inputs: splash=0 starts on a blank canvas and splash=1 starts with the Device modal.\", \"For splash=1, dismiss the Device storage chooser with Change Storage then Decide Later, leaving no modal open.\", \"The final canvas must contain exactly one rectangle labelled exactly Vibe Maa, and the established VibeMaaVisible completion condition must remain unchanged.\"], \"max_attempts\": 10, \"scenarios\": {\"blank_start\": \"StartBlank\", \"splash_start\": \"SplashOpen\"}, \"created_at\": \"2026-11-12T10:18:22.121731+00:00\", \"verification\": {\"verified_at\": \"2026-11-12T10:48:56.681487+00:00\", \"viewport\": \"1280x720\", \"fresh_blank\": {\"url\": \"http://127.0.0.1:34175/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0\", \"run_ids\": [\"run_85543282e74c4ad9984771965a57bdac\", \"run_1a170d6318cd469c9a95f94d7c3ccf9e\", \"run_80300f0a88774cb38abe7aa6aa597d88\"], \"task_attempt_id\": \"attempt_d2bfb21aa0c8446ba1c84565074cbc89\", \"result\": \"3/3 fresh runs execution_status=succeeded, goal_status=passed; saved scenario attempt accepted\", \"observed\": \"one rectangle labelled Vibe Maa, no modal\"}, \"fresh_splash\": {\"url\": \"http://127.0.0.1:34175/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0\", \"run_ids\": [\"run_eb66eec01a48470da9b3443cd8ddab28\", \"run_8726a440528c480ab6078024ddde08fe\", \"run_9745533d31654bd7aa130349dfbf73aa\"], \"task_attempt_id\": \"attempt_681ddd2373894a15b5685d4f2efdb058\", \"result\": \"3/3 fresh runs execution_status=succeeded, goal_status=passed; saved scenario attempt accepted\", \"observed\": \"Device modal cleared through Change Storage then Decide Later; one rectangle labelled Vibe Maa, no modal\"}}, \"spec_sha256\": \"93e0d92372fd792beaa938561392c7b3284b6aed8091b1d2540429acf707be8a\", \"state\": \"draft\", \"scope\": \"unknown\", \"acceptance_scope\": \"configured_checks_only\", \"constraints_status\": \"not_automatically_verified\", \"freshness\": \"unverified\", \"attempt_count\": 0, \"remaining_attempts\": 10, \"latest_attempt\": null, \"required_scenarios\": [\"blank_start\", \"splash_start\"], \"completed_scenarios\": [], \"missing_scenarios\": [\"blank_start\", \"splash_start\"], \"proofs\": {}, \"acceptance_target\": null, \"excluded_target_attempts\": [], \"excluded_target_attempts_omitted\": 0, \"task_path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/tasks/AgentCanvas.json\", \"next_action\": \"Inspect the task and latest evidence, edit resources, then run the task on the intended session.\"}}"
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_6",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . context --task AgentCanvas'",
+      "exit_code": 0,
+      "output": "[REDACTED private/auth field]"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_8",
+      "status": "in_progress",
+      "command": "/bin/bash -c \"printf '%s\\\\n' '--- interface.json'; cat interface.json; printf '%s\\\\n' '--- pipeline'; cat resource/pipeline/agent_task.json; printf '%s\\\\n' '--- task'; cat dev/tasks/AgentCanvas.json; printf '%s\\\\n' '--- cases'; cat dev/cases/AgentCanvas.json\"",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_8",
+      "status": "completed",
+      "command": "/bin/bash -c \"printf '%s\\\\n' '--- interface.json'; cat interface.json; printf '%s\\\\n' '--- pipeline'; cat resource/pipeline/agent_task.json; printf '%s\\\\n' '--- task'; cat dev/tasks/AgentCanvas.json; printf '%s\\\\n' '--- cases'; cat dev/cases/AgentCanvas.json\"",
+      "exit_code": 0,
+      "output": "--- interface.json\n{\"interface_version\": 2, \"name\": \"vibe-maa-project\", \"controller\": [{\"name\": \"Android\", \"type\": \"Adb\"}], \"resource\": [{\"name\": \"Default\", \"path\": [\"./resource\"]}], \"task\": [{\"name\": \"AgentTask\", \"label\": \"Create Vibe Maa rectangle\", \"entry\": \"AgentTask\"}]}\n--- pipeline\n{\"AgentTask\": {\"recognition\": \"DirectHit\", \"action\": \"DoNothing\", \"post_delay\": 300, \"timeout\": 10000, \"next\": [\"SplashOpen\", \"StartBlank\"]}, \"SplashOpen\": {\"recognition\": \"TemplateMatch\", \"template\": \"device_create_new.png\", \"roi\": [440, 300, 400, 80], \"threshold\": 0.92, \"action\": \"Click\", \"target\": [640, 464], \"post_delay\": 350, \"timeout\": 3000, \"next\": [\"SplashStorage\"]}, \"SplashStorage\": {\"recognition\": \"TemplateMatch\", \"template\": \"save_diagrams_title.png\", \"roi\": [500, 230, 280, 70], \"threshold\": 0.92, \"action\": \"Click\", \"target\": [640, 454], \"post_delay\": 450, \"timeout\": 3000, \"next\": [\"StartBlank\"]}, \"StartBlank\": {\"recognition\": \"TemplateMatch\", \"template\": \"rectangle_tool.png\", \"roi\": [0, 140, 220, 60], \"threshold\": 0.9, \"action\": \"Click\", \"target\": [633, 400], \"post_delay\": 300, \"timeout\": 10000, \"next\": [\"ClearExisting\"]}, \"ClearExisting\": {\"recognition\": \"DirectHit\", \"action\": \"ClickKey\", \"key\": 46, \"target\": [633, 400], \"post_delay\": 300, \"timeout\": 3000, \"next\": [\"DrawRectangle\"]}, \"DrawRectangle\": {\"recognition\": \"DirectHit\", \"action\": \"Click\", \"target\": [36, 177], \"post_delay\": 350, \"timeout\": 3000, \"next\": [\"SelectRectangle\"]}, \"SelectRectangle\": {\"recognition\": \"DirectHit\", \"action\": \"Click\", \"target\": [633, 400], \"post_delay\": 300, \"timeout\": 3000, \"next\": [\"EditLabel\"]}, \"EditLabel\": {\"recognition\": \"DirectHit\", \"action\": \"ClickKey\", \"key\": 113, \"target\": [633, 400], \"post_delay\": 450, \"timeout\": 3000, \"next\": [\"EnterLabel\"]}, \"EnterLabel\": {\"recognition\": \"DirectHit\", \"action\": \"InputText\", \"input_text\": \"Vibe Maa\", \"target\": [633, 400], \"post_delay\": 450, \"timeout\": 3000, \"next\": [\"CommitLabel\"]}, \"CommitLabel\": {\"recognition\": \"DirectHit\", \"action\": \"Click\", \"target\": [885, 555], \"post_delay\": 500, \"timeout\": 3000, \"next\": [\"VibeMaaVisible\"]}, \"VibeMaaVisible\": {\"recognition\": \"TemplateMatch\", \"template\": \"vibe_maa_rectangle.png\", \"roi\": [480, 260, 360, 240], \"threshold\": 0.85, \"action\": \"DoNothing\", \"timeout\": 3000}}\n--- task\n{\"schema_version\": 1, \"name\": \"AgentCanvas\", \"objective\": \"In diagrams.net, create a rectangle on the application canvas labeled exactly Vibe Maa from a fresh blank document, repeatably.\", \"entry\": \"AgentTask\", \"goal\": \"VibeMaaVisible\", \"cases\": \"dev/cases/AgentCanvas.json\", \"constraints\": [\"Use standard MaaFramework Pipeline actions only; no Shell, Command, or Custom actions.\", \"Expose entry AgentTask through interface.json for normal MaaFW handoff.\", \"Each run must create the result from a fresh blank document at 1280x720.\", \"The AgentTask entry must handle both fresh start URLs without external setup inputs: splash=0 starts on a blank canvas and splash=1 starts with the Device modal.\", \"For splash=1, dismiss the Device storage chooser with Change Storage then Decide Later, leaving no modal open.\", \"The final canvas must contain exactly one rectangle labelled exactly Vibe Maa, and the established VibeMaaVisible completion condition must remain unchanged.\"], \"max_attempts\": 10, \"scenarios\": {\"blank_start\": \"StartBlank\", \"splash_start\": \"SplashOpen\"}, \"created_at\": \"2026-11-12T10:18:22.121731+00:00\", \"verification\": {\"verified_at\": \"2026-11-12T10:48:56.681487+00:00\", \"viewport\": \"1280x720\", \"fresh_blank\": {\"url\": \"http://127.0.0.1:34175/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0\", \"run_ids\": [\"run_85543282e74c4ad9984771965a57bdac\", \"run_1a170d6318cd469c9a95f94d7c3ccf9e\", \"run_80300f0a88774cb38abe7aa6aa597d88\"], \"task_attempt_id\": \"attempt_d2bfb21aa0c8446ba1c84565074cbc89\", \"result\": \"3/3 fresh runs execution_status=succeeded, goal_status=passed; saved scenario attempt accepted\", \"observed\": \"one rectangle labelled Vibe Maa, no modal\"}, \"fresh_splash\": {\"url\": \"http://127.0.0.1:34175/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0\", \"run_ids\": [\"run_eb66eec01a48470da9b3443cd8ddab28\", \"run_8726a440528c480ab6078024ddde08fe\", \"run_9745533d31654bd7aa130349dfbf73aa\"], \"task_attempt_id\": \"attempt_681ddd2373894a15b5685d4f2efdb058\", \"result\": \"3/3 fresh runs execution_status=succeeded, goal_status=passed; saved scenario attempt accepted\", \"observed\": \"Device modal cleared through Change Storage then Decide Later; one rectangle labelled Vibe Maa, no modal\"}}}\n--- cases\n[{\"expected_hit\": true, \"image\": \"VibeMaa_positive.png\", \"node\": \"VibeMaaVisible\"}, {\"expected_hit\": false, \"image\": \"VibeMaa_negative.png\", \"node\": \"VibeMaaVisible\"}, {\"expected_hit\": true, \"image\": \"SplashOpen_positive.png\", \"node\": \"SplashOpen\"}, {\"expected_hit\": true, \"image\": \"VibeMaa_splash_positive.png\", \"node\": \"VibeMaaVisible\"}, {\"expected_hit\": true, \"image\": \"VibeMaa_blank_positive.png\", \"node\": \"VibeMaaVisible\"}, {\"node\": \"SplashStorage\", \"image\": \"PreviousDialog.png\", \"expected_hit\": true}, {\"node\": \"SplashStorage\", \"image\": \"ChangedDialog.png\", \"expected_hit\": true}]"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_9",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'for f in .maa-dev/runs/*/record.json; do echo ---$f; cat \"$f\"; done'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_9",
+      "status": "completed",
+      "command": "/bin/bash -c 'for f in .maa-dev/runs/*/record.json; do echo ---$f; cat \"$f\"; done'",
+      "exit_code": 0,
+      "output": "---.maa-dev/runs/run_6965ac78a6fa4e1ebc6e1e11b7f8d1c3/record.json\n{\"schema_version\": 1, \"run_id\": \"run_6965ac78a6fa4e1ebc6e1e11b7f8d1c3\", \"session_id\": \"session_06db62ab7bb14dfc94d70b84e4332b77\", \"backend\": \"browser\", \"device\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0\", \"scope\": \"device\", \"runtime\": {\"browser_version\": \"158.0.8127.18\", \"playwright_version\": \"1.65.1\", \"viewport\": {\"width\": 1280, \"height\": 720, \"device_scale_factor\": 1}, \"headless\": true, \"platform\": \"Linux\"}, \"resource_path\": \"resource\", \"entry\": \"AgentTask\", \"override\": {}, \"timeout_seconds\": 12, \"goal\": null, \"execution_status\": \"succeeded\", \"goal_status\": \"unknown\", \"before_observation\": \"obs_66c9526ebd8f4ded8207e7cd3575b36b\", \"started_at\": \"2026-11-12T11:24:41.656598+00:00\", \"inputs\": {\"resource/image/device_create_new.png\": \"968ddbe0bd501243368dabba3382fee2456cbb7b483c26c07b1661b980c7e14e\", \"resource/image/rectangle_tool.png\": \"f7e4346d55dcbc892667bb4ffbb0a475eef29d3dfb82c2554c66d94a44d0b46f\", \"resource/image/save_diagrams_title.png\": \"9e49056b2f4fd63ec14e6957ed51f73ffa71f29d39baa82480be037379e3ebf6\", \"resource/image/vibe_maa_rectangle.png\": \"ca8b2f24f8d279016963ca88e5a96e1d97d4a5f9d75e17a353cdd3115180d2ad\", \"resource/pipeline/agent_task.json\": \"2283e77fac68c660fd09812f7679f544cecf0cb6987ed0fb88136c658ee4c6e9\"}, \"events\": [{\"message\": \"Node.PipelineNode.Starting\", \"details\": {\"focus\": null, \"name\": \"AgentTask\", \"node_id\": 300000001, \"task_id\": 200000001}, \"received_at_ns\": 1794482681780720578, \"sequence\": 0, \"recorded_at\": \"2026-11-12T11:24:41.790639+00:00\"}, {\"message\": \"Node.NextList.Starting\", \"details\": {\"focus\": null, \"list\": [{\"anchor\": false, \"jump_back\": false, \"name\": \"AgentTask\"}], \"name\": \"AgentTask\", \"task_id\": 200000001}, \"received_at_ns\": 1794482681780817568, \"sequence\": 1, \"recorded_at\": \"2026-11-12T11:24:41.790823+00:00\"}, {\"message\": \"Node.Recognition.Starting\", \"details\": {\"focus\": null, \"name\": \"AgentTask\", \"reco_id\": 400000001, \"task_id\": 200000001}, \"received_at_ns\": 1794482681780896391, \"sequence\": 2, \"recorded_at\": \"2026-11-12T11:24:41.790884+00:00\"}, {\"message\": \"Node.Recognition.Succeeded\", \"details\": {\"focus\": null, \"name\": \"AgentTask\", \"reco_details\": {\"algorithm\": \"DirectHit\", \"box\": [0, 0, 0, 0], \"detail\": null, \"name\": \"AgentTask\", \"reco_id\": 400000001}, \"reco_id\": 400000001, \"task_id\": 200000001}, \"received_at_ns\": 1794482681780975945, \"recognition\": {\"reco_id\": 400000001, \"algorithm\": \"DirectHit\", \"hit\": true, \"box\": {\"x\": 0, \"y\": 0, \"w\": 0, \"h\": 0}, \"all_results\": [], \"filtered_results\": [], \"best_result\": null, \"raw_detail\": null}, \"missing_evidence\": \"Recognition image unavailable or evicted\", \"sequence\": 3, \"recorded_at\": \"2026-11-12T11:24:41.791108+00:00\"}, {\"message\": \"Node.NextList.Succeeded\", \"details\": {\"focus\": null, \"list\": [{\"anchor\": false, \"jump_back\": false, \"name\": \"AgentTask\"}], \"name\": \"AgentTask\", \"task_id\": 200000001}, \"received_at_ns\": 1794482681781041289, \"sequence\": 4, \"recorded_at\": \"2026-11-12T11:24:41.791199+00:00\"}, {\"message\": \"Node.Action.Starting\", \"details\": {\"action_id\": 500000001, \"focus\": null, \"name\": \"AgentTask\", \"task_id\": 200000001}, \"received_at_ns\": 1794482681981492853, \"sequence\": 5, \"recorded_at\": \"2026-11-12T11:24:41.982978+00:00\"}, {\"message\": \"Node.Action.Succeeded\", \"details\": {\"action_details\": {\"action\": \"DoNothing\", \"action_id\": 500000001, \"box\": [0, 0, 0, 0], \"detail\": {}, \"name\": \"AgentTask\", \"success\": true}, \"action_id\": 500000001, \"focus\": null, \"name\": \"AgentTask\", \"task_id\": 200000001}, \"received_at_ns\": 1794482681981612485, \"action\": {\"action_id\": 500000001, \"name\": \"AgentTask\", \"action\": \"DoNothing\", \"box\": {\"x\": 0, \"y\": 0, \"w\": 0, \"h\": 0}, \"success\": true, \"result\": null, \"raw_detail\": {}}, \"sequence\": 6, \"recorded_at\": \"2026-11-12T11:24:41.983325+00:00\"}, {\"message\": \"Node.PipelineNode.Succeeded\", \"details\": {\"action_details\": {\"action\": \"DoNothing\", \"action_id\": 500000001, \"box\": [0, 0, 0, 0], \"detail\": {}, \"name\": \"AgentTask\", \"success\": true}, \"focus\": null, \"name\": \"AgentTask\", \"node_details\": {\"action_id\": 500000001, \"completed\": true, \"name\": \"AgentTask\", \"node_id\": 300000001, \"reco_id\": 400000001}, \"node_id\": 300000001, \"reco_details\": {\"algorithm\": \"DirectHit\", \"box\": [0, 0, 0, 0], \"detail\": null, \"name\": \"AgentTask\", \"reco_id\": 400000001}, \"task_id\": 200000001}, \"received_at_ns\": 1794482682305406920, \"sequence\": 7, \"recorded_at\": \"2026-11-12T11:24:42.306527+00:00\"}, {\"message\": \"Node.PipelineNode.Starting\", \"details\": {\"focus\": null, \"name\": \"AgentTask\", \"node_id\": 300000002, \"task_id\": 200000001}, \"received_at_ns\": 1794482682305524078, \"sequence\": 8, \"recorded_at\": \"2026-11-12T11:24:42.306671+00:00\"}, {\"message\": \"Node.NextList.Starting\", \"details\": {\"focus\": null, \"list\": [{\"anchor\": false, \"jump_back\": false, \"name\": \"SplashOpen\"}, {\"anchor\": false, \"jump_back\": false, \"name\": \"StartBlank\"}], \"name\": \"AgentTask\", \"task_id\": 200000001}, \"received_at_ns\": 1794482682384806248, \"sequence\": 9, \"recorded_at\": \"2026-11-12T11:24:42.387818+00:00\"}, {\"message\": \"Node.Recognition.Starting\", \"details\": {\"focus\": null, \"name\": \"SplashOpen\", \"reco_id\": 400000002, \"task_id\": 200000001}, \"received_at_ns\": 1794482682384898851, \"sequence\": 10, \"recorded_at\": \"2026-11-12T11:24:42.388015+00:00\"}, {\"message\": \"Node.Recognition.Failed\", \"details\": {\"focus\": null, \"name\": \"SplashOpen\", \"reco_details\": {\"algorithm\": \"TemplateMatch\", \"box\": null, \"detail\": {\"all\": [], \"best\": null, \"filtered\": []}, \"name\": \"SplashOpen\", \"reco_id\": 400000002}, \"reco_id\": 400000002, \"task_id\": 200000001}, \"received_at_ns\": 1794482682400911201, \"recognition\": {\"reco_id\": 400000002, \"algorithm\": \"TemplateMatch\", \"hit\": false, \"box\": null, \"all_results\": [], \"filtered_results\": [], \"best_result\": null, \"raw_detail\": {\"all\": [], \"best\": null, \"filtered\": []}}, \"sequence\": 11, \"recorded_at\": \"2026-11-12T11:24:42.423305+00:00\", \"image_path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/runs/run_69\n[truncated]"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_10",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . capabilities'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_10",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . capabilities'",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"schema_version\": 1, \"tool\": \"vibe-maa\", \"version\": \"0.4.0\", \"readiness\": \"not_checked\", \"methods\": [{\"method\": \"session.open\", \"summary\": \"Open a persistent, explicitly selected device or fixture connection.\", \"required\": [\"backend\"], \"effect\": \"writes_or_executes\", \"sends_ui_input\": false, \"details\": \"vibe-maa capabilities --method session.open\"}, {\"method\": \"session.list\", \"summary\": \"List the current service's live connections.\", \"required\": [], \"effect\": \"reads\", \"sends_ui_input\": false, \"details\": \"vibe-maa capabilities --method session.list\"}, {\"method\": \"session.close\", \"summary\": \"Stop a session and release its connection/lease.\", \"required\": [\"session_id\"], \"effect\": \"writes_or_executes\", \"sends_ui_input\": false, \"details\": \"vibe-maa capabilities --method session.close\"}, {\"method\": \"observe\", \"summary\": \"Capture one original frame and optional OCR from those exact pixels.\", \"required\": [\"session_id\"], \"effect\": \"writes_or_executes\", \"sends_ui_input\": false, \"details\": \"vibe-maa capabilities --method observe\"}, {\"method\": \"act\", \"summary\": \"Dispatch one guarded input using a current observation.\", \"required\": [\"session_id\", \"observation_id\"], \"effect\": \"writes_or_executes\", \"sends_ui_input\": true, \"details\": \"vibe-maa capabilities --method act\"}, {\"method\": \"probe\", \"summary\": \"Evaluate one node on saved pixels without executing its actions.\", \"required\": [\"session_id\", \"observation_id\", \"node\"], \"effect\": \"writes_or_executes\", \"sends_ui_input\": false, \"details\": \"vibe-maa capabilities --method probe\"}, {\"method\": \"run\", \"summary\": \"Run the current Pipeline source with a finite native execution budget.\", \"required\": [\"session_id\", \"entry\"], \"effect\": \"writes_or_executes\", \"sends_ui_input\": true, \"details\": \"vibe-maa capabilities --method run\"}, {\"method\": \"asset.extract\", \"summary\": \"Crop a source-tracked template from a saved observation.\", \"required\": [\"observation_id\", \"box\", \"name\"], \"effect\": \"writes_or_executes\", \"sends_ui_input\": false, \"details\": \"vibe-maa capabilities --method asset.extract\"}, {\"method\": \"case.check\", \"summary\": \"Check positive and negative labeled screenshots with native recognition.\", \"required\": [\"session_id\", \"cases\"], \"effect\": \"writes_or_executes\", \"sends_ui_input\": false, \"details\": \"vibe-maa capabilities --method case.check\"}, {\"method\": \"artifact.read\", \"summary\": \"Read an existing immutable-identity record by kind and ID.\", \"required\": [\"kind\", \"id\"], \"effect\": \"reads\", \"sends_ui_input\": false, \"details\": \"vibe-maa capabilities --method artifact.read\"}, {\"method\": \"task.create\", \"summary\": \"Save an objective and executable acceptance contract.\", \"required\": [\"name\", \"objective\", \"entry\", \"goal\"], \"effect\": \"writes_or_executes\", \"sends_ui_input\": false, \"details\": \"vibe-maa capabilities --method task.create\"}, {\"method\": \"task.list\", \"summary\": \"List durable objectives and their current verification states.\", \"required\": [], \"effect\": \"reads\", \"sends_ui_input\": false, \"details\": \"vibe-maa capabilities --method task.list\"}, {\"method\": \"task.context\", \"summary\": \"Recover the objective, latest evidence and remaining work after interruption.\", \"required\": [\"name\"], \"effect\": \"reads\", \"sends_ui_input\": false, \"details\": \"vibe-maa capabilities --method task.context\"}, {\"method\": \"task.run\", \"summary\": \"Validate a saved task and named starting state against current source files.\", \"required\": [\"session_id\", \"name\"], \"effect\": \"writes_or_executes\", \"sends_ui_input\": true, \"details\": \"vibe-maa capabilities --method task.run\"}], \"backends\": {\"adb\": {\"setup\": \"Android platform-tools and a reachable device address\", \"scope\": \"device\"}, \"browser\": {\"setup\": \"vibe-maa[browser] extra, Chromium, and an http(s) URL\", \"scope\": \"device\", \"perception\": \"screenshots only; no DOM/evaluate API\"}, \"demo\": {\"setup\": \"demo init creates the packaged resource fixture\", \"scope\": \"fixture\", \"perception\": \"synthetic UI/text; real native recognition and execution\"}}, \"status_fields\": {\"ok\": \"Request handling completed; not proof of action/task success.\", \"status\": \"act: succeeded/failed; inspect its new observation.\", \"execution_status\": \"run: succeeded/failed/timeout.\", \"goal_status\": \"run: passed/failed/unknown, independently checked if requested.\", \"state\": \"task: draft/needs_validation/accepted/blocked; acceptance covers configured checks only.\", \"scope\": \"fixture/device for runs; offline_recognition_only for cases. Fixture or offline success does not prove a live-game result.\"}, \"coordinates\": \"Full controller screenshot pixels. A box is [x,y,width,height], never [x1,y1,x2,y2].\", \"daemon\": {\"foreground_command\": \"vibe-maa --project PATH daemon serve\", \"readiness_command\": \"vibe-maa --project PATH daemon status\", \"lifetime\": \"Keep daemon serve running in a long-lived exec/PTY tool session; let the tool yield, then use a separate call. Confirm running and compatible before session.open. Shell & alone is insufficient in command-lifetime sandboxes.\", \"owner_loss\": \"Read context and saved evidence, repair service lifetime, then open one new session and observe. Never loop session.open or automatically replay old inputs.\", \"external_owner\": \"When a runner provides VIBE_MAA_EXTERNAL_DAEMON_PROJECT and VIBE_MAA_EXTERNAL_DAEMON_PID, attach only to that owner. The runner manages its lifetime; do not serve, stop, replace it or change these values.\", \"stop_recovery\": {\"next\": \"session.close\", \"instruction\": \"Close your device sessions when finished; only the owning runner may stop or replace the externally managed daemon.\"}}, \"cli_tools\": [\"context [--task NAME]: bounded project orientation and retained evidence\", \"daemon serve|status|stop: persistent foreground owner, readiness and shutdown; externally managed owners belong to their runner\", \"reference --topic project|pipeline|recognition|actions|errors: offline handoff and protocol examples\", \"doctor / devices: readiness checks and ADB discovery\", \"agent show|install|export: bundled Sk\n[truncated]"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_11",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'identify dev/cases/*.png .maa-dev/runs/*/*.png 2>/dev/null'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_11",
+      "status": "failed",
+      "command": "/bin/bash -c 'identify dev/cases/*.png .maa-dev/runs/*/*.png 2>/dev/null'",
+      "exit_code": 127,
+      "output": ""
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_12",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . report show run_9ef946b5baba4d28bd543ad53cbaf1bd'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_12",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . report show run_9ef946b5baba4d28bd543ad53cbaf1bd'",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"run_id\": \"run_9ef946b5baba4d28bd543ad53cbaf1bd\", \"entry\": \"AgentTask\", \"started_at\": \"2026-11-12T11:24:48.532753+00:00\", \"finished_at\": \"2026-11-12T11:24:53.031527+00:00\", \"execution_status\": \"failed\", \"goal_status\": \"unknown\", \"backend\": \"browser\", \"device\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0\", \"scope\": \"device\", \"runtime\": {\"browser_version\": \"158.0.8127.18\", \"playwright_version\": \"1.65.1\", \"viewport\": {\"width\": 1280, \"height\": 720, \"device_scale_factor\": 1}, \"headless\": true, \"platform\": \"Linux\"}, \"inputs_changed\": false, \"report_path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/runs/run_9ef946b5baba4d28bd543ad53cbaf1bd/record.json\", \"last_node\": {\"name\": \"\", \"node_id\": 300000012, \"completed\": false}, \"waiting_for\": [\"SplashStorage\"], \"last_recognition\": {\"message\": \"Node.Recognition.Failed\", \"details\": {\"focus\": null, \"name\": \"SplashStorage\", \"reco_details\": {\"algorithm\": \"TemplateMatch\", \"box\": null, \"detail\": {\"all\": [{\"box\": [537, 246, 228, 34], \"score\": 0.411326}], \"best\": null, \"filtered\": []}, \"name\": \"SplashStorage\", \"reco_id\": 400000016}, \"reco_id\": 400000016, \"task_id\": 200000002}, \"received_at_ns\": 1794482692827525348, \"recognition\": {\"reco_id\": 400000016, \"algorithm\": \"TemplateMatch\", \"hit\": false, \"box\": null, \"all_results\": [{\"box\": [537, 246, 228, 34], \"score\": 0.411326}], \"filtered_results\": [], \"best_result\": null, \"raw_detail\": {\"all\": [{\"box\": [537, 246, 228, 34], \"score\": 0.411326}], \"best\": null, \"filtered\": []}}, \"image_path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/runs/run_9ef946b5baba4d28bd543ad53cbaf1bd/last-recognition.png\", \"sha256\": \"d48eb544a38f0aa0b01b107416051cf5a3f20340e02291a2f85639302bb04302\"}, \"before_observation\": \"obs_006d480da07946a680928412087d5d2f\", \"after_observation\": \"obs_5d3f65a8d4d1468ea6d5665f09e2ea1b\", \"error\": null, \"failure\": null, \"verification_error\": null, \"verification_failure\": null, \"evidence\": {\"events\": 34, \"missing\": [{\"sequence\": 3, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}], \"missing_count\": 1, \"truncated_events\": 0, \"truncated_images\": 0, \"omitted_nodes\": 0}, \"interpretation\": \"Recorded facts only; no root cause was inferred.\"}}"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_13",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . report show run_6965ac78a6fa4e1ebc6e1e11b7f8d1c3'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_13",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . report show run_6965ac78a6fa4e1ebc6e1e11b7f8d1c3'",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"run_id\": \"run_6965ac78a6fa4e1ebc6e1e11b7f8d1c3\", \"entry\": \"AgentTask\", \"started_at\": \"2026-11-12T11:24:41.656598+00:00\", \"finished_at\": \"2026-11-12T11:24:47.160711+00:00\", \"execution_status\": \"succeeded\", \"goal_status\": \"unknown\", \"backend\": \"browser\", \"device\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0\", \"scope\": \"device\", \"runtime\": {\"browser_version\": \"158.0.8127.18\", \"playwright_version\": \"1.65.1\", \"viewport\": {\"width\": 1280, \"height\": 720, \"device_scale_factor\": 1}, \"headless\": true, \"platform\": \"Linux\"}, \"inputs_changed\": false, \"report_path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/runs/run_6965ac78a6fa4e1ebc6e1e11b7f8d1c3/record.json\", \"last_node\": {\"name\": \"VibeMaaVisible\", \"node_id\": 300000009, \"completed\": true, \"recognition\": {\"reco_id\": 400000010, \"algorithm\": \"TemplateMatch\", \"hit\": true, \"box\": {\"x\": 571, \"y\": 360, \"w\": 121, \"h\": 82}, \"all_results\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"filtered_results\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best_result\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"raw_detail\": {\"all\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"filtered\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}]}}, \"action\": {\"action_id\": 500000009, \"name\": \"VibeMaaVisible\", \"action\": \"DoNothing\", \"box\": {\"x\": 0, \"y\": 0, \"w\": 0, \"h\": 0}, \"success\": true, \"result\": null, \"raw_detail\": {}}}, \"waiting_for\": [], \"last_recognition\": {\"message\": \"Node.Recognition.Succeeded\", \"details\": {\"focus\": null, \"name\": \"VibeMaaVisible\", \"reco_details\": {\"algorithm\": \"TemplateMatch\", \"box\": [571, 360, 121, 82], \"detail\": {\"all\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"filtered\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}]}, \"name\": \"VibeMaaVisible\", \"reco_id\": 400000010}, \"reco_id\": 400000010, \"task_id\": 200000001}, \"received_at_ns\": 1794482686611346545, \"recognition\": {\"reco_id\": 400000010, \"algorithm\": \"TemplateMatch\", \"hit\": true, \"box\": {\"x\": 571, \"y\": 360, \"w\": 121, \"h\": 82}, \"all_results\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"filtered_results\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best_result\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"raw_detail\": {\"all\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"filtered\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}]}}, \"image_path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/runs/run_6965ac78a6fa4e1ebc6e1e11b7f8d1c3/last-recognition.png\", \"sha256\": \"ff2f141cf2ec8273db9d6eb9ccbd15551cc169dc296577b70211ec075118ddeb\"}, \"before_observation\": \"obs_66c9526ebd8f4ded8207e7cd3575b36b\", \"after_observation\": \"obs_67a3b41a2eba4df89984d8871d03a6be\", \"error\": null, \"failure\": null, \"verification_error\": null, \"verification_failure\": null, \"evidence\": {\"events\": 74, \"missing\": [{\"sequence\": 3, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}, {\"sequence\": 21, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}, {\"sequence\": 29, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}, {\"sequence\": 37, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}, {\"sequence\": 45, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}, {\"sequence\": 53, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}, {\"sequence\": 61, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}], \"missing_count\": 7, \"truncated_events\": 0, \"truncated_images\": 0, \"omitted_nodes\": 0}, \"interpretation\": \"Recorded facts only; no root cause was inferred.\"}}"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_14",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . capabilities --method task.run; vibe-maa --project . capabilities --method session.open; vibe-maa --project . capabilities --method observe'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_14",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . capabilities --method task.run; vibe-maa --project . capabilities --method session.open; vibe-maa --project . capabilities --method observe'",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"schema_version\": 1, \"tool\": \"vibe-maa\", \"version\": \"0.4.0\", \"readiness\": \"not_checked\", \"method\": \"task.run\", \"summary\": \"Validate a saved task and named starting state against current source files.\", \"input_schema\": {\"type\": \"object\", \"properties\": {\"session_id\": {\"type\": \"string\"}, \"name\": {\"type\": \"string\", \"pattern\": \"^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$\"}, \"timeout_seconds\": {\"type\": \"number\", \"default\": 20, \"exclusiveMinimum\": 0, \"maximum\": 300}, \"scenario\": {\"anyOf\": [{\"type\": \"string\"}, {\"type\": \"null\"}], \"default\": null}}, \"required\": [\"session_id\", \"name\"], \"additionalProperties\": false}, \"side_effects\": [\"consumes one durable attempt\", \"executes configured UI actions and acceptance checks\"], \"prerequisites\": [\"live session_id\", \"saved task\", \"remaining attempt budget\", \"matching starting UI\"], \"returns\": [\"attempt\", \"context\"], \"notes\": [\"Select scenario when multiple starts are configured; it must pass its start check.\", \"All required scenarios need current proofs for the same backend/resource/runtime and device; explicit scenario_urls allows only its exact per-scenario browser URLs.\", \"Unlike run, this accepts no temporary override. Save intended source edits first.\"], \"example\": {\"method\": \"task.run\", \"params\": {\"session_id\": \"session_ID\", \"name\": \"mailbox\", \"timeout_seconds\": 20}}, \"cli_example\": \"vibe-maa --project PATH task run mailbox --session SESSION_ID --timeout-seconds 20\", \"recovery\": {\"SESSION_NOT_FOUND\": {\"next\": \"daemon status\", \"instruction\": \"Confirm a stable compatible owner, read task.context, then reopen the intended backend once and observe. Repeated session.open calls cannot repair a short-lived daemon.\"}, \"TASK_BUDGET_EXHAUSTED\": {\"next\": \"task.context\", \"instruction\": \"Review evidence and the declared budget; do not silently weaken checks or reset history.\"}, \"TASK_TARGET_MISMATCH\": {\"next\": \"session.open\", \"instruction\": \"Use the exact browser URL declared for this scenario; no inputs were executed. Changing scenario_urls requires fresh task validation.\"}, \"DAEMON_UNAVAILABLE\": {\"next\": \"daemon status\", \"instruction\": \"Inspect saved actions/runs before retrying; input may already have occurred. Repair the service lifetime before opening another session; preserve an externally managed owner.\"}, \"DAEMON_REQUIRES_SUPERVISOR\": {\"next\": \"daemon serve\", \"instruction\": \"Start once in a long-lived exec or PTY session and let the tool yield while the foreground command keeps running. In a separate call confirm daemon status is running and compatible before session.open. Shell & alone may be killed with its command sandbox.\"}, \"EXTERNAL_DAEMON_CONFIGURATION\": {\"next\": \"context\", \"instruction\": \"The owning runner must supply a valid external-project/PID environment pair. Preserve evidence and report the configuration failure; do not invent PID values or start a replacement daemon.\"}, \"EXTERNAL_DAEMON_PROJECT_MISMATCH\": {\"next\": \"context\", \"instruction\": \"Use the project assigned by the owning runner. Report the mismatch; do not replace its daemon or change the external-owner environment to bypass it.\"}, \"EXTERNAL_DAEMON_UNAVAILABLE\": {\"next\": \"context\", \"instruction\": \"Read saved evidence and report the unavailable owner to the supervising runner. Do not run daemon serve, restart it, or loop session.open.\"}, \"EXTERNAL_DAEMON_PID_MISMATCH\": {\"next\": \"context\", \"instruction\": \"The external owner was replaced. Preserve evidence and report to the supervising runner; do not attach to the replacement or change its expected PID.\"}, \"SESSION_OWNER_LOST\": {\"next\": \"context\", \"instruction\": \"Read saved evidence first. Restore a persistent owner, confirm daemon status, then open one new session and observe the current UI. Do not loop session.open or replay old inputs; an external supervisor must restore its own owner.\"}, \"INVALID_ARGUMENT\": {\"next\": \"capabilities --method task.run\", \"instruction\": \"Check required and conditional parameters against this method's input_schema before retrying.\"}}, \"invocation\": \"method/params describe the service contract; use the matching CLI command or SDK dispatch, not a raw unauthenticated socket\", \"failure_delivery\": \"Request errors use envelope.error. An executed operation can return ok=true with result.failure; check status fields. verification_failure explains an unavailable goal check.\"}}\n{\"schema_version\": 1, \"ok\": true, \"result\": {\"schema_version\": 1, \"tool\": \"vibe-maa\", \"version\": \"0.4.0\", \"readiness\": \"not_checked\", \"method\": \"session.open\", \"summary\": \"Open a persistent, explicitly selected device or fixture connection.\", \"input_schema\": {\"type\": \"object\", \"properties\": {\"backend\": {\"type\": \"string\", \"enum\": [\"demo\", \"adb\", \"browser\"]}, \"device\": {\"type\": \"string\", \"default\": \"\"}, \"adb_path\": {\"type\": \"string\", \"default\": \"adb\"}, \"resource_path\": {\"type\": \"string\", \"default\": \"resource\"}, \"initial_state\": {\"type\": \"string\", \"default\": \"home\", \"enum\": [\"home\", \"mailbox\", \"popup\"]}, \"url\": {\"anyOf\": [{\"type\": \"string\"}, {\"type\": \"null\"}], \"default\": null}, \"headless\": {\"type\": \"boolean\", \"default\": true, \"description\": \"Browser display mode: true by default. CLI --headless sets true; --headed sets false.\"}, \"width\": {\"type\": \"integer\", \"default\": 1280, \"minimum\": 64, \"maximum\": 4096}, \"height\": {\"type\": \"integer\", \"default\": 720, \"minimum\": 64, \"maximum\": 4096}, \"browser_executable\": {\"anyOf\": [{\"type\": \"string\"}, {\"type\": \"null\"}], \"default\": null}}, \"required\": [\"backend\"], \"additionalProperties\": false, \"allOf\": [{\"if\": {\"properties\": {\"backend\": {\"const\": \"adb\"}}}, \"then\": {\"required\": [\"device\"], \"properties\": {\"device\": {\"minLength\": 1}}}}, {\"if\": {\"properties\": {\"backend\": {\"const\": \"browser\"}}}, \"then\": {\"required\": [\"url\"], \"properties\": {\"url\": {\"type\": \"string\", \"pattern\": \"^https?://\"}}}}, {\"if\": {\"properties\": {\"backend\": {\"const\": \"demo\"}}}, \"then\": {\"properties\": {\"resource_path\": {\"const\": \"resource\"}}}}]}, \"side_effects\": [\"connects a device or starts a browser/fixture\", \"r\n[truncated]"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_16",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'sha256sum dev/cases/*.png resource/image/*.png; file dev/cases/*.png resource/image/*.png'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_16",
+      "status": "completed",
+      "command": "/bin/bash -c 'sha256sum dev/cases/*.png resource/image/*.png; file dev/cases/*.png resource/image/*.png'",
+      "exit_code": 0,
+      "output": "225de74ec9ecfbd24a0f81d2183724e1a97b39c38503e706dd1c8ef6a1be89af  dev/cases/ChangedDialog.png\nbd46f835597120cdf69162efbdd9064ab4a97ff0f73d5e628c9bdff17ee2b8ae  dev/cases/PreviousDialog.png\nec08b21ffd254748a0a7e5251f2596f3d960e8a4bdb5a6804bafd205d2ba6e28  dev/cases/SplashOpen_positive.png\n7922f9921beb3fd56573438f9066e2147ce30b38829f9974cbb84461ed80cb12  dev/cases/VibeMaa_blank_positive.png\n27ad41c93ab0dad2202ed282737aef3071245921fc50252f6f2d71f32fc1e0a9  dev/cases/VibeMaa_negative.png\n9ff0f063d8b05309d4b903e8dc7a4038b6359218d0d309c2e55acf6b6adca744  dev/cases/VibeMaa_positive.png\n7922f9921beb3fd56573438f9066e2147ce30b38829f9974cbb84461ed80cb12  dev/cases/VibeMaa_splash_positive.png\n968ddbe0bd501243368dabba3382fee2456cbb7b483c26c07b1661b980c7e14e  resource/image/device_create_new.png\nf7e4346d55dcbc892667bb4ffbb0a475eef29d3dfb82c2554c66d94a44d0b46f  resource/image/rectangle_tool.png\n9e49056b2f4fd63ec14e6957ed51f73ffa71f29d39baa82480be037379e3ebf6  resource/image/save_diagrams_title.png\nca8b2f24f8d279016963ca88e5a96e1d97d4a5f9d75e17a353cdd3115180d2ad  resource/image/vibe_maa_rectangle.png\ndev/cases/ChangedDialog.png:            PNG image data, 1280 x 720, 8-bit/color RGB, non-interlaced\ndev/cases/PreviousDialog.png:           PNG image data, 1280 x 720, 8-bit/color RGB, non-interlaced\ndev/cases/SplashOpen_positive.png:      PNG image data, 1280 x 720, 8-bit/color RGB, non-interlaced\ndev/cases/VibeMaa_blank_positive.png:   PNG image data, 1280 x 720, 8-bit/color RGB, non-interlaced\ndev/cases/VibeMaa_negative.png:         PNG image data, 1280 x 720, 8-bit/color RGB, non-interlaced\ndev/cases/VibeMaa_positive.png:         PNG image data, 1280 x 720, 8-bit/color RGB, non-interlaced\ndev/cases/VibeMaa_splash_positive.png:  PNG image data, 1280 x 720, 8-bit/color RGB, non-interlaced\nresource/image/device_create_new.png:   PNG image data, 340 x 40, 8-bit/color RGB, non-interlaced\nresource/image/rectangle_tool.png:      PNG image data, 24 x 23, 8-bit/color RGB, non-interlaced\nresource/image/save_diagrams_title.png: PNG image data, 228 x 34, 8-bit/color RGB, non-interlaced\nresource/image/vibe_maa_rectangle.png:  PNG image data, 121 x 82, 8-bit/color RGB, non-interlaced"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_17",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . capabilities --method case.check; vibe-maa --project . capabilities --method asset.extract; vibe-maa --project . capabilities --method session.open'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_17",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . capabilities --method case.check; vibe-maa --project . capabilities --method asset.extract; vibe-maa --project . capabilities --method session.open'",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"schema_version\": 1, \"tool\": \"vibe-maa\", \"version\": \"0.4.0\", \"readiness\": \"not_checked\", \"method\": \"case.check\", \"summary\": \"Check positive and negative labeled screenshots with native recognition.\", \"input_schema\": {\"type\": \"object\", \"properties\": {\"session_id\": {\"type\": \"string\"}, \"cases\": {\"type\": \"string\"}}, \"required\": [\"session_id\", \"cases\"], \"additionalProperties\": false}, \"side_effects\": [\"loads resources and images; sends no UI input\"], \"prerequisites\": [\"live backend session\", \"case manifest and images inside the project\"], \"returns\": [\"passed\", \"scope\", \"cases\"], \"notes\": [\"Manifest is [{node,image,expected_hit}]; image paths are relative to it. Offline checks do not prove a live task completed.\"], \"example\": {\"method\": \"case.check\", \"params\": {\"session_id\": \"session_ID\", \"cases\": \"dev/cases/mailbox.json\"}}, \"cli_example\": \"vibe-maa --project PATH case check --session SESSION_ID --cases dev/cases/mailbox.json\", \"recovery\": {\"SESSION_NOT_FOUND\": {\"next\": \"daemon status\", \"instruction\": \"Confirm a stable compatible owner, read task.context, then reopen the intended backend once and observe. Repeated session.open calls cannot repair a short-lived daemon.\"}, \"NODE_NOT_FOUND\": {\"next\": \"reference --topic pipeline\", \"instruction\": \"Read or create the named source node before trying again.\"}, \"UNSUPPORTED_PROBE\": {\"next\": \"reference --topic recognition\", \"instruction\": \"Use supported saved-image recognition or test the contextual node in a bounded run.\"}, \"DAEMON_REQUIRES_SUPERVISOR\": {\"next\": \"daemon serve\", \"instruction\": \"Start once in a long-lived exec or PTY session and let the tool yield while the foreground command keeps running. In a separate call confirm daemon status is running and compatible before session.open. Shell & alone may be killed with its command sandbox.\"}, \"EXTERNAL_DAEMON_CONFIGURATION\": {\"next\": \"context\", \"instruction\": \"The owning runner must supply a valid external-project/PID environment pair. Preserve evidence and report the configuration failure; do not invent PID values or start a replacement daemon.\"}, \"EXTERNAL_DAEMON_PROJECT_MISMATCH\": {\"next\": \"context\", \"instruction\": \"Use the project assigned by the owning runner. Report the mismatch; do not replace its daemon or change the external-owner environment to bypass it.\"}, \"EXTERNAL_DAEMON_UNAVAILABLE\": {\"next\": \"context\", \"instruction\": \"Read saved evidence and report the unavailable owner to the supervising runner. Do not run daemon serve, restart it, or loop session.open.\"}, \"EXTERNAL_DAEMON_PID_MISMATCH\": {\"next\": \"context\", \"instruction\": \"The external owner was replaced. Preserve evidence and report to the supervising runner; do not attach to the replacement or change its expected PID.\"}, \"SESSION_OWNER_LOST\": {\"next\": \"context\", \"instruction\": \"Read saved evidence first. Restore a persistent owner, confirm daemon status, then open one new session and observe the current UI. Do not loop session.open or replay old inputs; an external supervisor must restore its own owner.\"}, \"INVALID_ARGUMENT\": {\"next\": \"capabilities --method case.check\", \"instruction\": \"Check required and conditional parameters against this method's input_schema before retrying.\"}}, \"invocation\": \"method/params describe the service contract; use the matching CLI command or SDK dispatch, not a raw unauthenticated socket\", \"failure_delivery\": \"Request errors use envelope.error. An executed operation can return ok=true with result.failure; check status fields. verification_failure explains an unavailable goal check.\"}}\n{\"schema_version\": 1, \"ok\": true, \"result\": {\"schema_version\": 1, \"tool\": \"vibe-maa\", \"version\": \"0.4.0\", \"readiness\": \"not_checked\", \"method\": \"asset.extract\", \"summary\": \"Crop a source-tracked template from a saved observation.\", \"input_schema\": {\"type\": \"object\", \"properties\": {\"observation_id\": {\"type\": \"string\"}, \"box\": {\"type\": \"array\", \"items\": {\"type\": \"integer\"}, \"minItems\": 4, \"maxItems\": 4, \"prefixItems\": [{\"minimum\": 0}, {\"minimum\": 0}, {\"minimum\": 1}, {\"minimum\": 1}]}, \"name\": {\"type\": \"string\", \"pattern\": \"^[A-Za-z0-9_-]{1,100}$\"}}, \"required\": [\"observation_id\", \"box\", \"name\"], \"additionalProperties\": false}, \"side_effects\": [\"creates resource/image/NAME.png and dev/assets/NAME.json; never overwrites\"], \"prerequisites\": [\"saved observation\", \"in-bounds box\", \"unused asset name\"], \"returns\": [\"image_path\", \"sha256\", \"source_sha256\", \"observation_id\", \"box\"], \"notes\": [], \"example\": {\"method\": \"asset.extract\", \"params\": {\"observation_id\": \"obs_ID\", \"box\": [220, 140, 200, 60], \"name\": \"MailboxButton\"}}, \"cli_example\": \"vibe-maa --project PATH asset extract --observation OBS_ID --box 220,140,200,60 --name MailboxButton\", \"recovery\": {\"DAEMON_REQUIRES_SUPERVISOR\": {\"next\": \"daemon serve\", \"instruction\": \"Start once in a long-lived exec or PTY session and let the tool yield while the foreground command keeps running. In a separate call confirm daemon status is running and compatible before session.open. Shell & alone may be killed with its command sandbox.\"}, \"EXTERNAL_DAEMON_CONFIGURATION\": {\"next\": \"context\", \"instruction\": \"The owning runner must supply a valid external-project/PID environment pair. Preserve evidence and report the configuration failure; do not invent PID values or start a replacement daemon.\"}, \"EXTERNAL_DAEMON_PROJECT_MISMATCH\": {\"next\": \"context\", \"instruction\": \"Use the project assigned by the owning runner. Report the mismatch; do not replace its daemon or change the external-owner environment to bypass it.\"}, \"EXTERNAL_DAEMON_UNAVAILABLE\": {\"next\": \"context\", \"instruction\": \"Read saved evidence and report the unavailable owner to the supervising runner. Do not run daemon serve, restart it, or loop session.open.\"}, \"EXTERNAL_DAEMON_PID_MISMATCH\": {\"next\": \"context\", \"instruction\": \"The external owner was replaced. Preserve evidence and report to the supervising runner; do not attach to the replacement or change its expected PID.\"}, \"INVALID\n[truncated]"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_18",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . daemon status; vibe-maa --project . session list'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_18",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . daemon status; vibe-maa --project . session list'",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"running\": true, \"pid\": 3149, \"version\": \"0.4.0\", \"build_id\": \"afe70fc53dca3f9325b6d548f1563a502533b4432e22061057c39bd92baff006\", \"project\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project\", \"stopping\": false, \"compatible\": true}}\n{\"schema_version\": 1, \"ok\": true, \"result\": {\"sessions\": []}}"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_19",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'for f in dev/assets/*.json; do echo ---$f; cat \"$f\"; done'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_19",
+      "status": "completed",
+      "command": "/bin/bash -c 'for f in dev/assets/*.json; do echo ---$f; cat \"$f\"; done'",
+      "exit_code": 0,
+      "output": "---dev/assets/device_create_new.json\n{\"box\": [470, 318, 340, 40], \"image_path\": \"resource/image/device_create_new.png\", \"observation_id\": \"obs_7293cbd34809440597c098cd3db3f597\", \"sha256\": \"968ddbe0bd501243368dabba3382fee2456cbb7b483c26c07b1661b980c7e14e\", \"source_sha256\": \"ec08b21ffd254748a0a7e5251f2596f3d960e8a4bdb5a6804bafd205d2ba6e28\"}\n---dev/assets/rectangle_tool.json\n{\"box\": [24, 166, 24, 23], \"image_path\": \"resource/image/rectangle_tool.png\", \"observation_id\": \"obs_69f3ad276e754a118c10620649f6dad1\", \"sha256\": \"f7e4346d55dcbc892667bb4ffbb0a475eef29d3dfb82c2554c66d94a44d0b46f\", \"source_sha256\": \"27ad41c93ab0dad2202ed282737aef3071245921fc50252f6f2d71f32fc1e0a9\"}\n---dev/assets/save_diagrams_title.json\n{\"box\": [526, 246, 228, 34], \"image_path\": \"resource/image/save_diagrams_title.png\", \"observation_id\": \"obs_377a67d80cda42a2a3296bdab204a4e1\", \"sha256\": \"9e49056b2f4fd63ec14e6957ed51f73ffa71f29d39baa82480be037379e3ebf6\", \"source_sha256\": \"bd46f835597120cdf69162efbdd9064ab4a97ff0f73d5e628c9bdff17ee2b8ae\"}\n---dev/assets/vibe_maa_rectangle.json\n{\"box\": [571, 360, 121, 82], \"image_path\": \"resource/image/vibe_maa_rectangle.png\", \"observation_id\": \"obs_e28fb9aac8ea4b7da64c39c09c636ce9\", \"sha256\": \"ca8b2f24f8d279016963ca88e5a96e1d97d4a5f9d75e17a353cdd3115180d2ad\", \"source_sha256\": \"6e45f4280d0f88be1cf6ab5f38450bfdcdac3a50bf0b5b605b58560d1380e6e4\"}"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_20",
+      "status": "in_progress",
+      "command": "/bin/bash -c \"python - <<'PY'\nfrom PIL import Image, ImageChops\nfrom pathlib import Path\nfor p in Path('dev/cases').glob('*.png'):\n im=Image.open(p).convert('RGB')\n print(p.name, im.size, im.getpixel((100,100)))\na=Image.open('dev/cases/PreviousDialog.png').convert('RGB')\nb=Image.open('dev/cases/ChangedDialog.png').convert('RGB')\nd=ImageChops.difference(a,b)\nprint('diff bbox', d.getbbox())\n# non-background boxes for title band\nfor name,im in [('prev',a),('changed',b)]:\n crop=im.crop((480,230,800,290))\n bg=crop.getpixel((0,0))\n # bounding pixels different than bg by > 10 any channel\n pts=[]\n for y in range(crop.height):\n  for x in range(crop.width):\n   px=crop.getpixel((x,y))\n   if max(abs(px[i]-bg[i]) for i in range(3))>10: pts.append((x+480,y+230))\n print(name,'title diff bbox abs', (min(x for x,y in pts),min(y for x,y in pts),max(x for x,y in pts),max(y for x,y in pts)) if pts else None)\n# changed area stats\nprint('diff nonzero', sum(1 for px in d.getdata() if px\"'!=(0,0,0)))\n# save enlarged crops for visual inspection\na.crop((480,220,800,300)).resize((1280,320)).save('\"'/tmp/prev_title.png')\nb.crop((480,220,800,300)).resize((1280,320)).save('/tmp/changed_title.png')\nPY\"",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_20",
+      "status": "completed",
+      "command": "/bin/bash -c \"python - <<'PY'\nfrom PIL import Image, ImageChops\nfrom pathlib import Path\nfor p in Path('dev/cases').glob('*.png'):\n im=Image.open(p).convert('RGB')\n print(p.name, im.size, im.getpixel((100,100)))\na=Image.open('dev/cases/PreviousDialog.png').convert('RGB')\nb=Image.open('dev/cases/ChangedDialog.png').convert('RGB')\nd=ImageChops.difference(a,b)\nprint('diff bbox', d.getbbox())\n# non-background boxes for title band\nfor name,im in [('prev',a),('changed',b)]:\n crop=im.crop((480,230,800,290))\n bg=crop.getpixel((0,0))\n # bounding pixels different than bg by > 10 any channel\n pts=[]\n for y in range(crop.height):\n  for x in range(crop.width):\n   px=crop.getpixel((x,y))\n   if max(abs(px[i]-bg[i]) for i in range(3))>10: pts.append((x+480,y+230))\n print(name,'title diff bbox abs', (min(x for x,y in pts),min(y for x,y in pts),max(x for x,y in pts),max(y for x,y in pts)) if pts else None)\n# changed area stats\nprint('diff nonzero', sum(1 for px in d.getdata() if px\"'!=(0,0,0)))\n# save enlarged crops for visual inspection\na.crop((480,220,800,300)).resize((1280,320)).save('\"'/tmp/prev_title.png')\nb.crop((480,220,800,300)).resize((1280,320)).save('/tmp/changed_title.png')\nPY\"",
+      "exit_code": 0,
+      "output": "<stdin>:22: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.\nVibeMaa_negative.png (1280, 720) (242, 255, 255)\nSplashOpen_positive.png (1280, 720) (180, 182, 183)\nVibeMaa_splash_positive.png (1280, 720) (242, 255, 255)\nPreviousDialog.png (1280, 720) (180, 182, 183)\nVibeMaa_blank_positive.png (1280, 720) (242, 255, 255)\nVibeMaa_positive.png (1280, 720) (242, 255, 255)\nChangedDialog.png (1280, 720) (180, 182, 183)\ndiff bbox (52, 10, 738, 460)\nprev title diff bbox abs (480, 231, 799, 289)\nchanged title diff bbox abs (480, 231, 799, 289)\ndiff nonzero 8340"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_22",
+      "status": "in_progress",
+      "command": "/bin/bash -c \"vibe-maa --project . session open --backend browser --url 'http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0' --width 1280 --height 720\"",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_22",
+      "status": "completed",
+      "command": "/bin/bash -c \"vibe-maa --project . session open --backend browser --url 'http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0' --width 1280 --height 720\"",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"session_id\": \"session_8e53e822364c45c5afaf8563b1e972a4\", \"backend\": \"browser\", \"device\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0\", \"coordinates\": \"controller screenshot pixels\", \"runtime\": {\"browser_version\": \"158.0.8127.18\", \"playwright_version\": \"1.65.1\", \"viewport\": {\"width\": 1280, \"height\": 720, \"device_scale_factor\": 1}, \"headless\": true, \"platform\": \"Linux\"}}}"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_23",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . observe --session session_8e53e822364c45c5afaf8563b1e972a4'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_23",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . observe --session session_8e53e822364c45c5afaf8563b1e972a4'",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"schema_version\": 1, \"observation_id\": \"obs_66c7714db514423db0eb81f97be281cc\", \"session_id\": \"session_8e53e822364c45c5afaf8563b1e972a4\", \"generation\": 0, \"backend\": \"browser\", \"device\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0\", \"scope\": \"device\", \"runtime\": {\"browser_version\": \"158.0.8127.18\", \"playwright_version\": \"1.65.1\", \"viewport\": {\"width\": 1280, \"height\": 720, \"device_scale_factor\": 1}, \"headless\": true, \"platform\": \"Linux\"}, \"captured_at\": \"2026-11-12T11:25:34.844528+00:00\", \"resource_path\": \"resource\", \"image_path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/observations/obs_66c7714db514423db0eb81f97be281cc/image.png\", \"sha256\": \"ef82eb3332304ef9948c5178834f2649bfb93697c9c6ad3b4878a71746c7a780\", \"width\": 1280, \"height\": 720, \"coordinate_system\": \"controller\", \"elements\": [], \"warnings\": [{\"code\": \"OCR_UNAVAILABLE\", \"message\": \"Install OCR models in resource/model/ocr\", \"details\": {}}]}}"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_24",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . capabilities --method act; vibe-maa --project . act --help'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_24",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . capabilities --method act; vibe-maa --project . act --help'",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"schema_version\": 1, \"tool\": \"vibe-maa\", \"version\": \"0.4.0\", \"readiness\": \"not_checked\", \"method\": \"act\", \"summary\": \"Dispatch one guarded input using a current observation.\", \"input_schema\": {\"type\": \"object\", \"properties\": {\"session_id\": {\"type\": \"string\"}, \"observation_id\": {\"type\": \"string\"}, \"type\": {\"type\": \"string\", \"default\": \"click\", \"enum\": [\"click\", \"swipe\", \"key\", \"text\"]}, \"target\": {\"anyOf\": [{\"type\": \"string\"}, {\"type\": \"null\"}], \"default\": null}, \"box\": {\"anyOf\": [{\"type\": \"array\", \"items\": {\"type\": \"integer\"}, \"minItems\": 4, \"maxItems\": 4, \"prefixItems\": [{\"minimum\": 0}, {\"minimum\": 0}, {\"minimum\": 1}, {\"minimum\": 1}]}, {\"type\": \"null\"}], \"default\": null}, \"x2\": {\"anyOf\": [{\"type\": \"integer\"}, {\"type\": \"null\"}], \"default\": null}, \"y2\": {\"anyOf\": [{\"type\": \"integer\"}, {\"type\": \"null\"}], \"default\": null}, \"duration\": {\"type\": \"integer\", \"default\": 300}, \"key\": {\"anyOf\": [{\"type\": \"integer\"}, {\"type\": \"null\"}], \"default\": null}, \"text\": {\"anyOf\": [{\"type\": \"string\"}, {\"type\": \"null\"}], \"default\": null}}, \"required\": [\"session_id\", \"observation_id\"], \"additionalProperties\": false, \"oneOf\": [{\"required\": [\"target\"], \"properties\": {\"target\": {\"type\": \"string\", \"minLength\": 1}, \"box\": {\"type\": \"null\"}}}, {\"required\": [\"box\"], \"properties\": {\"box\": {\"type\": \"array\", \"items\": {\"type\": \"integer\"}, \"minItems\": 4, \"maxItems\": 4, \"prefixItems\": [{\"minimum\": 0}, {\"minimum\": 0}, {\"minimum\": 1}, {\"minimum\": 1}]}, \"target\": {\"type\": \"null\"}}}], \"allOf\": [{\"if\": {\"properties\": {\"type\": {\"const\": \"swipe\"}}, \"required\": [\"type\"]}, \"then\": {\"required\": [\"x2\", \"y2\"], \"properties\": {\"x2\": {\"type\": \"integer\", \"minimum\": 0}, \"y2\": {\"type\": \"integer\", \"minimum\": 0}, \"duration\": {\"minimum\": 1, \"maximum\": 10000}}}}, {\"if\": {\"properties\": {\"type\": {\"const\": \"key\"}}, \"required\": [\"type\"]}, \"then\": {\"required\": [\"key\"], \"properties\": {\"key\": {\"type\": \"integer\", \"minimum\": 0}}}}, {\"if\": {\"properties\": {\"type\": {\"const\": \"text\"}}, \"required\": [\"type\"]}, \"then\": {\"required\": [\"text\"], \"properties\": {\"text\": {\"type\": \"string\", \"maxLength\": 10000}}}}]}, \"side_effects\": [\"changes the UI\", \"records intent, result and a new observation\"], \"prerequisites\": [\"live session_id\", \"same-session current observation\", \"target or box\"], \"returns\": [\"action_id\", \"status\", \"observation\", \"failure\"], \"notes\": [\"target is an eN reference from that observation. box is [x,y,width,height].\", \"All input types require target or box, including key/text as a visual guard.\", \"Click/swipe starts at the selected box center; swipe also needs x2,y2.\", \"Inspect status and the returned new observation; do not reuse the old reference.\"], \"example\": {\"method\": \"act\", \"params\": {\"session_id\": \"session_ID\", \"observation_id\": \"obs_ID\", \"target\": \"e2\"}}, \"cli_example\": \"vibe-maa --project PATH act --session SESSION_ID --observation OBS_ID --target e2\", \"recovery\": {\"STALE_OBSERVATION\": {\"next\": \"observe\", \"instruction\": \"Inspect the replacement observation or capture anew; do not retry old coordinates.\"}, \"SESSION_NOT_FOUND\": {\"next\": \"daemon status\", \"instruction\": \"Confirm a stable compatible owner, read task.context, then reopen the intended backend once and observe. Repeated session.open calls cannot repair a short-lived daemon.\"}, \"DAEMON_UNAVAILABLE\": {\"next\": \"daemon status\", \"instruction\": \"Inspect saved actions/runs before retrying; input may already have occurred. Repair the service lifetime before opening another session; preserve an externally managed owner.\"}, \"DAEMON_REQUIRES_SUPERVISOR\": {\"next\": \"daemon serve\", \"instruction\": \"Start once in a long-lived exec or PTY session and let the tool yield while the foreground command keeps running. In a separate call confirm daemon status is running and compatible before session.open. Shell & alone may be killed with its command sandbox.\"}, \"EXTERNAL_DAEMON_CONFIGURATION\": {\"next\": \"context\", \"instruction\": \"The owning runner must supply a valid external-project/PID environment pair. Preserve evidence and report the configuration failure; do not invent PID values or start a replacement daemon.\"}, \"EXTERNAL_DAEMON_PROJECT_MISMATCH\": {\"next\": \"context\", \"instruction\": \"Use the project assigned by the owning runner. Report the mismatch; do not replace its daemon or change the external-owner environment to bypass it.\"}, \"EXTERNAL_DAEMON_UNAVAILABLE\": {\"next\": \"context\", \"instruction\": \"Read saved evidence and report the unavailable owner to the supervising runner. Do not run daemon serve, restart it, or loop session.open.\"}, \"EXTERNAL_DAEMON_PID_MISMATCH\": {\"next\": \"context\", \"instruction\": \"The external owner was replaced. Preserve evidence and report to the supervising runner; do not attach to the replacement or change its expected PID.\"}, \"SESSION_OWNER_LOST\": {\"next\": \"context\", \"instruction\": \"Read saved evidence first. Restore a persistent owner, confirm daemon status, then open one new session and observe the current UI. Do not loop session.open or replay old inputs; an external supervisor must restore its own owner.\"}, \"INVALID_ARGUMENT\": {\"next\": \"capabilities --method act\", \"instruction\": \"Check required and conditional parameters against this method's input_schema before retrying.\"}}, \"invocation\": \"method/params describe the service contract; use the matching CLI command or SDK dispatch, not a raw unauthenticated socket\", \"failure_delivery\": \"Request errors use envelope.error. An executed operation can return ok=true with result.failure; check status fields. verification_failure explains an unavailable goal check.\"}}\nusage: vibe-maa act [-h] --session SESSION_ID --observation OBSERVATION_ID\n                    [--type {click,swipe,key,text}]\n                    [--target TARGET | --box BOX] [--x2 X2] [--y2 Y2]\n                    [--duration DURATION] [--key KEY] [--text TEXT]\n\noptions:\n  -h, --help            show this help message and exit\n  --session SESSION_ID\n  --observation OBSERVATION_ID\n  --type {click,swipe,key,text}\n  --tar\n[truncated]"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_25",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . act --session session_8e53e822364c45c5afaf8563b1e972a4 --observation obs_66c7714db514423db0eb81f97be281cc --box 560,450,160,30'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_25",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . act --session session_8e53e822364c45c5afaf8563b1e972a4 --observation obs_66c7714db514423db0eb81f97be281cc --box 560,450,160,30'",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"schema_version\": 1, \"action_id\": \"action_eb2b628e72e949d6ac27be5ca1ae4330\", \"session_id\": \"session_8e53e822364c45c5afaf8563b1e972a4\", \"source_observation\": \"obs_66c7714db514423db0eb81f97be281cc\", \"before_observation\": \"obs_17c3e44ff1ea456481e1dc34f5986214\", \"action\": {\"type\": \"click\", \"x\": 640, \"y\": 465}, \"started_at\": \"2026-11-12T11:25:40.312305+00:00\", \"status\": \"succeeded\", \"finished_at\": \"2026-11-12T11:25:40.323590+00:00\", \"after_observation\": \"obs_75c2d10a48d24bfea8b7e8ede83ed839\", \"observation\": {\"schema_version\": 1, \"observation_id\": \"obs_75c2d10a48d24bfea8b7e8ede83ed839\", \"session_id\": \"session_8e53e822364c45c5afaf8563b1e972a4\", \"generation\": 1, \"backend\": \"browser\", \"device\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0\", \"scope\": \"device\", \"runtime\": {\"browser_version\": \"158.0.8127.18\", \"playwright_version\": \"1.65.1\", \"viewport\": {\"width\": 1280, \"height\": 720, \"device_scale_factor\": 1}, \"headless\": true, \"platform\": \"Linux\"}, \"captured_at\": \"2026-11-12T11:25:40.323604+00:00\", \"resource_path\": \"resource\", \"image_path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/observations/obs_75c2d10a48d24bfea8b7e8ede83ed839/image.png\", \"sha256\": \"d48eb544a38f0aa0b01b107416051cf5a3f20340e02291a2f85639302bb04302\", \"width\": 1280, \"height\": 720, \"coordinate_system\": \"controller\", \"elements\": [], \"warnings\": [{\"code\": \"OCR_UNAVAILABLE\", \"message\": \"Install OCR models in resource/model/ocr\", \"details\": {}}]}}}"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_26",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . reference --topic recognition; vibe-maa --project . reference --topic pipeline'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_26",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . reference --topic recognition; vibe-maa --project . reference --topic pipeline'",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"schema_version\": 1, \"version\": \"0.4.0\", \"protocol\": \"MaaFramework 5.16 core subset\", \"topic\": \"recognition\", \"content\": \"roi is [x,y,width,height], not two corner points. Prefer a small stable region with positive and negative examples. TemplateMatch uses template relative to resource/image/ and threshold in [0,1]. Crop an observed original with asset extract before using it; keep the same screenshot scale. OCR uses expected text or regex and requires det.onnx, rec.onnx and keys.txt in resource/model/ocr/. Missing OCR is not an empty-screen result. ColorMatch uses lower/upper bounds; its default method 4 uses RGB values, although adapter arrays internally use BGR. count is the minimum matching pixel count. DirectHit is unconditional. Probe uses saved pixels and never runs action/next; inspect result.hit, since nonempty all_results can still fail filtering. Offline probes reject Custom, And/Or and context-dependent ROI. A DirectHit + DoNothing entry with guarded next candidates clearly separates dispatch from UI-dependent actions.\", \"examples\": {\"template_node\": {\"recognition\": \"TemplateMatch\", \"template\": \"confirm.png\", \"roi\": [100, 100, 300, 200], \"threshold\": 0.85, \"action\": \"Click\"}, \"ocr_node\": {\"recognition\": \"OCR\", \"expected\": \"^Confirm$\", \"roi\": [100, 100, 300, 200], \"action\": \"Click\"}}, \"commands\": {\"crop\": \"vibe-maa --project PATH asset extract --observation OBS_ID --box 100,100,150,40 --name confirm\", \"check_cases\": \"vibe-maa --project PATH case check --session SESSION_ID --cases dev/cases/checks.json\"}}}\n{\"schema_version\": 1, \"ok\": true, \"result\": {\"schema_version\": 1, \"version\": \"0.4.0\", \"protocol\": \"MaaFramework 5.16 core subset\", \"topic\": \"pipeline\", \"content\": \"Write a JSON/JSONC object mapping unique node names to node objects in resource/pipeline/*.json. Images belong in resource/image/; optional OCR files belong in resource/model/ocr/. All coordinates use the returned controller screenshot pixels. Use a DirectHit + DoNothing entry with next candidates for a predictable dispatcher. In the verified 5.16 runtime an entry with conditional recognition is also recognized before its action, so an entry may wait or fail without dispatching input. MaaFW checks next in order on each frame; the first matching candidate executes its action, then follows that candidate's next. An empty next ends that path. After a node runs, its timeout controls waiting for its NEXT list: change the predecessor timeout to extend that candidate wait. Initial entry recognition uses the entry's own timeout. timeout, rate_limit, pre_delay and post_delay are milliseconds; the vibe-maa run --timeout-seconds budget is seconds. Use bounded waits. on_error handles action failure or no next match before timeout. Verify the goal separately using observable recognition; DirectHit is not a valid completion check.\", \"examples\": {\"model_free_click_flow\": {\"Start\": {\"recognition\": \"DirectHit\", \"action\": \"DoNothing\", \"next\": [\"ClickBlack\"], \"timeout\": 1500, \"rate_limit\": 20}, \"ClickBlack\": {\"recognition\": \"ColorMatch\", \"roi\": [0, 0, 16, 16], \"lower\": [0, 0, 0], \"upper\": [5, 5, 5], \"count\": 100, \"action\": \"Click\", \"target\": [20, 20], \"next\": [\"WhiteVisible\"], \"timeout\": 1500, \"rate_limit\": 20}, \"WhiteVisible\": {\"recognition\": \"ColorMatch\", \"roi\": [0, 0, 16, 16], \"lower\": [250, 250, 250], \"upper\": [255, 255, 255], \"count\": 100, \"action\": \"DoNothing\"}}}, \"example_setup\": \"The model-free example expects a black 64x64 image and a target that turns white after clicking [20,20]. Entry: Start. Goal: WhiteVisible. Adapt observations to the real UI.\", \"commands\": {\"inspect\": \"vibe-maa --project PATH observe --session SESSION_ID\", \"probe\": \"vibe-maa --project PATH probe --session SESSION_ID --observation OBS_ID --node NODE\", \"run\": \"vibe-maa --project PATH run --session SESSION_ID --entry Start --goal WhiteVisible --timeout-seconds 10\"}}}"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_27",
+      "status": "in_progress",
+      "command": "/bin/bash -c \"python - <<'PY'\nfrom PIL import Image\nfor fn in ['PreviousDialog.png','ChangedDialog.png']:\n im=Image.open('dev/cases/'+fn).convert('RGB')\n pts=[]\n for y in range(235,290):\n  for x in range(500,780):\n   r,g,b=im.getpixel((x,y))\n   if max(r,g,b)<210: pts.append((x,y,r,g,b))\n xs=[p[0] for p in pts]; ys=[p[1] for p in pts]\n print(fn, 'bbox', (min(xs),min(ys),max(xs),max(ys)), 'count',len(pts))\n # per row count\n print([(y,sum(1 for p in pts if p[1]==y)) for y in range(min(ys),max(ys)+1)])\nPY\"",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_27",
+      "status": "completed",
+      "command": "/bin/bash -c \"python - <<'PY'\nfrom PIL import Image\nfor fn in ['PreviousDialog.png','ChangedDialog.png']:\n im=Image.open('dev/cases/'+fn).convert('RGB')\n pts=[]\n for y in range(235,290):\n  for x in range(500,780):\n   r,g,b=im.getpixel((x,y))\n   if max(r,g,b)<210: pts.append((x,y,r,g,b))\n xs=[p[0] for p in pts]; ys=[p[1] for p in pts]\n print(fn, 'bbox', (min(xs),min(ys),max(xs),max(ys)), 'count',len(pts))\n # per row count\n print([(y,sum(1 for p in pts if p[1]==y)) for y in range(min(ys),max(ys)+1)])\nPY\"",
+      "exit_code": 0,
+      "output": "PreviousDialog.png bbox (541, 257, 737, 276) count 1090\n[(257, 12), (258, 17), (259, 13), (260, 8), (261, 95), (262, 115), (263, 76), (264, 64), (265, 76), (266, 90), (267, 83), (268, 67), (269, 63), (270, 82), (271, 114), (272, 95), (273, 2), (274, 3), (275, 8), (276, 7)]\nChangedDialog.png bbox (549, 259, 730, 279) count 977\n[(259, 12), (260, 16), (261, 11), (262, 8), (263, 91), (264, 111), (265, 70), (266, 59), (267, 52), (268, 77), (269, 78), (270, 55), (271, 58), (272, 64), (273, 107), (274, 85), (275, 2), (276, 2), (277, 3), (278, 9), (279, 7)]"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_28",
+      "status": "in_progress",
+      "command": "/bin/bash -c \"python - <<'PY'\nfrom PIL import Image\nfor fn in ['PreviousDialog.png','ChangedDialog.png','SplashOpen_positive.png','VibeMaa_blank_positive.png','VibeMaa_negative.png']:\n im=Image.open('dev/cases/'+fn).convert('RGB')\n for roi in [(480,220,320,280),(520,240,240,240),(500,430,280,70),(500,220,280,40),(500,240,280,60)]:\n  x,y,w,h=roi\n  n=sum(1 for yy in range(y,y+h) for xx in range(x,x+w) if all(240<=c<=255 for c in im.getpixel((xx,yy))))\n  print(fn,roi,n,end='; ')\n print()\nPY\"",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_28",
+      "status": "completed",
+      "command": "/bin/bash -c \"python - <<'PY'\nfrom PIL import Image\nfor fn in ['PreviousDialog.png','ChangedDialog.png','SplashOpen_positive.png','VibeMaa_blank_positive.png','VibeMaa_negative.png']:\n im=Image.open('dev/cases/'+fn).convert('RGB')\n for roi in [(480,220,320,280),(520,240,240,240),(500,430,280,70),(500,220,280,40),(500,240,280,60)]:\n  x,y,w,h=roi\n  n=sum(1 for yy in range(y,y+h) for xx in range(x,x+w) if all(240<=c<=255 for c in im.getpixel((xx,yy))))\n  print(fn,roi,n,end='; ')\n print()\nPY\"",
+      "exit_code": 0,
+      "output": "PreviousDialog.png (480, 220, 320, 280) 77374; PreviousDialog.png (520, 240, 240, 240) 52534; PreviousDialog.png (500, 430, 280, 70) 15796; PreviousDialog.png (500, 220, 280, 40) 8069; PreviousDialog.png (500, 240, 280, 60) 15234; \nChangedDialog.png (480, 220, 320, 280) 77475; ChangedDialog.png (520, 240, 240, 240) 52635; ChangedDialog.png (500, 430, 280, 70) 15821; ChangedDialog.png (500, 220, 280, 40) 8105; ChangedDialog.png (500, 240, 280, 60) 15306; \nSplashOpen_positive.png (480, 220, 320, 280) 60917; SplashOpen_positive.png (520, 240, 240, 240) 36277; SplashOpen_positive.png (500, 430, 280, 70) 18429; SplashOpen_positive.png (500, 220, 280, 40) 10299; SplashOpen_positive.png (500, 240, 280, 60) 15345; \nVibeMaa_blank_positive.png (480, 220, 320, 280) 88705; VibeMaa_blank_positive.png (520, 240, 240, 240) 56785; VibeMaa_blank_positive.png (500, 430, 280, 70) 19544; VibeMaa_blank_positive.png (500, 220, 280, 40) 11172; VibeMaa_blank_positive.png (500, 240, 280, 60) 16772; \nVibeMaa_negative.png (480, 220, 320, 280) 89376; VibeMaa_negative.png (520, 240, 240, 240) 57456; VibeMaa_negative.png (500, 430, 280, 70) 19544; VibeMaa_negative.png (500, 220, 280, 40) 11172; VibeMaa_negative.png (500, 240, 280, 60) 16772; "
+    },
+    {
+      "event": "item.started",
+      "tool_type": "file_change",
+      "item_id": "item_30",
+      "status": "in_progress",
+      "changes": [
+        {
+          "kind": "update",
+          "path": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/resource/pipeline/agent_task.json"
+        }
+      ]
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "file_change",
+      "item_id": "item_30",
+      "status": "completed",
+      "changes": [
+        {
+          "kind": "update",
+          "path": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/resource/pipeline/agent_task.json"
+        }
+      ]
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_31",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . case check --session session_8e53e822364c45c5afaf8563b1e972a4 --cases dev/cases/AgentCanvas.json'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_31",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . case check --session session_8e53e822364c45c5afaf8563b1e972a4 --cases dev/cases/AgentCanvas.json'",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"scope\": \"offline_recognition_only\", \"passed\": false, \"cases\": [{\"node\": \"VibeMaaVisible\", \"image\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/VibeMaa_positive.png\", \"expected_hit\": true, \"actual_hit\": true, \"passed\": true, \"result\": {\"reco_id\": 400000001, \"algorithm\": \"TemplateMatch\", \"hit\": true, \"box\": {\"x\": 571, \"y\": 360, \"w\": 121, \"h\": 82}, \"all_results\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"filtered_results\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best_result\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"raw_detail\": {\"all\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"filtered\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}]}}}, {\"node\": \"VibeMaaVisible\", \"image\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/VibeMaa_negative.png\", \"expected_hit\": false, \"actual_hit\": false, \"passed\": true, \"result\": {\"reco_id\": 400000002, \"algorithm\": \"TemplateMatch\", \"hit\": false, \"box\": null, \"all_results\": [{\"box\": [511, 260, 121, 82], \"score\": 0.326242}], \"filtered_results\": [], \"best_result\": null, \"raw_detail\": {\"all\": [{\"box\": [511, 260, 121, 82], \"score\": 0.326242}], \"best\": null, \"filtered\": []}}}, {\"node\": \"SplashOpen\", \"image\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/SplashOpen_positive.png\", \"expected_hit\": true, \"actual_hit\": true, \"passed\": true, \"result\": {\"reco_id\": 400000003, \"algorithm\": \"TemplateMatch\", \"hit\": true, \"box\": {\"x\": 470, \"y\": 318, \"w\": 340, \"h\": 40}, \"all_results\": [{\"box\": [470, 318, 340, 40], \"score\": 1.0}], \"filtered_results\": [{\"box\": [470, 318, 340, 40], \"score\": 1.0}], \"best_result\": {\"box\": [470, 318, 340, 40], \"score\": 1.0}, \"raw_detail\": {\"all\": [{\"box\": [470, 318, 340, 40], \"score\": 1.0}], \"best\": {\"box\": [470, 318, 340, 40], \"score\": 1.0}, \"filtered\": [{\"box\": [470, 318, 340, 40], \"score\": 1.0}]}}}, {\"node\": \"VibeMaaVisible\", \"image\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/VibeMaa_splash_positive.png\", \"expected_hit\": true, \"actual_hit\": true, \"passed\": true, \"result\": {\"reco_id\": 400000004, \"algorithm\": \"TemplateMatch\", \"hit\": true, \"box\": {\"x\": 571, \"y\": 360, \"w\": 121, \"h\": 82}, \"all_results\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"filtered_results\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best_result\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"raw_detail\": {\"all\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"filtered\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}]}}}, {\"node\": \"VibeMaaVisible\", \"image\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/VibeMaa_blank_positive.png\", \"expected_hit\": true, \"actual_hit\": true, \"passed\": true, \"result\": {\"reco_id\": 400000005, \"algorithm\": \"TemplateMatch\", \"hit\": true, \"box\": {\"x\": 571, \"y\": 360, \"w\": 121, \"h\": 82}, \"all_results\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"filtered_results\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best_result\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"raw_detail\": {\"all\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"filtered\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}]}}}, {\"node\": \"SplashStorage\", \"image\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/PreviousDialog.png\", \"expected_hit\": true, \"actual_hit\": false, \"passed\": false, \"result\": {\"reco_id\": 400000006, \"algorithm\": \"ColorMatch\", \"hit\": false, \"box\": null, \"all_results\": [{\"box\": [500, 430, 280, 55], \"count\": 14676}], \"filtered_results\": [], \"best_result\": null, \"raw_detail\": {\"all\": [{\"box\": [500, 430, 280, 55], \"count\": 14676}], \"best\": null, \"filtered\": []}}}, {\"node\": \"SplashStorage\", \"image\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/ChangedDialog.png\", \"expected_hit\": true, \"actual_hit\": false, \"passed\": false, \"result\": {\"reco_id\": 400000007, \"algorithm\": \"ColorMatch\", \"hit\": false, \"box\": null, \"all_results\": [{\"box\": [500, 430, 280, 55], \"count\": 14701}], \"filtered_results\": [], \"best_result\": null, \"raw_detail\": {\"all\": [{\"box\": [500, 430, 280, 55], \"count\": 14701}], \"best\": null, \"filtered\": []}}}]}}"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_33",
+      "status": "in_progress",
+      "command": "/bin/bash -c \"apply_patch <<'PATCH'\n*** Begin Patch\n*** Update File: resource/pipeline/agent_task.json\n@@\n-    \\\"count\\\": 15000,\n+    \\\"count\\\": 14000,\n*** End Patch\nPATCH\nvibe-maa --project . case check --session session_8e53e822364c45c5afaf8563b1e972a4 --cases dev/cases/AgentCanvas.json\"",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_33",
+      "status": "completed",
+      "command": "/bin/bash -c \"apply_patch <<'PATCH'\n*** Begin Patch\n*** Update File: resource/pipeline/agent_task.json\n@@\n-    \\\"count\\\": 15000,\n+    \\\"count\\\": 14000,\n*** End Patch\nPATCH\nvibe-maa --project . case check --session session_8e53e822364c45c5afaf8563b1e972a4 --cases dev/cases/AgentCanvas.json\"",
+      "exit_code": 0,
+      "output": "/bin/bash: line 1: apply_patch: command not found\n{\"schema_version\": 1, \"ok\": true, \"result\": {\"scope\": \"offline_recognition_only\", \"passed\": false, \"cases\": [{\"node\": \"VibeMaaVisible\", \"image\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/VibeMaa_positive.png\", \"expected_hit\": true, \"actual_hit\": true, \"passed\": true, \"result\": {\"reco_id\": 400000008, \"algorithm\": \"TemplateMatch\", \"hit\": true, \"box\": {\"x\": 571, \"y\": 360, \"w\": 121, \"h\": 82}, \"all_results\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"filtered_results\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best_result\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"raw_detail\": {\"all\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"filtered\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}]}}}, {\"node\": \"VibeMaaVisible\", \"image\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/VibeMaa_negative.png\", \"expected_hit\": false, \"actual_hit\": false, \"passed\": true, \"result\": {\"reco_id\": 400000009, \"algorithm\": \"TemplateMatch\", \"hit\": false, \"box\": null, \"all_results\": [{\"box\": [511, 260, 121, 82], \"score\": 0.326242}], \"filtered_results\": [], \"best_result\": null, \"raw_detail\": {\"all\": [{\"box\": [511, 260, 121, 82], \"score\": 0.326242}], \"best\": null, \"filtered\": []}}}, {\"node\": \"SplashOpen\", \"image\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/SplashOpen_positive.png\", \"expected_hit\": true, \"actual_hit\": true, \"passed\": true, \"result\": {\"reco_id\": 400000010, \"algorithm\": \"TemplateMatch\", \"hit\": true, \"box\": {\"x\": 470, \"y\": 318, \"w\": 340, \"h\": 40}, \"all_results\": [{\"box\": [470, 318, 340, 40], \"score\": 1.0}], \"filtered_results\": [{\"box\": [470, 318, 340, 40], \"score\": 1.0}], \"best_result\": {\"box\": [470, 318, 340, 40], \"score\": 1.0}, \"raw_detail\": {\"all\": [{\"box\": [470, 318, 340, 40], \"score\": 1.0}], \"best\": {\"box\": [470, 318, 340, 40], \"score\": 1.0}, \"filtered\": [{\"box\": [470, 318, 340, 40], \"score\": 1.0}]}}}, {\"node\": \"VibeMaaVisible\", \"image\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/VibeMaa_splash_positive.png\", \"expected_hit\": true, \"actual_hit\": true, \"passed\": true, \"result\": {\"reco_id\": 400000011, \"algorithm\": \"TemplateMatch\", \"hit\": true, \"box\": {\"x\": 571, \"y\": 360, \"w\": 121, \"h\": 82}, \"all_results\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"filtered_results\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best_result\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"raw_detail\": {\"all\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"filtered\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}]}}}, {\"node\": \"VibeMaaVisible\", \"image\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/VibeMaa_blank_positive.png\", \"expected_hit\": true, \"actual_hit\": true, \"passed\": true, \"result\": {\"reco_id\": 400000012, \"algorithm\": \"TemplateMatch\", \"hit\": true, \"box\": {\"x\": 571, \"y\": 360, \"w\": 121, \"h\": 82}, \"all_results\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"filtered_results\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best_result\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"raw_detail\": {\"all\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"filtered\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}]}}}, {\"node\": \"SplashStorage\", \"image\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/PreviousDialog.png\", \"expected_hit\": true, \"actual_hit\": false, \"passed\": false, \"result\": {\"reco_id\": 400000013, \"algorithm\": \"ColorMatch\", \"hit\": false, \"box\": null, \"all_results\": [{\"box\": [500, 430, 280, 55], \"count\": 14676}], \"filtered_results\": [], \"best_result\": null, \"raw_detail\": {\"all\": [{\"box\": [500, 430, 280, 55], \"count\": 14676}], \"best\": null, \"filtered\": []}}}, {\"node\": \"SplashStorage\", \"image\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/ChangedDialog.png\", \"expected_hit\": true, \"actual_hit\": false, \"passed\": false, \"result\": {\"reco_id\": 400000014, \"algorithm\": \"ColorMatch\", \"hit\": false, \"box\": null, \"all_results\": [{\"box\": [500, 430, 280, 55], \"count\": 14701}], \"filtered_results\": [], \"best_result\": null, \"raw_detail\": {\"all\": [{\"box\": [500, 430, 280, 55], \"count\": 14701}], \"best\": null, \"filtered\": []}}}]}}"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "file_change",
+      "item_id": "item_34",
+      "status": "in_progress",
+      "changes": [
+        {
+          "kind": "update",
+          "path": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/resource/pipeline/agent_task.json"
+        }
+      ]
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "file_change",
+      "item_id": "item_34",
+      "status": "completed",
+      "changes": [
+        {
+          "kind": "update",
+          "path": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/resource/pipeline/agent_task.json"
+        }
+      ]
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_35",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . case check --session session_8e53e822364c45c5afaf8563b1e972a4 --cases dev/cases/AgentCanvas.json'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_35",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . case check --session session_8e53e822364c45c5afaf8563b1e972a4 --cases dev/cases/AgentCanvas.json'",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"scope\": \"offline_recognition_only\", \"passed\": true, \"cases\": [{\"node\": \"VibeMaaVisible\", \"image\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/VibeMaa_positive.png\", \"expected_hit\": true, \"actual_hit\": true, \"passed\": true, \"result\": {\"reco_id\": 400000015, \"algorithm\": \"TemplateMatch\", \"hit\": true, \"box\": {\"x\": 571, \"y\": 360, \"w\": 121, \"h\": 82}, \"all_results\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"filtered_results\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best_result\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"raw_detail\": {\"all\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"filtered\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}]}}}, {\"node\": \"VibeMaaVisible\", \"image\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/VibeMaa_negative.png\", \"expected_hit\": false, \"actual_hit\": false, \"passed\": true, \"result\": {\"reco_id\": 400000016, \"algorithm\": \"TemplateMatch\", \"hit\": false, \"box\": null, \"all_results\": [{\"box\": [511, 260, 121, 82], \"score\": 0.326242}], \"filtered_results\": [], \"best_result\": null, \"raw_detail\": {\"all\": [{\"box\": [511, 260, 121, 82], \"score\": 0.326242}], \"best\": null, \"filtered\": []}}}, {\"node\": \"SplashOpen\", \"image\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/SplashOpen_positive.png\", \"expected_hit\": true, \"actual_hit\": true, \"passed\": true, \"result\": {\"reco_id\": 400000017, \"algorithm\": \"TemplateMatch\", \"hit\": true, \"box\": {\"x\": 470, \"y\": 318, \"w\": 340, \"h\": 40}, \"all_results\": [{\"box\": [470, 318, 340, 40], \"score\": 1.0}], \"filtered_results\": [{\"box\": [470, 318, 340, 40], \"score\": 1.0}], \"best_result\": {\"box\": [470, 318, 340, 40], \"score\": 1.0}, \"raw_detail\": {\"all\": [{\"box\": [470, 318, 340, 40], \"score\": 1.0}], \"best\": {\"box\": [470, 318, 340, 40], \"score\": 1.0}, \"filtered\": [{\"box\": [470, 318, 340, 40], \"score\": 1.0}]}}}, {\"node\": \"VibeMaaVisible\", \"image\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/VibeMaa_splash_positive.png\", \"expected_hit\": true, \"actual_hit\": true, \"passed\": true, \"result\": {\"reco_id\": 400000018, \"algorithm\": \"TemplateMatch\", \"hit\": true, \"box\": {\"x\": 571, \"y\": 360, \"w\": 121, \"h\": 82}, \"all_results\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"filtered_results\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best_result\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"raw_detail\": {\"all\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"filtered\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}]}}}, {\"node\": \"VibeMaaVisible\", \"image\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/VibeMaa_blank_positive.png\", \"expected_hit\": true, \"actual_hit\": true, \"passed\": true, \"result\": {\"reco_id\": 400000019, \"algorithm\": \"TemplateMatch\", \"hit\": true, \"box\": {\"x\": 571, \"y\": 360, \"w\": 121, \"h\": 82}, \"all_results\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"filtered_results\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best_result\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"raw_detail\": {\"all\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"filtered\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}]}}}, {\"node\": \"SplashStorage\", \"image\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/PreviousDialog.png\", \"expected_hit\": true, \"actual_hit\": true, \"passed\": true, \"result\": {\"reco_id\": 400000020, \"algorithm\": \"ColorMatch\", \"hit\": true, \"box\": {\"x\": 500, \"y\": 430, \"w\": 280, \"h\": 55}, \"all_results\": [{\"box\": [500, 430, 280, 55], \"count\": 14676}], \"filtered_results\": [{\"box\": [500, 430, 280, 55], \"count\": 14676}], \"best_result\": {\"box\": [500, 430, 280, 55], \"count\": 14676}, \"raw_detail\": {\"all\": [{\"box\": [500, 430, 280, 55], \"count\": 14676}], \"best\": {\"box\": [500, 430, 280, 55], \"count\": 14676}, \"filtered\": [{\"box\": [500, 430, 280, 55], \"count\": 14676}]}}}, {\"node\": \"SplashStorage\", \"image\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/ChangedDialog.png\", \"expected_hit\": true, \"actual_hit\": true, \"passed\": true, \"result\": {\"reco_id\": 400000021, \"algorithm\": \"ColorMatch\", \"hit\": true, \"box\": {\"x\": 500, \"y\": 430, \"w\": 280, \"h\": 55}, \"all_results\": [{\"box\": [500, 430, 280, 55], \"count\": 14701}], \"filtered_results\": [{\"box\": [500, 430, 280, 55], \"count\": 14701}], \"best_result\": {\"box\": [500, 430, 280, 55], \"count\": 14701}, \"raw_detail\": {\"all\": [{\"box\": [500, 430, 280, 55], \"count\": 14701}], \"best\": {\"box\": [500, 430, 280, 55], \"count\": 14701}, \"filtered\": [{\"box\": [500, 430, 280, 55], \"count\": 14701}]}}}]}}"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_37",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . run --session session_8e53e822364c45c5afaf8563b1e972a4 --entry SplashStorage --goal VibeMaaVisible --timeout-seconds 20'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_37",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . run --session session_8e53e822364c45c5afaf8563b1e972a4 --entry SplashStorage --goal VibeMaaVisible --timeout-seconds 20'",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"run_id\": \"run_377f6295a8ac48daa42a32784d1d033a\", \"entry\": \"SplashStorage\", \"started_at\": \"2026-11-12T11:26:28.907061+00:00\", \"finished_at\": \"2026-11-12T11:26:34.576881+00:00\", \"execution_status\": \"succeeded\", \"goal_status\": \"passed\", \"backend\": \"browser\", \"device\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0\", \"scope\": \"device\", \"runtime\": {\"browser_version\": \"158.0.8127.18\", \"playwright_version\": \"1.65.1\", \"viewport\": {\"width\": 1280, \"height\": 720, \"device_scale_factor\": 1}, \"headless\": true, \"platform\": \"Linux\"}, \"inputs_changed\": false, \"report_path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/runs/run_377f6295a8ac48daa42a32784d1d033a/record.json\", \"last_node\": {\"name\": \"VibeMaaVisible\", \"node_id\": 300000030, \"completed\": true, \"recognition\": {\"reco_id\": 400000030, \"algorithm\": \"TemplateMatch\", \"hit\": true, \"box\": {\"x\": 571, \"y\": 360, \"w\": 121, \"h\": 82}, \"all_results\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"filtered_results\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best_result\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"raw_detail\": {\"all\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"filtered\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}]}}, \"action\": {\"action_id\": 500000009, \"name\": \"VibeMaaVisible\", \"action\": \"DoNothing\", \"box\": {\"x\": 0, \"y\": 0, \"w\": 0, \"h\": 0}, \"success\": true, \"result\": null, \"raw_detail\": {}}}, \"waiting_for\": [], \"last_recognition\": {\"message\": \"Node.Recognition.Succeeded\", \"details\": {\"focus\": null, \"name\": \"VibeMaaVisible\", \"reco_details\": {\"algorithm\": \"TemplateMatch\", \"box\": [571, 360, 121, 82], \"detail\": {\"all\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"filtered\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}]}, \"name\": \"VibeMaaVisible\", \"reco_id\": 400000030}, \"reco_id\": 400000030, \"task_id\": 200000022}, \"received_at_ns\": 1794482793973338401, \"recognition\": {\"reco_id\": 400000030, \"algorithm\": \"TemplateMatch\", \"hit\": true, \"box\": {\"x\": 571, \"y\": 360, \"w\": 121, \"h\": 82}, \"all_results\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"filtered_results\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best_result\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"raw_detail\": {\"all\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"filtered\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}]}}, \"image_path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/runs/run_377f6295a8ac48daa42a32784d1d033a/last-recognition.png\", \"sha256\": \"648d47f1410b7af9f00a77ee277d7acc6d664cc2cd09e73567cfbbd6980715eb\"}, \"before_observation\": \"obs_a39696242de546c4a353a0bfa862d125\", \"after_observation\": \"obs_2a745b2e20384b4f88f98c2da03aa72d\", \"error\": null, \"failure\": null, \"verification_error\": null, \"verification_failure\": null, \"evidence\": {\"events\": 72, \"missing\": [{\"sequence\": 19, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}, {\"sequence\": 27, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}, {\"sequence\": 35, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}, {\"sequence\": 43, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}, {\"sequence\": 51, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}, {\"sequence\": 59, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}], \"missing_count\": 6, \"truncated_events\": 0, \"truncated_images\": 0, \"omitted_nodes\": 0}, \"interpretation\": \"Recorded facts only; no root cause was inferred.\"}}"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "file_change",
+      "item_id": "item_39",
+      "status": "in_progress",
+      "changes": [
+        {
+          "kind": "update",
+          "path": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/tasks/AgentCanvas.json"
+        }
+      ]
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "file_change",
+      "item_id": "item_39",
+      "status": "completed",
+      "changes": [
+        {
+          "kind": "update",
+          "path": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/tasks/AgentCanvas.json"
+        }
+      ]
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_40",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . task context AgentCanvas'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_40",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . task context AgentCanvas'",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"schema_version\": 1, \"name\": \"AgentCanvas\", \"objective\": \"In diagrams.net, create a rectangle on the application canvas labeled exactly Vibe Maa from a fresh blank document, repeatably.\", \"entry\": \"AgentTask\", \"goal\": \"VibeMaaVisible\", \"cases\": \"dev/cases/AgentCanvas.json\", \"constraints\": [\"Use standard MaaFramework Pipeline actions only; no Shell, Command, or Custom actions.\", \"Expose entry AgentTask through interface.json for normal MaaFW handoff.\", \"Each run must create the result from a fresh blank document at 1280x720.\", \"The AgentTask entry must handle both fresh start URLs without external setup inputs: splash=0 starts on a blank canvas and splash=1 starts with the Device modal.\", \"For splash=1, dismiss the Device storage chooser with Change Storage then Decide Later, leaving no modal open.\", \"The final canvas must contain exactly one rectangle labelled exactly Vibe Maa, and the established VibeMaaVisible completion condition must remain unchanged.\"], \"max_attempts\": 10, \"scenarios\": {\"blank_start\": \"StartBlank\", \"splash_start\": \"SplashOpen\"}, \"scenario_urls\": {\"blank_start\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0\", \"splash_start\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0\"}, \"created_at\": \"2026-11-12T10:18:22.121731+00:00\", \"verification\": {\"verified_at\": \"2026-11-12T10:48:56.681487+00:00\", \"viewport\": \"1280x720\", \"fresh_blank\": {\"url\": \"http://127.0.0.1:34175/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0\", \"run_ids\": [\"run_85543282e74c4ad9984771965a57bdac\", \"run_1a170d6318cd469c9a95f94d7c3ccf9e\", \"run_80300f0a88774cb38abe7aa6aa597d88\"], \"task_attempt_id\": \"attempt_d2bfb21aa0c8446ba1c84565074cbc89\", \"result\": \"3/3 fresh runs execution_status=succeeded, goal_status=passed; saved scenario attempt accepted\", \"observed\": \"one rectangle labelled Vibe Maa, no modal\"}, \"fresh_splash\": {\"url\": \"http://127.0.0.1:34175/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0\", \"run_ids\": [\"run_eb66eec01a48470da9b3443cd8ddab28\", \"run_8726a440528c480ab6078024ddde08fe\", \"run_9745533d31654bd7aa130349dfbf73aa\"], \"task_attempt_id\": \"attempt_681ddd2373894a15b5685d4f2efdb058\", \"result\": \"3/3 fresh runs execution_status=succeeded, goal_status=passed; saved scenario attempt accepted\", \"observed\": \"Device modal cleared through Change Storage then Decide Later; one rectangle labelled Vibe Maa, no modal\"}}, \"spec_sha256\": \"f5710959317573c0980e8d3d412721e0336b75d236ea69e3078bee186f495400\", \"state\": \"draft\", \"scope\": \"unknown\", \"acceptance_scope\": \"configured_checks_only\", \"constraints_status\": \"not_automatically_verified\", \"freshness\": \"unverified\", \"attempt_count\": 0, \"remaining_attempts\": 10, \"latest_attempt\": null, \"required_scenarios\": [\"blank_start\", \"splash_start\"], \"completed_scenarios\": [], \"missing_scenarios\": [\"blank_start\", \"splash_start\"], \"proofs\": {}, \"acceptance_target\": null, \"excluded_target_attempts\": [], \"excluded_target_attempts_omitted\": 0, \"task_path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/tasks/AgentCanvas.json\", \"next_action\": \"Inspect the task and latest evidence, edit resources, then run the task on the intended session.\"}}"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_41",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . task run --help; vibe-maa --project . session close --help'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_41",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . task run --help; vibe-maa --project . session close --help'",
+      "exit_code": 0,
+      "output": "usage: vibe-maa task run [-h] --session SESSION_ID\n                         [--timeout-seconds TIMEOUT_SECONDS]\n                         [--scenario SCENARIO]\n                         name\n\npositional arguments:\n  name\n\noptions:\n  -h, --help            show this help message and exit\n  --session SESSION_ID\n  --timeout-seconds TIMEOUT_SECONDS\n  --scenario SCENARIO\nusage: vibe-maa session close [-h] --session SESSION_ID\n\noptions:\n  -h, --help            show this help message and exit\n  --session SESSION_ID"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_42",
+      "status": "in_progress",
+      "command": "/bin/bash -c \"vibe-maa --project . session close --session session_8e53e822364c45c5afaf8563b1e972a4 && vibe-maa --project . session open --backend browser --url 'http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0' --width 1280 --height 720\"",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_42",
+      "status": "completed",
+      "command": "/bin/bash -c \"vibe-maa --project . session close --session session_8e53e822364c45c5afaf8563b1e972a4 && vibe-maa --project . session open --backend browser --url 'http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0' --width 1280 --height 720\"",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"closed\": \"session_8e53e822364c45c5afaf8563b1e972a4\"}}\n{\"schema_version\": 1, \"ok\": true, \"result\": {\"session_id\": \"session_2c35b7d701e44a78a1d2bae561a2c805\", \"backend\": \"browser\", \"device\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0\", \"coordinates\": \"controller screenshot pixels\", \"runtime\": {\"browser_version\": \"158.0.8127.18\", \"playwright_version\": \"1.65.1\", \"viewport\": {\"width\": 1280, \"height\": 720, \"device_scale_factor\": 1}, \"headless\": true, \"platform\": \"Linux\"}}}"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_43",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . observe --session session_2c35b7d701e44a78a1d2bae561a2c805'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_43",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . observe --session session_2c35b7d701e44a78a1d2bae561a2c805'",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"schema_version\": 1, \"observation_id\": \"obs_a4cd993bf40c4685ac2c9fad31f076e3\", \"session_id\": \"session_2c35b7d701e44a78a1d2bae561a2c805\", \"generation\": 0, \"backend\": \"browser\", \"device\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0\", \"scope\": \"device\", \"runtime\": {\"browser_version\": \"158.0.8127.18\", \"playwright_version\": \"1.65.1\", \"viewport\": {\"width\": 1280, \"height\": 720, \"device_scale_factor\": 1}, \"headless\": true, \"platform\": \"Linux\"}, \"captured_at\": \"2026-11-12T11:26:53.390384+00:00\", \"resource_path\": \"resource\", \"image_path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/observations/obs_a4cd993bf40c4685ac2c9fad31f076e3/image.png\", \"sha256\": \"cba7ee7a9ac47fbca7fede7cc296556911f4c1be068803062901c702ebcdad3a\", \"width\": 1280, \"height\": 720, \"coordinate_system\": \"controller\", \"elements\": [], \"warnings\": [{\"code\": \"OCR_UNAVAILABLE\", \"message\": \"Install OCR models in resource/model/ocr\", \"details\": {}}]}}"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_44",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . task run AgentCanvas --session session_2c35b7d701e44a78a1d2bae561a2c805 --scenario blank_start --timeout-seconds 30'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_44",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . task run AgentCanvas --session session_2c35b7d701e44a78a1d2bae561a2c805 --scenario blank_start --timeout-seconds 30'",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"attempt\": {\"schema_version\": 1, \"attempt_id\": \"attempt_cead8d2f45da4b31a952d5b4dd3bde67\", \"task\": \"AgentCanvas\", \"spec_sha256\": \"f5710959317573c0980e8d3d412721e0336b75d236ea69e3078bee186f495400\", \"spec\": {\"schema_version\": 1, \"name\": \"AgentCanvas\", \"objective\": \"In diagrams.net, create a rectangle on the application canvas labeled exactly Vibe Maa from a fresh blank document, repeatably.\", \"entry\": \"AgentTask\", \"goal\": \"VibeMaaVisible\", \"cases\": \"dev/cases/AgentCanvas.json\", \"constraints\": [\"Use standard MaaFramework Pipeline actions only; no Shell, Command, or Custom actions.\", \"Expose entry AgentTask through interface.json for normal MaaFW handoff.\", \"Each run must create the result from a fresh blank document at 1280x720.\", \"The AgentTask entry must handle both fresh start URLs without external setup inputs: splash=0 starts on a blank canvas and splash=1 starts with the Device modal.\", \"For splash=1, dismiss the Device storage chooser with Change Storage then Decide Later, leaving no modal open.\", \"The final canvas must contain exactly one rectangle labelled exactly Vibe Maa, and the established VibeMaaVisible completion condition must remain unchanged.\"], \"max_attempts\": 10, \"scenarios\": {\"blank_start\": \"StartBlank\", \"splash_start\": \"SplashOpen\"}, \"scenario_urls\": {\"blank_start\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0\", \"splash_start\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0\"}, \"created_at\": \"2026-11-12T10:18:22.121731+00:00\", \"verification\": {\"verified_at\": \"2026-11-12T10:48:56.681487+00:00\", \"viewport\": \"1280x720\", \"fresh_blank\": {\"url\": \"http://127.0.0.1:34175/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0\", \"run_ids\": [\"run_85543282e74c4ad9984771965a57bdac\", \"run_1a170d6318cd469c9a95f94d7c3ccf9e\", \"run_80300f0a88774cb38abe7aa6aa597d88\"], \"task_attempt_id\": \"attempt_d2bfb21aa0c8446ba1c84565074cbc89\", \"result\": \"3/3 fresh runs execution_status=succeeded, goal_status=passed; saved scenario attempt accepted\", \"observed\": \"one rectangle labelled Vibe Maa, no modal\"}, \"fresh_splash\": {\"url\": \"http://127.0.0.1:34175/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0\", \"run_ids\": [\"run_eb66eec01a48470da9b3443cd8ddab28\", \"run_8726a440528c480ab6078024ddde08fe\", \"run_9745533d31654bd7aa130349dfbf73aa\"], \"task_attempt_id\": \"attempt_681ddd2373894a15b5685d4f2efdb058\", \"result\": \"3/3 fresh runs execution_status=succeeded, goal_status=passed; saved scenario attempt accepted\", \"observed\": \"Device modal cleared through Change Storage then Decide Later; one rectangle labelled Vibe Maa, no modal\"}}}, \"session_id\": \"session_2c35b7d701e44a78a1d2bae561a2c805\", \"resource_path\": \"resource\", \"scenario\": \"blank_start\", \"started_at\": \"2026-11-12T11:26:55.720782+00:00\", \"status\": \"completed\", \"accepted\": true, \"scope\": \"device\", \"backend\": \"browser\", \"device\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0\", \"runtime\": {\"browser_version\": \"158.0.8127.18\", \"playwright_version\": \"1.65.1\", \"viewport\": {\"width\": 1280, \"height\": 720, \"device_scale_factor\": 1}, \"headless\": true, \"platform\": \"Linux\"}, \"inputs\": {\"resource/image/device_create_new.png\": \"968ddbe0bd501243368dabba3382fee2456cbb7b483c26c07b1661b980c7e14e\", \"resource/image/rectangle_tool.png\": \"f7e4346d55dcbc892667bb4ffbb0a475eef29d3dfb82c2554c66d94a44d0b46f\", \"resource/image/save_diagrams_title.png\": \"9e49056b2f4fd63ec14e6957ed51f73ffa71f29d39baa82480be037379e3ebf6\", \"resource/image/vibe_maa_rectangle.png\": \"ca8b2f24f8d279016963ca88e5a96e1d97d4a5f9d75e17a353cdd3115180d2ad\", \"resource/pipeline/agent_task.json\": \"2776f807f679e229c1328880796a7ead6a8470cb5f58cab19c7a991bd2beb475\"}, \"case_inputs\": {\"dev/cases/AgentCanvas.json\": \"1706542e275b1e9bfe83e4d01bb8d1df6241124d2326e2aebd3f253cf6b5dcb0\", \"dev/cases/ChangedDialog.png\": \"225de74ec9ecfbd24a0f81d2183724e1a97b39c38503e706dd1c8ef6a1be89af\", \"dev/cases/PreviousDialog.png\": \"bd46f835597120cdf69162efbdd9064ab4a97ff0f73d5e628c9bdff17ee2b8ae\", \"dev/cases/SplashOpen_positive.png\": \"ec08b21ffd254748a0a7e5251f2596f3d960e8a4bdb5a6804bafd205d2ba6e28\", \"dev/cases/VibeMaa_blank_positive.png\": \"7922f9921beb3fd56573438f9066e2147ce30b38829f9974cbb84461ed80cb12\", \"dev/cases/VibeMaa_negative.png\": \"27ad41c93ab0dad2202ed282737aef3071245921fc50252f6f2d71f32fc1e0a9\", \"dev/cases/VibeMaa_positive.png\": \"9ff0f063d8b05309d4b903e8dc7a4038b6359218d0d309c2e55acf6b6adca744\", \"dev/cases/VibeMaa_splash_positive.png\": \"7922f9921beb3fd56573438f9066e2147ce30b38829f9974cbb84461ed80cb12\"}, \"attempt_path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/tasks/AgentCanvas/attempts/attempt_cead8d2f45da4b31a952d5b4dd3bde67.json\", \"acceptance_scope\": \"configured_checks_only\", \"constraints_status\": \"not_automatically_verified\", \"start_inputs\": {\"resource/image/device_create_new.png\": \"968ddbe0bd501243368dabba3382fee2456cbb7b483c26c07b1661b980c7e14e\", \"resource/image/rectangle_tool.png\": \"f7e4346d55dcbc892667bb4ffbb0a475eef29d3dfb82c2554c66d94a44d0b46f\", \"resource/image/save_diagrams_title.png\": \"9e49056b2f4fd63ec14e6957ed51f73ffa71f29d39baa82480be037379e3ebf6\", \"resource/image/vibe_maa_rectangle.png\": \"ca8b2f24f8d279016963ca88e5a96e1d97d4a5f9d75e17a353cdd3115180d2ad\", \"resource/pipeline/agent_task.json\": \"2776f807f679e229c1328880796a7ead6a8470cb5f58cab19c7a991bd2beb475\"}, \"start_check\": {\"node\": \"StartBlank\", \"observation_id\": \"obs_36a1b2212cd9439c8015713687638f92\", \"probe_id\": \"probe_cf7dfebbc1ee4e898fb09d513eb05fb5\", \"hit\": true, \"observation_path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/observations/obs_36a1b2212cd9439c8015713687638f92/record.json\", \"probe_path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/probes/probe_cf7dfebbc1ee4e898fb09d513eb05fb5/record.json\", \"image_path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/observations/obs_36a1b2212cd9439c801\n[truncated]"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_46",
+      "status": "in_progress",
+      "command": "/bin/bash -c \"vibe-maa --project . session close --session session_2c35b7d701e44a78a1d2bae561a2c805 && vibe-maa --project . session open --backend browser --url 'http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0' --width 1280 --height 720\"",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_46",
+      "status": "completed",
+      "command": "/bin/bash -c \"vibe-maa --project . session close --session session_2c35b7d701e44a78a1d2bae561a2c805 && vibe-maa --project . session open --backend browser --url 'http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0' --width 1280 --height 720\"",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"closed\": \"session_2c35b7d701e44a78a1d2bae561a2c805\"}}\n{\"schema_version\": 1, \"ok\": true, \"result\": {\"session_id\": \"session_ce56357eb35c498f8ef69e1ad9299ea2\", \"backend\": \"browser\", \"device\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0\", \"coordinates\": \"controller screenshot pixels\", \"runtime\": {\"browser_version\": \"158.0.8127.18\", \"playwright_version\": \"1.65.1\", \"viewport\": {\"width\": 1280, \"height\": 720, \"device_scale_factor\": 1}, \"headless\": true, \"platform\": \"Linux\"}}}"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_47",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . observe --session session_ce56357eb35c498f8ef69e1ad9299ea2'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_47",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . observe --session session_ce56357eb35c498f8ef69e1ad9299ea2'",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"schema_version\": 1, \"observation_id\": \"obs_68eb26ca08584596a04dca8568b51287\", \"session_id\": \"session_ce56357eb35c498f8ef69e1ad9299ea2\", \"generation\": 0, \"backend\": \"browser\", \"device\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0\", \"scope\": \"device\", \"runtime\": {\"browser_version\": \"158.0.8127.18\", \"playwright_version\": \"1.65.1\", \"viewport\": {\"width\": 1280, \"height\": 720, \"device_scale_factor\": 1}, \"headless\": true, \"platform\": \"Linux\"}, \"captured_at\": \"2026-11-12T11:27:07.948901+00:00\", \"resource_path\": \"resource\", \"image_path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/observations/obs_68eb26ca08584596a04dca8568b51287/image.png\", \"sha256\": \"ef82eb3332304ef9948c5178834f2649bfb93697c9c6ad3b4878a71746c7a780\", \"width\": 1280, \"height\": 720, \"coordinate_system\": \"controller\", \"elements\": [], \"warnings\": [{\"code\": \"OCR_UNAVAILABLE\", \"message\": \"Install OCR models in resource/model/ocr\", \"details\": {}}]}}"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_48",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . task run AgentCanvas --session session_ce56357eb35c498f8ef69e1ad9299ea2 --scenario splash_start --timeout-seconds 30'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_48",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . task run AgentCanvas --session session_ce56357eb35c498f8ef69e1ad9299ea2 --scenario splash_start --timeout-seconds 30'",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"attempt\": {\"schema_version\": 1, \"attempt_id\": \"attempt_cbfedf8da63b4cc0b6e309b741ea57d5\", \"task\": \"AgentCanvas\", \"spec_sha256\": \"f5710959317573c0980e8d3d412721e0336b75d236ea69e3078bee186f495400\", \"spec\": {\"schema_version\": 1, \"name\": \"AgentCanvas\", \"objective\": \"In diagrams.net, create a rectangle on the application canvas labeled exactly Vibe Maa from a fresh blank document, repeatably.\", \"entry\": \"AgentTask\", \"goal\": \"VibeMaaVisible\", \"cases\": \"dev/cases/AgentCanvas.json\", \"constraints\": [\"Use standard MaaFramework Pipeline actions only; no Shell, Command, or Custom actions.\", \"Expose entry AgentTask through interface.json for normal MaaFW handoff.\", \"Each run must create the result from a fresh blank document at 1280x720.\", \"The AgentTask entry must handle both fresh start URLs without external setup inputs: splash=0 starts on a blank canvas and splash=1 starts with the Device modal.\", \"For splash=1, dismiss the Device storage chooser with Change Storage then Decide Later, leaving no modal open.\", \"The final canvas must contain exactly one rectangle labelled exactly Vibe Maa, and the established VibeMaaVisible completion condition must remain unchanged.\"], \"max_attempts\": 10, \"scenarios\": {\"blank_start\": \"StartBlank\", \"splash_start\": \"SplashOpen\"}, \"scenario_urls\": {\"blank_start\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0\", \"splash_start\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0\"}, \"created_at\": \"2026-11-12T10:18:22.121731+00:00\", \"verification\": {\"verified_at\": \"2026-11-12T10:48:56.681487+00:00\", \"viewport\": \"1280x720\", \"fresh_blank\": {\"url\": \"http://127.0.0.1:34175/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0\", \"run_ids\": [\"run_85543282e74c4ad9984771965a57bdac\", \"run_1a170d6318cd469c9a95f94d7c3ccf9e\", \"run_80300f0a88774cb38abe7aa6aa597d88\"], \"task_attempt_id\": \"attempt_d2bfb21aa0c8446ba1c84565074cbc89\", \"result\": \"3/3 fresh runs execution_status=succeeded, goal_status=passed; saved scenario attempt accepted\", \"observed\": \"one rectangle labelled Vibe Maa, no modal\"}, \"fresh_splash\": {\"url\": \"http://127.0.0.1:34175/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0\", \"run_ids\": [\"run_eb66eec01a48470da9b3443cd8ddab28\", \"run_8726a440528c480ab6078024ddde08fe\", \"run_9745533d31654bd7aa130349dfbf73aa\"], \"task_attempt_id\": \"attempt_681ddd2373894a15b5685d4f2efdb058\", \"result\": \"3/3 fresh runs execution_status=succeeded, goal_status=passed; saved scenario attempt accepted\", \"observed\": \"Device modal cleared through Change Storage then Decide Later; one rectangle labelled Vibe Maa, no modal\"}}}, \"session_id\": \"session_ce56357eb35c498f8ef69e1ad9299ea2\", \"resource_path\": \"resource\", \"scenario\": \"splash_start\", \"started_at\": \"2026-11-12T11:27:10.540829+00:00\", \"status\": \"completed\", \"accepted\": true, \"scope\": \"device\", \"backend\": \"browser\", \"device\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0\", \"runtime\": {\"browser_version\": \"158.0.8127.18\", \"playwright_version\": \"1.65.1\", \"viewport\": {\"width\": 1280, \"height\": 720, \"device_scale_factor\": 1}, \"headless\": true, \"platform\": \"Linux\"}, \"inputs\": {\"resource/image/device_create_new.png\": \"968ddbe0bd501243368dabba3382fee2456cbb7b483c26c07b1661b980c7e14e\", \"resource/image/rectangle_tool.png\": \"f7e4346d55dcbc892667bb4ffbb0a475eef29d3dfb82c2554c66d94a44d0b46f\", \"resource/image/save_diagrams_title.png\": \"9e49056b2f4fd63ec14e6957ed51f73ffa71f29d39baa82480be037379e3ebf6\", \"resource/image/vibe_maa_rectangle.png\": \"ca8b2f24f8d279016963ca88e5a96e1d97d4a5f9d75e17a353cdd3115180d2ad\", \"resource/pipeline/agent_task.json\": \"2776f807f679e229c1328880796a7ead6a8470cb5f58cab19c7a991bd2beb475\"}, \"case_inputs\": {\"dev/cases/AgentCanvas.json\": \"1706542e275b1e9bfe83e4d01bb8d1df6241124d2326e2aebd3f253cf6b5dcb0\", \"dev/cases/ChangedDialog.png\": \"225de74ec9ecfbd24a0f81d2183724e1a97b39c38503e706dd1c8ef6a1be89af\", \"dev/cases/PreviousDialog.png\": \"bd46f835597120cdf69162efbdd9064ab4a97ff0f73d5e628c9bdff17ee2b8ae\", \"dev/cases/SplashOpen_positive.png\": \"ec08b21ffd254748a0a7e5251f2596f3d960e8a4bdb5a6804bafd205d2ba6e28\", \"dev/cases/VibeMaa_blank_positive.png\": \"7922f9921beb3fd56573438f9066e2147ce30b38829f9974cbb84461ed80cb12\", \"dev/cases/VibeMaa_negative.png\": \"27ad41c93ab0dad2202ed282737aef3071245921fc50252f6f2d71f32fc1e0a9\", \"dev/cases/VibeMaa_positive.png\": \"9ff0f063d8b05309d4b903e8dc7a4038b6359218d0d309c2e55acf6b6adca744\", \"dev/cases/VibeMaa_splash_positive.png\": \"7922f9921beb3fd56573438f9066e2147ce30b38829f9974cbb84461ed80cb12\"}, \"attempt_path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/tasks/AgentCanvas/attempts/attempt_cbfedf8da63b4cc0b6e309b741ea57d5.json\", \"acceptance_scope\": \"configured_checks_only\", \"constraints_status\": \"not_automatically_verified\", \"start_inputs\": {\"resource/image/device_create_new.png\": \"968ddbe0bd501243368dabba3382fee2456cbb7b483c26c07b1661b980c7e14e\", \"resource/image/rectangle_tool.png\": \"f7e4346d55dcbc892667bb4ffbb0a475eef29d3dfb82c2554c66d94a44d0b46f\", \"resource/image/save_diagrams_title.png\": \"9e49056b2f4fd63ec14e6957ed51f73ffa71f29d39baa82480be037379e3ebf6\", \"resource/image/vibe_maa_rectangle.png\": \"ca8b2f24f8d279016963ca88e5a96e1d97d4a5f9d75e17a353cdd3115180d2ad\", \"resource/pipeline/agent_task.json\": \"2776f807f679e229c1328880796a7ead6a8470cb5f58cab19c7a991bd2beb475\"}, \"start_check\": {\"node\": \"SplashOpen\", \"observation_id\": \"obs_a6359110ec4844ec973b90886da4c7c5\", \"probe_id\": \"probe_a12e7eecce944295bbe76db810cbbdc5\", \"hit\": true, \"observation_path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/observations/obs_a6359110ec4844ec973b90886da4c7c5/record.json\", \"probe_path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/probes/probe_a12e7eecce944295bbe76db810cbbdc5/record.json\", \"image_path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/observations/obs_a6359110ec4844ec97\n[truncated]"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_50",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . task context AgentCanvas'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_50",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . task context AgentCanvas'",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"schema_version\": 1, \"name\": \"AgentCanvas\", \"objective\": \"In diagrams.net, create a rectangle on the application canvas labeled exactly Vibe Maa from a fresh blank document, repeatably.\", \"entry\": \"AgentTask\", \"goal\": \"VibeMaaVisible\", \"cases\": \"dev/cases/AgentCanvas.json\", \"constraints\": [\"Use standard MaaFramework Pipeline actions only; no Shell, Command, or Custom actions.\", \"Expose entry AgentTask through interface.json for normal MaaFW handoff.\", \"Each run must create the result from a fresh blank document at 1280x720.\", \"The AgentTask entry must handle both fresh start URLs without external setup inputs: splash=0 starts on a blank canvas and splash=1 starts with the Device modal.\", \"For splash=1, dismiss the Device storage chooser with Change Storage then Decide Later, leaving no modal open.\", \"The final canvas must contain exactly one rectangle labelled exactly Vibe Maa, and the established VibeMaaVisible completion condition must remain unchanged.\"], \"max_attempts\": 10, \"scenarios\": {\"blank_start\": \"StartBlank\", \"splash_start\": \"SplashOpen\"}, \"scenario_urls\": {\"blank_start\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0\", \"splash_start\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0\"}, \"created_at\": \"2026-11-12T10:18:22.121731+00:00\", \"verification\": {\"verified_at\": \"2026-11-12T10:48:56.681487+00:00\", \"viewport\": \"1280x720\", \"fresh_blank\": {\"url\": \"http://127.0.0.1:34175/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0\", \"run_ids\": [\"run_85543282e74c4ad9984771965a57bdac\", \"run_1a170d6318cd469c9a95f94d7c3ccf9e\", \"run_80300f0a88774cb38abe7aa6aa597d88\"], \"task_attempt_id\": \"attempt_d2bfb21aa0c8446ba1c84565074cbc89\", \"result\": \"3/3 fresh runs execution_status=succeeded, goal_status=passed; saved scenario attempt accepted\", \"observed\": \"one rectangle labelled Vibe Maa, no modal\"}, \"fresh_splash\": {\"url\": \"http://127.0.0.1:34175/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0\", \"run_ids\": [\"run_eb66eec01a48470da9b3443cd8ddab28\", \"run_8726a440528c480ab6078024ddde08fe\", \"run_9745533d31654bd7aa130349dfbf73aa\"], \"task_attempt_id\": \"attempt_681ddd2373894a15b5685d4f2efdb058\", \"result\": \"3/3 fresh runs execution_status=succeeded, goal_status=passed; saved scenario attempt accepted\", \"observed\": \"Device modal cleared through Change Storage then Decide Later; one rectangle labelled Vibe Maa, no modal\"}}, \"spec_sha256\": \"f5710959317573c0980e8d3d412721e0336b75d236ea69e3078bee186f495400\", \"state\": \"accepted\", \"scope\": \"device\", \"acceptance_scope\": \"configured_checks_only\", \"constraints_status\": \"not_automatically_verified\", \"freshness\": \"current\", \"attempt_count\": 2, \"remaining_attempts\": 8, \"latest_attempt\": {\"schema_version\": 1, \"attempt_id\": \"attempt_cbfedf8da63b4cc0b6e309b741ea57d5\", \"task\": \"AgentCanvas\", \"spec_sha256\": \"f5710959317573c0980e8d3d412721e0336b75d236ea69e3078bee186f495400\", \"spec\": {\"schema_version\": 1, \"name\": \"AgentCanvas\", \"objective\": \"In diagrams.net, create a rectangle on the application canvas labeled exactly Vibe Maa from a fresh blank document, repeatably.\", \"entry\": \"AgentTask\", \"goal\": \"VibeMaaVisible\", \"cases\": \"dev/cases/AgentCanvas.json\", \"constraints\": [\"Use standard MaaFramework Pipeline actions only; no Shell, Command, or Custom actions.\", \"Expose entry AgentTask through interface.json for normal MaaFW handoff.\", \"Each run must create the result from a fresh blank document at 1280x720.\", \"The AgentTask entry must handle both fresh start URLs without external setup inputs: splash=0 starts on a blank canvas and splash=1 starts with the Device modal.\", \"For splash=1, dismiss the Device storage chooser with Change Storage then Decide Later, leaving no modal open.\", \"The final canvas must contain exactly one rectangle labelled exactly Vibe Maa, and the established VibeMaaVisible completion condition must remain unchanged.\"], \"max_attempts\": 10, \"scenarios\": {\"blank_start\": \"StartBlank\", \"splash_start\": \"SplashOpen\"}, \"scenario_urls\": {\"blank_start\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0\", \"splash_start\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0\"}, \"created_at\": \"2026-11-12T10:18:22.121731+00:00\", \"verification\": {\"verified_at\": \"2026-11-12T10:48:56.681487+00:00\", \"viewport\": \"1280x720\", \"fresh_blank\": {\"url\": \"http://127.0.0.1:34175/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0\", \"run_ids\": [\"run_85543282e74c4ad9984771965a57bdac\", \"run_1a170d6318cd469c9a95f94d7c3ccf9e\", \"run_80300f0a88774cb38abe7aa6aa597d88\"], \"task_attempt_id\": \"attempt_d2bfb21aa0c8446ba1c84565074cbc89\", \"result\": \"3/3 fresh runs execution_status=succeeded, goal_status=passed; saved scenario attempt accepted\", \"observed\": \"one rectangle labelled Vibe Maa, no modal\"}, \"fresh_splash\": {\"url\": \"http://127.0.0.1:34175/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0\", \"run_ids\": [\"run_eb66eec01a48470da9b3443cd8ddab28\", \"run_8726a440528c480ab6078024ddde08fe\", \"run_9745533d31654bd7aa130349dfbf73aa\"], \"task_attempt_id\": \"attempt_681ddd2373894a15b5685d4f2efdb058\", \"result\": \"3/3 fresh runs execution_status=succeeded, goal_status=passed; saved scenario attempt accepted\", \"observed\": \"Device modal cleared through Change Storage then Decide Later; one rectangle labelled Vibe Maa, no modal\"}}}, \"session_id\": \"session_ce56357eb35c498f8ef69e1ad9299ea2\", \"resource_path\": \"resource\", \"scenario\": \"splash_start\", \"started_at\": \"2026-11-12T11:27:10.540829+00:00\", \"status\": \"completed\", \"accepted\": true, \"scope\": \"device\", \"backend\": \"browser\", \"device\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0\", \"runtime\": {\"browser_version\": \"158.0.8127.18\", \"playwright_version\": \"1.65.1\", \"viewport\": {\"width\": 1280, \"height\": 720, \"device_scale_factor\": 1}, \"headless\": true, \"platform\": \"Linux\"}, \"inputs\": {\"resource/image/device_create_new.png\": \"968ddbe0bd501243368dabba3382fee2456cbb7b483c\n[truncated]"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_51",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . report show run_41c047ff7aa54d2a831315c1aaf72c40'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_51",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . report show run_41c047ff7aa54d2a831315c1aaf72c40'",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"run_id\": \"run_41c047ff7aa54d2a831315c1aaf72c40\", \"entry\": \"AgentTask\", \"started_at\": \"2026-11-12T11:27:11.024588+00:00\", \"finished_at\": \"2026-11-12T11:27:17.866729+00:00\", \"execution_status\": \"succeeded\", \"goal_status\": \"passed\", \"backend\": \"browser\", \"device\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0\", \"scope\": \"device\", \"runtime\": {\"browser_version\": \"158.0.8127.18\", \"playwright_version\": \"1.65.1\", \"viewport\": {\"width\": 1280, \"height\": 720, \"device_scale_factor\": 1}, \"headless\": true, \"platform\": \"Linux\"}, \"inputs_changed\": false, \"report_path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/runs/run_41c047ff7aa54d2a831315c1aaf72c40/record.json\", \"last_node\": {\"name\": \"VibeMaaVisible\", \"node_id\": 300000061, \"completed\": true, \"recognition\": {\"reco_id\": 400000062, \"algorithm\": \"TemplateMatch\", \"hit\": true, \"box\": {\"x\": 571, \"y\": 360, \"w\": 121, \"h\": 82}, \"all_results\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"filtered_results\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best_result\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"raw_detail\": {\"all\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"filtered\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}]}}, \"action\": {\"action_id\": 500000029, \"name\": \"VibeMaaVisible\", \"action\": \"DoNothing\", \"box\": {\"x\": 0, \"y\": 0, \"w\": 0, \"h\": 0}, \"success\": true, \"result\": null, \"raw_detail\": {}}}, \"waiting_for\": [], \"last_recognition\": {\"message\": \"Node.Recognition.Succeeded\", \"details\": {\"focus\": null, \"name\": \"VibeMaaVisible\", \"reco_details\": {\"algorithm\": \"TemplateMatch\", \"box\": [571, 360, 121, 82], \"detail\": {\"all\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"filtered\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}]}, \"name\": \"VibeMaaVisible\", \"reco_id\": 400000062}, \"reco_id\": 400000062, \"task_id\": 200000035}, \"received_at_ns\": 1794482837267399212, \"recognition\": {\"reco_id\": 400000062, \"algorithm\": \"TemplateMatch\", \"hit\": true, \"box\": {\"x\": 571, \"y\": 360, \"w\": 121, \"h\": 82}, \"all_results\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"filtered_results\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best_result\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"raw_detail\": {\"all\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"filtered\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}]}}, \"image_path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/runs/run_41c047ff7aa54d2a831315c1aaf72c40/last-recognition.png\", \"sha256\": \"648d47f1410b7af9f00a77ee277d7acc6d664cc2cd09e73567cfbbd6980715eb\"}, \"before_observation\": \"obs_8c136909dcc847b6875ef3e7e1d19594\", \"after_observation\": \"obs_78cb25e29a1d4354b637bc6a7046f0dd\", \"error\": null, \"failure\": null, \"verification_error\": null, \"verification_failure\": null, \"evidence\": {\"events\": 88, \"missing\": [{\"sequence\": 3, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}, {\"sequence\": 35, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}, {\"sequence\": 43, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}, {\"sequence\": 51, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}, {\"sequence\": 59, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}, {\"sequence\": 67, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}, {\"sequence\": 75, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}], \"missing_count\": 7, \"truncated_events\": 0, \"truncated_images\": 0, \"omitted_nodes\": 0}, \"interpretation\": \"Recorded facts only; no root cause was inferred.\"}}"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_52",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . report show run_343899042df14481bd08d8077dbdee53'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_52",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . report show run_343899042df14481bd08d8077dbdee53'",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"run_id\": \"run_343899042df14481bd08d8077dbdee53\", \"entry\": \"AgentTask\", \"started_at\": \"2026-11-12T11:26:56.071844+00:00\", \"finished_at\": \"2026-11-12T11:27:01.444732+00:00\", \"execution_status\": \"succeeded\", \"goal_status\": \"passed\", \"backend\": \"browser\", \"device\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0\", \"scope\": \"device\", \"runtime\": {\"browser_version\": \"158.0.8127.18\", \"playwright_version\": \"1.65.1\", \"viewport\": {\"width\": 1280, \"height\": 720, \"device_scale_factor\": 1}, \"headless\": true, \"platform\": \"Linux\"}, \"inputs_changed\": false, \"report_path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/runs/run_343899042df14481bd08d8077dbdee53/record.json\", \"last_node\": {\"name\": \"VibeMaaVisible\", \"node_id\": 300000041, \"completed\": true, \"recognition\": {\"reco_id\": 400000042, \"algorithm\": \"TemplateMatch\", \"hit\": true, \"box\": {\"x\": 571, \"y\": 360, \"w\": 121, \"h\": 82}, \"all_results\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"filtered_results\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best_result\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"raw_detail\": {\"all\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"filtered\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}]}}, \"action\": {\"action_id\": 500000018, \"name\": \"VibeMaaVisible\", \"action\": \"DoNothing\", \"box\": {\"x\": 0, \"y\": 0, \"w\": 0, \"h\": 0}, \"success\": true, \"result\": null, \"raw_detail\": {}}}, \"waiting_for\": [], \"last_recognition\": {\"message\": \"Node.Recognition.Succeeded\", \"details\": {\"focus\": null, \"name\": \"VibeMaaVisible\", \"reco_details\": {\"algorithm\": \"TemplateMatch\", \"box\": [571, 360, 121, 82], \"detail\": {\"all\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"filtered\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}]}, \"name\": \"VibeMaaVisible\", \"reco_id\": 400000042}, \"reco_id\": 400000042, \"task_id\": 200000025}, \"received_at_ns\": 1794482820853091392, \"recognition\": {\"reco_id\": 400000042, \"algorithm\": \"TemplateMatch\", \"hit\": true, \"box\": {\"x\": 571, \"y\": 360, \"w\": 121, \"h\": 82}, \"all_results\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"filtered_results\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best_result\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"raw_detail\": {\"all\": [{\"box\": [540, 300, 121, 82], \"score\": 0.504817}, {\"box\": [571, 360, 121, 82], \"score\": 0.999998}], \"best\": {\"box\": [571, 360, 121, 82], \"score\": 0.999998}, \"filtered\": [{\"box\": [571, 360, 121, 82], \"score\": 0.999998}]}}, \"image_path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/runs/run_343899042df14481bd08d8077dbdee53/last-recognition.png\", \"sha256\": \"648d47f1410b7af9f00a77ee277d7acc6d664cc2cd09e73567cfbbd6980715eb\"}, \"before_observation\": \"obs_d4ebc349848b403d9bd6cba4e665fec1\", \"after_observation\": \"obs_59eaa9988b6042f092d9830078f2e19d\", \"error\": null, \"failure\": null, \"verification_error\": null, \"verification_failure\": null, \"evidence\": {\"events\": 74, \"missing\": [{\"sequence\": 3, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}, {\"sequence\": 21, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}, {\"sequence\": 29, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}, {\"sequence\": 37, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}, {\"sequence\": 45, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}, {\"sequence\": 53, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}, {\"sequence\": 61, \"message\": \"Node.Recognition.Succeeded\", \"reason\": \"Recognition image unavailable or evicted\"}], \"missing_count\": 7, \"truncated_events\": 0, \"truncated_images\": 0, \"omitted_nodes\": 0}, \"interpretation\": \"Recorded facts only; no root cause was inferred.\"}}"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_53",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'ls -l .maa-dev/runs/run_41c047ff7aa54d2a831315c1aaf72c40/ .maa-dev/runs/run_343899042df14481bd08d8077dbdee53/'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_53",
+      "status": "completed",
+      "command": "/bin/bash -c 'ls -l .maa-dev/runs/run_41c047ff7aa54d2a831315c1aaf72c40/ .maa-dev/runs/run_343899042df14481bd08d8077dbdee53/'",
+      "exit_code": 0,
+      "output": ".maa-dev/runs/run_343899042df14481bd08d8077dbdee53/:\ntotal 388\n-rw-r--r-- 1 runner runner 32652 Nov 12 11:27 events.jsonl\n-rw-r--r-- 1 runner runner 67402 Nov 12 11:26 frame-00011.png\n-rw-r--r-- 1 runner runner 67402 Nov 12 11:26 frame-00013.png\n-rw-r--r-- 1 runner runner 71691 Nov 12 11:27 frame-00069.png\ndrwxr-xr-x 3 runner runner  4096 Nov 12 11:26 input-files\n-rw-r--r-- 1 runner runner 71691 Nov 12 11:27 last-recognition.png\n-rw-r--r-- 1 runner runner 72281 Nov 12 11:27 record.json\n\n.maa-dev/runs/run_41c047ff7aa54d2a831315c1aaf72c40/:\ntotal 420\n-rw-r--r-- 1 runner runner 39860 Nov 12 11:27 events.jsonl\n-rw-r--r-- 1 runner runner 36464 Nov 12 11:27 frame-00011.png\n-rw-r--r-- 1 runner runner 34984 Nov 12 11:27 frame-00019.png\n-rw-r--r-- 1 runner runner 67402 Nov 12 11:27 frame-00027.png\n-rw-r--r-- 1 runner runner 71691 Nov 12 11:27 frame-00083.png\ndrwxr-xr-x 3 runner runner  4096 Nov 12 11:27 input-files\n-rw-r--r-- 1 runner runner 71691 Nov 12 11:27 last-recognition.png\n-rw-r--r-- 1 runner runner 90692 Nov 12 11:27 record.json"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_55",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . session close --session session_ce56357eb35c498f8ef69e1ad9299ea2; vibe-maa --project . session list'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_55",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . session close --session session_ce56357eb35c498f8ef69e1ad9299ea2; vibe-maa --project . session list'",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"closed\": \"session_ce56357eb35c498f8ef69e1ad9299ea2\"}}\n{\"schema_version\": 1, \"ok\": true, \"result\": {\"sessions\": []}}"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_56",
+      "status": "in_progress",
+      "command": "/bin/bash -c \"python -m json.tool resource/pipeline/agent_task.json >/dev/null && python -m json.tool dev/tasks/AgentCanvas.json >/dev/null && python -m json.tool interface.json >/dev/null && echo 'JSON valid'; rg -n 'Shell|Command|Custom' resource dev/tasks dev/cases interface.json || true; cat resource/pipeline/agent_task.json\"",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_56",
+      "status": "completed",
+      "command": "/bin/bash -c \"python -m json.tool resource/pipeline/agent_task.json >/dev/null && python -m json.tool dev/tasks/AgentCanvas.json >/dev/null && python -m json.tool interface.json >/dev/null && echo 'JSON valid'; rg -n 'Shell|Command|Custom' resource dev/tasks dev/cases interface.json || true; cat resource/pipeline/agent_task.json\"",
+      "exit_code": 0,
+      "output": "JSON valid\ndev/tasks/AgentCanvas.json:9:    \"Use standard MaaFramework Pipeline actions only; no Shell, Command, or Custom actions.\",\n{\"AgentTask\": {\"recognition\": \"DirectHit\", \"action\": \"DoNothing\", \"post_delay\": 300, \"timeout\": 10000, \"next\": [\"SplashOpen\", \"StartBlank\"]}, \"SplashOpen\": {\"recognition\": \"TemplateMatch\", \"template\": \"device_create_new.png\", \"roi\": [440, 300, 400, 80], \"threshold\": 0.92, \"action\": \"Click\", \"target\": [640, 464], \"post_delay\": 350, \"timeout\": 3000, \"next\": [\"SplashStorage\"]}, \"SplashStorage\": {\"recognition\": \"ColorMatch\", \"roi\": [500, 430, 280, 55], \"lower\": [240, 240, 240], \"upper\": [255, 255, 255], \"count\": 14000, \"action\": \"Click\", \"target\": [640, 454], \"post_delay\": 450, \"timeout\": 3000, \"next\": [\"StartBlank\"]}, \"StartBlank\": {\"recognition\": \"TemplateMatch\", \"template\": \"rectangle_tool.png\", \"roi\": [0, 140, 220, 60], \"threshold\": 0.9, \"action\": \"Click\", \"target\": [633, 400], \"post_delay\": 300, \"timeout\": 10000, \"next\": [\"ClearExisting\"]}, \"ClearExisting\": {\"recognition\": \"DirectHit\", \"action\": \"ClickKey\", \"key\": 46, \"target\": [633, 400], \"post_delay\": 300, \"timeout\": 3000, \"next\": [\"DrawRectangle\"]}, \"DrawRectangle\": {\"recognition\": \"DirectHit\", \"action\": \"Click\", \"target\": [36, 177], \"post_delay\": 350, \"timeout\": 3000, \"next\": [\"SelectRectangle\"]}, \"SelectRectangle\": {\"recognition\": \"DirectHit\", \"action\": \"Click\", \"target\": [633, 400], \"post_delay\": 300, \"timeout\": 3000, \"next\": [\"EditLabel\"]}, \"EditLabel\": {\"recognition\": \"DirectHit\", \"action\": \"ClickKey\", \"key\": 113, \"target\": [633, 400], \"post_delay\": 450, \"timeout\": 3000, \"next\": [\"EnterLabel\"]}, \"EnterLabel\": {\"recognition\": \"DirectHit\", \"action\": \"InputText\", \"input_text\": \"Vibe Maa\", \"target\": [633, 400], \"post_delay\": 450, \"timeout\": 3000, \"next\": [\"CommitLabel\"]}, \"CommitLabel\": {\"recognition\": \"DirectHit\", \"action\": \"Click\", \"target\": [885, 555], \"post_delay\": 500, \"timeout\": 3000, \"next\": [\"VibeMaaVisible\"]}, \"VibeMaaVisible\": {\"recognition\": \"TemplateMatch\", \"template\": \"vibe_maa_rectangle.png\", \"roi\": [480, 260, 360, 240], \"threshold\": 0.85, \"action\": \"DoNothing\", \"timeout\": 3000}}"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_57",
+      "status": "in_progress",
+      "command": "/bin/bash -c 'vibe-maa --project . task list'",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_57",
+      "status": "completed",
+      "command": "/bin/bash -c 'vibe-maa --project . task list'",
+      "exit_code": 0,
+      "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"tasks\": [{\"name\": \"AgentCanvas\", \"objective\": \"In diagrams.net, create a rectangle on the application canvas labeled exactly Vibe Maa from a fresh blank document, repeatably.\", \"state\": \"accepted\", \"scope\": \"device\", \"attempt_count\": 2, \"remaining_attempts\": 8}]}}"
+    },
+    {
+      "event": "item.started",
+      "tool_type": "command_execution",
+      "item_id": "item_58",
+      "status": "in_progress",
+      "command": "/bin/bash -c \"nl -ba resource/pipeline/agent_task.json | sed -n '20,42p'; nl -ba dev/tasks/AgentCanvas.json | sed -n '16,32p'; nl -ba interface.json | sed -n '1,40p'\"",
+      "output": ""
+    },
+    {
+      "event": "item.completed",
+      "tool_type": "command_execution",
+      "item_id": "item_58",
+      "status": "completed",
+      "command": "/bin/bash -c \"nl -ba resource/pipeline/agent_task.json | sed -n '20,42p'; nl -ba dev/tasks/AgentCanvas.json | sed -n '16,32p'; nl -ba interface.json | sed -n '1,40p'\"",
+      "exit_code": 0,
+      "output": "    20\t  \"SplashStorage\": {\n    21\t    \"recognition\": \"ColorMatch\",\n    22\t    \"roi\": [500, 430, 280, 55],\n    23\t    \"lower\": [240, 240, 240],\n    24\t    \"upper\": [255, 255, 255],\n    25\t    \"count\": 14000,\n    26\t    \"action\": \"Click\",\n    27\t    \"target\": [640, 454],\n    28\t    \"post_delay\": 450,\n    29\t    \"timeout\": 3000,\n    30\t    \"next\": [\"StartBlank\"]\n    31\t  },\n    32\t  \"StartBlank\": {\n    33\t    \"recognition\": \"TemplateMatch\",\n    34\t    \"template\": \"rectangle_tool.png\",\n    35\t    \"roi\": [0, 140, 220, 60],\n    36\t    \"threshold\": 0.9,\n    37\t    \"action\": \"Click\",\n    38\t    \"target\": [633, 400],\n    39\t    \"post_delay\": 300,\n    40\t    \"timeout\": 10000,\n    41\t    \"next\": [\"ClearExisting\"]\n    42\t  },\n    16\t  \"max_attempts\": 10,\n    17\t  \"scenarios\": {\n    18\t    \"blank_start\": \"StartBlank\",\n    19\t    \"splash_start\": \"SplashOpen\"\n    20\t  },\n    21\t  \"scenario_urls\": {\n    22\t    \"blank_start\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0\",\n    23\t    \"splash_start\": \"http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0\"\n    24\t  },\n    25\t  \"created_at\": \"2026-11-12T10:18:22.121731+00:00\",\n    26\t  \"verification\": {\n    27\t    \"verified_at\": \"2026-11-12T10:48:56.681487+00:00\",\n    28\t    \"viewport\": \"1280x720\",\n    29\t    \"fresh_blank\": {\n    30\t      \"url\": \"http://127.0.0.1:34175/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0\",\n    31\t      \"run_ids\": [\n    32\t        \"run_85543282e74c4ad9984771965a57bdac\",\n     1\t{\n     2\t  \"interface_version\": 2,\n     3\t  \"name\": \"vibe-maa-project\",\n     4\t  \"controller\": [\n     5\t    {\n     6\t      \"name\": \"Android\",\n     7\t      \"type\": \"Adb\"\n     8\t    }\n     9\t  ],\n    10\t  \"resource\": [\n    11\t    {\n    12\t      \"name\": \"Default\",\n    13\t      \"path\": [\n    14\t        \"./resource\"\n    15\t      ]\n    16\t    }\n    17\t  ],\n    18\t  \"task\": [\n    19\t    {\n    20\t      \"name\": \"AgentTask\",\n    21\t      \"label\": \"Create Vibe Maa rectangle\",\n    22\t      \"entry\": \"AgentTask\"\n    23\t    }\n    24\t  ]\n    25\t}"
+    }
+  ],
+  "truncated_records": 0,
+  "byte_budget": 1048576,
+  "terminal_state": "completed",
+  "historical_errors": [],
+  "usage": {
+    "input_tokens": 1958783,
+    "cached_input_tokens": 1893376,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 20864,
+    "reasoning_output_tokens": 6944
+  },
+  "usage_last_turn": {
+    "input_tokens": 1958783,
+    "cached_input_tokens": 1893376,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 20864,
+    "reasoning_output_tokens": 6944
+  },
+  "completed_turns": 1,
+  "usage_measurement": "sum_of_reported_turn.completed_events",
+  "completed_command_items": 44,
+  "failed_command_items": 1,
+  "command_failure_measurement": "retained_completed_command_items"
+}

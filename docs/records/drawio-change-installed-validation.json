@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "mode": "durable_task_validation_no_model_calls",
+  "passed": true,
+  "source_unchanged": true,
+  "source_hashes": {
+    "dev/assets/device_create_new.json": "7e46bf5fea6d1abd452752edd2e592f26813c59f21e2e7b43ae3536af34e122c",
+    "dev/assets/rectangle_tool.json": "bcc18a0e879a8056fb2898dec369a61dd307a4e8f8cf3136ef222bbfc04a7b89",
+    "dev/assets/save_diagrams_title.json": "131a672ff59a4c9589df378be1a0fe51bea2c78cb095ca53c3f640053304c2b7",
+    "dev/assets/vibe_maa_rectangle.json": "7dd703be083b136f8b18b418e59fa46c3e4dad4731ff82eca7e8fa4a78f7303e",
+    "dev/cases/AgentCanvas.json": "2fd3866841ebd1a9948358b4b5a20398e40f6c3de1bcfcdb8a9fa6efffda7ba3",
+    "dev/cases/ChangedDialog.png": "225de74ec9ecfbd24a0f81d2183724e1a97b39c38503e706dd1c8ef6a1be89af",
+    "dev/cases/PreviousDialog.png": "bd46f835597120cdf69162efbdd9064ab4a97ff0f73d5e628c9bdff17ee2b8ae",
+    "dev/cases/SplashOpen_positive.png": "ec08b21ffd254748a0a7e5251f2596f3d960e8a4bdb5a6804bafd205d2ba6e28",
+    "dev/cases/VibeMaa_blank_positive.png": "7922f9921beb3fd56573438f9066e2147ce30b38829f9974cbb84461ed80cb12",
+    "dev/cases/VibeMaa_negative.png": "27ad41c93ab0dad2202ed282737aef3071245921fc50252f6f2d71f32fc1e0a9",
+    "dev/cases/VibeMaa_positive.png": "9ff0f063d8b05309d4b903e8dc7a4038b6359218d0d309c2e55acf6b6adca744",
+    "dev/cases/VibeMaa_splash_positive.png": "7922f9921beb3fd56573438f9066e2147ce30b38829f9974cbb84461ed80cb12",
+    "dev/tasks/AgentCanvas.json": "f5710959317573c0980e8d3d412721e0336b75d236ea69e3078bee186f495400",
+    "interface.json": "e956be3236bf2397c1d0e340847f4e330ecbc2002e439269cca06404c44f7c9e",
+    "manifest.json": "d8accf16be87469345a2d397c5873056fa9f43219c0c3be8c42a5ec475311230",
+    "resource/image/device_create_new.png": "968ddbe0bd501243368dabba3382fee2456cbb7b483c26c07b1661b980c7e14e",
+    "resource/image/rectangle_tool.png": "f7e4346d55dcbc892667bb4ffbb0a475eef29d3dfb82c2554c66d94a44d0b46f",
+    "resource/image/save_diagrams_title.png": "9e49056b2f4fd63ec14e6957ed51f73ffa71f29d39baa82480be037379e3ebf6",
+    "resource/image/vibe_maa_rectangle.png": "ca8b2f24f8d279016963ca88e5a96e1d97d4a5f9d75e17a353cdd3115180d2ad",
+    "resource/pipeline/agent_task.json": "2776f807f679e229c1328880796a7ead6a8470cb5f58cab19c7a991bd2beb475"
+  },
+  "installed_from": "/tmp/vibe-maa-uv/archive-v0/XwRNAO9ps6sql4vs/lib/python3.12/site-packages/vibe_maa/__init__.py",
+  "restored_context": {
+    "state": "accepted",
+    "freshness": "current",
+    "completed_scenarios": [
+      "blank_start",
+      "splash_start"
+    ],
+    "missing_scenarios": [],
+    "attempt_count": 2,
+    "remaining_attempts": 8
+  },
+  "scope": "real_application_installed_wheel_no_model_calls"
+}

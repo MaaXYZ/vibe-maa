@@ -1,0 +1,1003 @@
+{
+  "schema_version": 1,
+  "name": "AgentCanvas",
+  "objective": "In diagrams.net, create a rectangle on the application canvas labeled exactly Vibe Maa from a fresh blank document, repeatably.",
+  "entry": "AgentTask",
+  "goal": "VibeMaaVisible",
+  "cases": "dev/cases/AgentCanvas.json",
+  "constraints": [
+    "Use standard MaaFramework Pipeline actions only; no Shell, Command, or Custom actions.",
+    "Expose entry AgentTask through interface.json for normal MaaFW handoff.",
+    "Each run must create the result from a fresh blank document at 1280x720.",
+    "The AgentTask entry must handle both fresh start URLs without external setup inputs: splash=0 starts on a blank canvas and splash=1 starts with the Device modal.",
+    "For splash=1, dismiss the Device storage chooser with Change Storage then Decide Later, leaving no modal open.",
+    "The final canvas must contain exactly one rectangle labelled exactly Vibe Maa, and the established VibeMaaVisible completion condition must remain unchanged."
+  ],
+  "max_attempts": 10,
+  "scenarios": {
+    "blank_start": "StartBlank",
+    "splash_start": "SplashOpen"
+  },
+  "scenario_urls": {
+    "blank_start": "http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0",
+    "splash_start": "http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0"
+  },
+  "created_at": "2026-11-12T10:18:22.121731+00:00",
+  "verification": {
+    "verified_at": "2026-11-12T10:48:56.681487+00:00",
+    "viewport": "1280x720",
+    "fresh_blank": {
+      "url": "http://127.0.0.1:34175/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0",
+      "run_ids": [
+        "run_85543282e74c4ad9984771965a57bdac",
+        "run_1a170d6318cd469c9a95f94d7c3ccf9e",
+        "run_80300f0a88774cb38abe7aa6aa597d88"
+      ],
+      "task_attempt_id": "attempt_d2bfb21aa0c8446ba1c84565074cbc89",
+      "result": "3/3 fresh runs execution_status=succeeded, goal_status=passed; saved scenario attempt accepted",
+      "observed": "one rectangle labelled Vibe Maa, no modal"
+    },
+    "fresh_splash": {
+      "url": "http://127.0.0.1:34175/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0",
+      "run_ids": [
+        "run_eb66eec01a48470da9b3443cd8ddab28",
+        "run_8726a440528c480ab6078024ddde08fe",
+        "run_9745533d31654bd7aa130349dfbf73aa"
+      ],
+      "task_attempt_id": "attempt_681ddd2373894a15b5685d4f2efdb058",
+      "result": "3/3 fresh runs execution_status=succeeded, goal_status=passed; saved scenario attempt accepted",
+      "observed": "Device modal cleared through Change Storage then Decide Later; one rectangle labelled Vibe Maa, no modal"
+    }
+  },
+  "spec_sha256": "f5710959317573c0980e8d3d412721e0336b75d236ea69e3078bee186f495400",
+  "state": "accepted",
+  "scope": "device",
+  "acceptance_scope": "configured_checks_only",
+  "constraints_status": "not_automatically_verified",
+  "freshness": "current",
+  "attempt_count": 2,
+  "remaining_attempts": 8,
+  "latest_attempt": {
+    "schema_version": 1,
+    "attempt_id": "attempt_cbfedf8da63b4cc0b6e309b741ea57d5",
+    "task": "AgentCanvas",
+    "spec_sha256": "f5710959317573c0980e8d3d412721e0336b75d236ea69e3078bee186f495400",
+    "spec": {
+      "schema_version": 1,
+      "name": "AgentCanvas",
+      "objective": "In diagrams.net, create a rectangle on the application canvas labeled exactly Vibe Maa from a fresh blank document, repeatably.",
+      "entry": "AgentTask",
+      "goal": "VibeMaaVisible",
+      "cases": "dev/cases/AgentCanvas.json",
+      "constraints": [
+        "Use standard MaaFramework Pipeline actions only; no Shell, Command, or Custom actions.",
+        "Expose entry AgentTask through interface.json for normal MaaFW handoff.",
+        "Each run must create the result from a fresh blank document at 1280x720.",
+        "The AgentTask entry must handle both fresh start URLs without external setup inputs: splash=0 starts on a blank canvas and splash=1 starts with the Device modal.",
+        "For splash=1, dismiss the Device storage chooser with Change Storage then Decide Later, leaving no modal open.",
+        "The final canvas must contain exactly one rectangle labelled exactly Vibe Maa, and the established VibeMaaVisible completion condition must remain unchanged."
+      ],
+      "max_attempts": 10,
+      "scenarios": {
+        "blank_start": "StartBlank",
+        "splash_start": "SplashOpen"
+      },
+      "scenario_urls": {
+        "blank_start": "http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0",
+        "splash_start": "http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0"
+      },
+      "created_at": "2026-11-12T10:18:22.121731+00:00",
+      "verification": {
+        "verified_at": "2026-11-12T10:48:56.681487+00:00",
+        "viewport": "1280x720",
+        "fresh_blank": {
+          "url": "http://127.0.0.1:34175/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0",
+          "run_ids": [
+            "run_85543282e74c4ad9984771965a57bdac",
+            "run_1a170d6318cd469c9a95f94d7c3ccf9e",
+            "run_80300f0a88774cb38abe7aa6aa597d88"
+          ],
+          "task_attempt_id": "attempt_d2bfb21aa0c8446ba1c84565074cbc89",
+          "result": "3/3 fresh runs execution_status=succeeded, goal_status=passed; saved scenario attempt accepted",
+          "observed": "one rectangle labelled Vibe Maa, no modal"
+        },
+        "fresh_splash": {
+          "url": "http://127.0.0.1:34175/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0",
+          "run_ids": [
+            "run_eb66eec01a48470da9b3443cd8ddab28",
+            "run_8726a440528c480ab6078024ddde08fe",
+            "run_9745533d31654bd7aa130349dfbf73aa"
+          ],
+          "task_attempt_id": "attempt_681ddd2373894a15b5685d4f2efdb058",
+          "result": "3/3 fresh runs execution_status=succeeded, goal_status=passed; saved scenario attempt accepted",
+          "observed": "Device modal cleared through Change Storage then Decide Later; one rectangle labelled Vibe Maa, no modal"
+        }
+      }
+    },
+    "session_id": "session_ce56357eb35c498f8ef69e1ad9299ea2",
+    "resource_path": "resource",
+    "scenario": "splash_start",
+    "started_at": "2026-11-12T11:27:10.540829+00:00",
+    "status": "completed",
+    "accepted": true,
+    "scope": "device",
+    "backend": "browser",
+    "device": "http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0",
+    "runtime": {
+      "browser_version": "158.0.8127.18",
+      "playwright_version": "1.65.1",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "device_scale_factor": 1
+      },
+      "headless": true,
+      "platform": "Linux"
+    },
+    "inputs": {
+      "resource/image/device_create_new.png": "968ddbe0bd501243368dabba3382fee2456cbb7b483c26c07b1661b980c7e14e",
+      "resource/image/rectangle_tool.png": "f7e4346d55dcbc892667bb4ffbb0a475eef29d3dfb82c2554c66d94a44d0b46f",
+      "resource/image/save_diagrams_title.png": "9e49056b2f4fd63ec14e6957ed51f73ffa71f29d39baa82480be037379e3ebf6",
+      "resource/image/vibe_maa_rectangle.png": "ca8b2f24f8d279016963ca88e5a96e1d97d4a5f9d75e17a353cdd3115180d2ad",
+      "resource/pipeline/agent_task.json": "2776f807f679e229c1328880796a7ead6a8470cb5f58cab19c7a991bd2beb475"
+    },
+    "case_inputs": {
+      "dev/cases/AgentCanvas.json": "1706542e275b1e9bfe83e4d01bb8d1df6241124d2326e2aebd3f253cf6b5dcb0",
+      "dev/cases/ChangedDialog.png": "225de74ec9ecfbd24a0f81d2183724e1a97b39c38503e706dd1c8ef6a1be89af",
+      "dev/cases/PreviousDialog.png": "bd46f835597120cdf69162efbdd9064ab4a97ff0f73d5e628c9bdff17ee2b8ae",
+      "dev/cases/SplashOpen_positive.png": "ec08b21ffd254748a0a7e5251f2596f3d960e8a4bdb5a6804bafd205d2ba6e28",
+      "dev/cases/VibeMaa_blank_positive.png": "7922f9921beb3fd56573438f9066e2147ce30b38829f9974cbb84461ed80cb12",
+      "dev/cases/VibeMaa_negative.png": "27ad41c93ab0dad2202ed282737aef3071245921fc50252f6f2d71f32fc1e0a9",
+      "dev/cases/VibeMaa_positive.png": "9ff0f063d8b05309d4b903e8dc7a4038b6359218d0d309c2e55acf6b6adca744",
+      "dev/cases/VibeMaa_splash_positive.png": "7922f9921beb3fd56573438f9066e2147ce30b38829f9974cbb84461ed80cb12"
+    },
+    "attempt_path": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/tasks/AgentCanvas/attempts/attempt_cbfedf8da63b4cc0b6e309b741ea57d5.json",
+    "acceptance_scope": "configured_checks_only",
+    "constraints_status": "not_automatically_verified",
+    "start_inputs": {
+      "resource/image/device_create_new.png": "968ddbe0bd501243368dabba3382fee2456cbb7b483c26c07b1661b980c7e14e",
+      "resource/image/rectangle_tool.png": "f7e4346d55dcbc892667bb4ffbb0a475eef29d3dfb82c2554c66d94a44d0b46f",
+      "resource/image/save_diagrams_title.png": "9e49056b2f4fd63ec14e6957ed51f73ffa71f29d39baa82480be037379e3ebf6",
+      "resource/image/vibe_maa_rectangle.png": "ca8b2f24f8d279016963ca88e5a96e1d97d4a5f9d75e17a353cdd3115180d2ad",
+      "resource/pipeline/agent_task.json": "2776f807f679e229c1328880796a7ead6a8470cb5f58cab19c7a991bd2beb475"
+    },
+    "start_check": {
+      "node": "SplashOpen",
+      "observation_id": "obs_a6359110ec4844ec973b90886da4c7c5",
+      "probe_id": "probe_a12e7eecce944295bbe76db810cbbdc5",
+      "hit": true,
+      "observation_path": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/observations/obs_a6359110ec4844ec973b90886da4c7c5/record.json",
+      "probe_path": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/probes/probe_a12e7eecce944295bbe76db810cbbdc5/record.json",
+      "image_path": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/observations/obs_a6359110ec4844ec973b90886da4c7c5/image.png",
+      "observation_sha256": "fa7b0a6fdeafbf09063bbcb702cd0f801b7cc62c28664a689489b5278320132f",
+      "probe_sha256": "096d63fedf673fd013b03e551e9e2e6eeea0622d0bc5aa0d8edcdb158e84a19d",
+      "image_sha256": "ef82eb3332304ef9948c5178834f2649bfb93697c9c6ad3b4878a71746c7a780"
+    },
+    "run_id": "run_41c047ff7aa54d2a831315c1aaf72c40",
+    "report_path": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/runs/run_41c047ff7aa54d2a831315c1aaf72c40/record.json",
+    "execution_status": "succeeded",
+    "goal_status": "passed",
+    "after_observation": "obs_78cb25e29a1d4354b637bc6a7046f0dd",
+    "last_recognition": {
+      "message": "Node.Recognition.Succeeded",
+      "details": {
+        "focus": null,
+        "name": "VibeMaaVisible",
+        "reco_details": {
+          "algorithm": "TemplateMatch",
+          "box": [
+            571,
+            360,
+            121,
+            82
+          ],
+          "detail": {
+            "all": [
+              {
+                "box": [
+                  540,
+                  300,
+                  121,
+                  82
+                ],
+                "score": 0.504817
+              },
+              {
+                "box": [
+                  571,
+                  360,
+                  121,
+                  82
+                ],
+                "score": 0.999998
+              }
+            ],
+            "best": {
+              "box": [
+                571,
+                360,
+                121,
+                82
+              ],
+              "score": 0.999998
+            },
+            "filtered": [
+              {
+                "box": [
+                  571,
+                  360,
+                  121,
+                  82
+                ],
+                "score": 0.999998
+              }
+            ]
+          },
+          "name": "VibeMaaVisible",
+          "reco_id": 400000062
+        },
+        "reco_id": 400000062,
+        "task_id": 200000035
+      },
+      "received_at_ns": 1794482837267399212,
+      "recognition": {
+        "reco_id": 400000062,
+        "algorithm": "TemplateMatch",
+        "hit": true,
+        "box": {
+          "x": 571,
+          "y": 360,
+          "w": 121,
+          "h": 82
+        },
+        "all_results": [
+          {
+            "box": [
+              540,
+              300,
+              121,
+              82
+            ],
+            "score": 0.504817
+          },
+          {
+            "box": [
+              571,
+              360,
+              121,
+              82
+            ],
+            "score": 0.999998
+          }
+        ],
+        "filtered_results": [
+          {
+            "box": [
+              571,
+              360,
+              121,
+              82
+            ],
+            "score": 0.999998
+          }
+        ],
+        "best_result": {
+          "box": [
+            571,
+            360,
+            121,
+            82
+          ],
+          "score": 0.999998
+        },
+        "raw_detail": {
+          "all": [
+            {
+              "box": [
+                540,
+                300,
+                121,
+                82
+              ],
+              "score": 0.504817
+            },
+            {
+              "box": [
+                571,
+                360,
+                121,
+                82
+              ],
+              "score": 0.999998
+            }
+          ],
+          "best": {
+            "box": [
+              571,
+              360,
+              121,
+              82
+            ],
+            "score": 0.999998
+          },
+          "filtered": [
+            {
+              "box": [
+                571,
+                360,
+                121,
+                82
+              ],
+              "score": 0.999998
+            }
+          ]
+        }
+      },
+      "image_path": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/runs/run_41c047ff7aa54d2a831315c1aaf72c40/last-recognition.png",
+      "sha256": "648d47f1410b7af9f00a77ee277d7acc6d664cc2cd09e73567cfbbd6980715eb"
+    },
+    "case_check": {
+      "scope": "offline_recognition_only",
+      "passed": true,
+      "cases": [
+        {
+          "node": "VibeMaaVisible",
+          "image": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/VibeMaa_positive.png",
+          "expected_hit": true,
+          "actual_hit": true,
+          "passed": true,
+          "result": {
+            "reco_id": 400000064,
+            "algorithm": "TemplateMatch",
+            "hit": true,
+            "box": {
+              "x": 571,
+              "y": 360,
+              "w": 121,
+              "h": 82
+            },
+            "all_results": [
+              {
+                "box": [
+                  540,
+                  300,
+                  121,
+                  82
+                ],
+                "score": 0.504817
+              },
+              {
+                "box": [
+                  571,
+                  360,
+                  121,
+                  82
+                ],
+                "score": 0.999998
+              }
+            ],
+            "filtered_results": [
+              {
+                "box": [
+                  571,
+                  360,
+                  121,
+                  82
+                ],
+                "score": 0.999998
+              }
+            ],
+            "best_result": {
+              "box": [
+                571,
+                360,
+                121,
+                82
+              ],
+              "score": 0.999998
+            },
+            "raw_detail": {
+              "all": [
+                {
+                  "box": [
+                    540,
+                    300,
+                    121,
+                    82
+                  ],
+                  "score": 0.504817
+                },
+                {
+                  "box": [
+                    571,
+                    360,
+                    121,
+                    82
+                  ],
+                  "score": 0.999998
+                }
+              ],
+              "best": {
+                "box": [
+                  571,
+                  360,
+                  121,
+                  82
+                ],
+                "score": 0.999998
+              },
+              "filtered": [
+                {
+                  "box": [
+                    571,
+                    360,
+                    121,
+                    82
+                  ],
+                  "score": 0.999998
+                }
+              ]
+            }
+          }
+        },
+        {
+          "node": "VibeMaaVisible",
+          "image": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/VibeMaa_negative.png",
+          "expected_hit": false,
+          "actual_hit": false,
+          "passed": true,
+          "result": {
+            "reco_id": 400000065,
+            "algorithm": "TemplateMatch",
+            "hit": false,
+            "box": null,
+            "all_results": [
+              {
+                "box": [
+                  511,
+                  260,
+                  121,
+                  82
+                ],
+                "score": 0.326242
+              }
+            ],
+            "filtered_results": [],
+            "best_result": null,
+            "raw_detail": {
+              "all": [
+                {
+                  "box": [
+                    511,
+                    260,
+                    121,
+                    82
+                  ],
+                  "score": 0.326242
+                }
+              ],
+              "best": null,
+              "filtered": []
+            }
+          }
+        },
+        {
+          "node": "SplashOpen",
+          "image": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/SplashOpen_positive.png",
+          "expected_hit": true,
+          "actual_hit": true,
+          "passed": true,
+          "result": {
+            "reco_id": 400000066,
+            "algorithm": "TemplateMatch",
+            "hit": true,
+            "box": {
+              "x": 470,
+              "y": 318,
+              "w": 340,
+              "h": 40
+            },
+            "all_results": [
+              {
+                "box": [
+                  470,
+                  318,
+                  340,
+                  40
+                ],
+                "score": 1.0
+              }
+            ],
+            "filtered_results": [
+              {
+                "box": [
+                  470,
+                  318,
+                  340,
+                  40
+                ],
+                "score": 1.0
+              }
+            ],
+            "best_result": {
+              "box": [
+                470,
+                318,
+                340,
+                40
+              ],
+              "score": 1.0
+            },
+            "raw_detail": {
+              "all": [
+                {
+                  "box": [
+                    470,
+                    318,
+                    340,
+                    40
+                  ],
+                  "score": 1.0
+                }
+              ],
+              "best": {
+                "box": [
+                  470,
+                  318,
+                  340,
+                  40
+                ],
+                "score": 1.0
+              },
+              "filtered": [
+                {
+                  "box": [
+                    470,
+                    318,
+                    340,
+                    40
+                  ],
+                  "score": 1.0
+                }
+              ]
+            }
+          }
+        },
+        {
+          "node": "VibeMaaVisible",
+          "image": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/VibeMaa_splash_positive.png",
+          "expected_hit": true,
+          "actual_hit": true,
+          "passed": true,
+          "result": {
+            "reco_id": 400000067,
+            "algorithm": "TemplateMatch",
+            "hit": true,
+            "box": {
+              "x": 571,
+              "y": 360,
+              "w": 121,
+              "h": 82
+            },
+            "all_results": [
+              {
+                "box": [
+                  540,
+                  300,
+                  121,
+                  82
+                ],
+                "score": 0.504817
+              },
+              {
+                "box": [
+                  571,
+                  360,
+                  121,
+                  82
+                ],
+                "score": 0.999998
+              }
+            ],
+            "filtered_results": [
+              {
+                "box": [
+                  571,
+                  360,
+                  121,
+                  82
+                ],
+                "score": 0.999998
+              }
+            ],
+            "best_result": {
+              "box": [
+                571,
+                360,
+                121,
+                82
+              ],
+              "score": 0.999998
+            },
+            "raw_detail": {
+              "all": [
+                {
+                  "box": [
+                    540,
+                    300,
+                    121,
+                    82
+                  ],
+                  "score": 0.504817
+                },
+                {
+                  "box": [
+                    571,
+                    360,
+                    121,
+                    82
+                  ],
+                  "score": 0.999998
+                }
+              ],
+              "best": {
+                "box": [
+                  571,
+                  360,
+                  121,
+                  82
+                ],
+                "score": 0.999998
+              },
+              "filtered": [
+                {
+                  "box": [
+                    571,
+                    360,
+                    121,
+                    82
+                  ],
+                  "score": 0.999998
+                }
+              ]
+            }
+          }
+        },
+        {
+          "node": "VibeMaaVisible",
+          "image": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/VibeMaa_blank_positive.png",
+          "expected_hit": true,
+          "actual_hit": true,
+          "passed": true,
+          "result": {
+            "reco_id": 400000068,
+            "algorithm": "TemplateMatch",
+            "hit": true,
+            "box": {
+              "x": 571,
+              "y": 360,
+              "w": 121,
+              "h": 82
+            },
+            "all_results": [
+              {
+                "box": [
+                  540,
+                  300,
+                  121,
+                  82
+                ],
+                "score": 0.504817
+              },
+              {
+                "box": [
+                  571,
+                  360,
+                  121,
+                  82
+                ],
+                "score": 0.999998
+              }
+            ],
+            "filtered_results": [
+              {
+                "box": [
+                  571,
+                  360,
+                  121,
+                  82
+                ],
+                "score": 0.999998
+              }
+            ],
+            "best_result": {
+              "box": [
+                571,
+                360,
+                121,
+                82
+              ],
+              "score": 0.999998
+            },
+            "raw_detail": {
+              "all": [
+                {
+                  "box": [
+                    540,
+                    300,
+                    121,
+                    82
+                  ],
+                  "score": 0.504817
+                },
+                {
+                  "box": [
+                    571,
+                    360,
+                    121,
+                    82
+                  ],
+                  "score": 0.999998
+                }
+              ],
+              "best": {
+                "box": [
+                  571,
+                  360,
+                  121,
+                  82
+                ],
+                "score": 0.999998
+              },
+              "filtered": [
+                {
+                  "box": [
+                    571,
+                    360,
+                    121,
+                    82
+                  ],
+                  "score": 0.999998
+                }
+              ]
+            }
+          }
+        },
+        {
+          "node": "SplashStorage",
+          "image": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/PreviousDialog.png",
+          "expected_hit": true,
+          "actual_hit": true,
+          "passed": true,
+          "result": {
+            "reco_id": 400000069,
+            "algorithm": "ColorMatch",
+            "hit": true,
+            "box": {
+              "x": 500,
+              "y": 430,
+              "w": 280,
+              "h": 55
+            },
+            "all_results": [
+              {
+                "box": [
+                  500,
+                  430,
+                  280,
+                  55
+                ],
+                "count": 14676
+              }
+            ],
+            "filtered_results": [
+              {
+                "box": [
+                  500,
+                  430,
+                  280,
+                  55
+                ],
+                "count": 14676
+              }
+            ],
+            "best_result": {
+              "box": [
+                500,
+                430,
+                280,
+                55
+              ],
+              "count": 14676
+            },
+            "raw_detail": {
+              "all": [
+                {
+                  "box": [
+                    500,
+                    430,
+                    280,
+                    55
+                  ],
+                  "count": 14676
+                }
+              ],
+              "best": {
+                "box": [
+                  500,
+                  430,
+                  280,
+                  55
+                ],
+                "count": 14676
+              },
+              "filtered": [
+                {
+                  "box": [
+                    500,
+                    430,
+                    280,
+                    55
+                  ],
+                  "count": 14676
+                }
+              ]
+            }
+          }
+        },
+        {
+          "node": "SplashStorage",
+          "image": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/cases/ChangedDialog.png",
+          "expected_hit": true,
+          "actual_hit": true,
+          "passed": true,
+          "result": {
+            "reco_id": 400000070,
+            "algorithm": "ColorMatch",
+            "hit": true,
+            "box": {
+              "x": 500,
+              "y": 430,
+              "w": 280,
+              "h": 55
+            },
+            "all_results": [
+              {
+                "box": [
+                  500,
+                  430,
+                  280,
+                  55
+                ],
+                "count": 14701
+              }
+            ],
+            "filtered_results": [
+              {
+                "box": [
+                  500,
+                  430,
+                  280,
+                  55
+                ],
+                "count": 14701
+              }
+            ],
+            "best_result": {
+              "box": [
+                500,
+                430,
+                280,
+                55
+              ],
+              "count": 14701
+            },
+            "raw_detail": {
+              "all": [
+                {
+                  "box": [
+                    500,
+                    430,
+                    280,
+                    55
+                  ],
+                  "count": 14701
+                }
+              ],
+              "best": {
+                "box": [
+                  500,
+                  430,
+                  280,
+                  55
+                ],
+                "count": 14701
+              },
+              "filtered": [
+                {
+                  "box": [
+                    500,
+                    430,
+                    280,
+                    55
+                  ],
+                  "count": 14701
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "report_sha256": "e0cc051a96ede6f5b246431b19f4d7dd1c24ce9745eb4ca38687b26190ab1ee8",
+    "finished_at": "2026-11-12T11:27:18.487711+00:00"
+  },
+  "required_scenarios": [
+    "blank_start",
+    "splash_start"
+  ],
+  "completed_scenarios": [
+    "blank_start",
+    "splash_start"
+  ],
+  "missing_scenarios": [],
+  "proofs": {
+    "blank_start": {
+      "attempt_id": "attempt_cead8d2f45da4b31a952d5b4dd3bde67",
+      "run_id": "run_343899042df14481bd08d8077dbdee53",
+      "report_path": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/runs/run_343899042df14481bd08d8077dbdee53/record.json",
+      "report_sha256": "6dcb4dd02a9d2befa1429b1cf39cadd7f0aa6351dc975cf9d1b283f09bfd71c4",
+      "start_check": {
+        "node": "StartBlank",
+        "observation_id": "obs_36a1b2212cd9439c8015713687638f92",
+        "probe_id": "probe_cf7dfebbc1ee4e898fb09d513eb05fb5",
+        "hit": true,
+        "observation_path": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/observations/obs_36a1b2212cd9439c8015713687638f92/record.json",
+        "probe_path": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/probes/probe_cf7dfebbc1ee4e898fb09d513eb05fb5/record.json",
+        "image_path": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/observations/obs_36a1b2212cd9439c8015713687638f92/image.png",
+        "observation_sha256": "edd76ea613057cbd4f0bb7071d7d49075583d418137a7df82cb402b96e976c8a",
+        "probe_sha256": "c62166fd6b61daf7c45a5d3cd3b59a1e351b08c1ec66d2e420bb04715e6dc1d7",
+        "image_sha256": "cba7ee7a9ac47fbca7fede7cc296556911f4c1be068803062901c702ebcdad3a"
+      }
+    },
+    "splash_start": {
+      "attempt_id": "attempt_cbfedf8da63b4cc0b6e309b741ea57d5",
+      "run_id": "run_41c047ff7aa54d2a831315c1aaf72c40",
+      "report_path": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/runs/run_41c047ff7aa54d2a831315c1aaf72c40/record.json",
+      "report_sha256": "e0cc051a96ede6f5b246431b19f4d7dd1c24ce9745eb4ca38687b26190ab1ee8",
+      "start_check": {
+        "node": "SplashOpen",
+        "observation_id": "obs_a6359110ec4844ec973b90886da4c7c5",
+        "probe_id": "probe_a12e7eecce944295bbe76db810cbbdc5",
+        "hit": true,
+        "observation_path": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/observations/obs_a6359110ec4844ec973b90886da4c7c5/record.json",
+        "probe_path": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/probes/probe_a12e7eecce944295bbe76db810cbbdc5/record.json",
+        "image_path": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/observations/obs_a6359110ec4844ec973b90886da4c7c5/image.png",
+        "observation_sha256": "fa7b0a6fdeafbf09063bbcb702cd0f801b7cc62c28664a689489b5278320132f",
+        "probe_sha256": "096d63fedf673fd013b03e551e9e2e6eeea0622d0bc5aa0d8edcdb158e84a19d",
+        "image_sha256": "ef82eb3332304ef9948c5178834f2649bfb93697c9c6ad3b4878a71746c7a780"
+      }
+    }
+  },
+  "acceptance_target": {
+    "scope": "device",
+    "backend": "browser",
+    "device": "http://127.0.0.1:38285/?offline=1&local=1&lang=en&ui=atlas&splash=1&picker=0",
+    "resource_path": "resource",
+    "runtime": {
+      "browser_version": "158.0.8127.18",
+      "playwright_version": "1.65.1",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "device_scale_factor": 1
+      },
+      "headless": true,
+      "platform": "Linux"
+    }
+  },
+  "excluded_target_attempts": [],
+  "excluded_target_attempts_omitted": 0,
+  "task_path": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/dev/tasks/AgentCanvas.json",
+  "next_action": "Deliver the current resource files and report the configured checks and evidence scope."
+}

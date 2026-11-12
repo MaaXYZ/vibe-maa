@@ -94,6 +94,27 @@ A second Linux host passed blank **3/3** but failed splash **0/3** at `SplashSto
 
 Reported usage: input including cache 6,370,060; cached input 6,285,696; output 42,690; reasoning output 13,049. These are provider counters for one observation, not a cost estimate or a general success rate.
 
-## Remaining acceptance work
+## Autonomous redevelopment after the next failure
+
+[Run 43208826944](https://github.com/MaaXYZ/vibe-maa/actions/runs/43208826944), source `8bb616c`, continues the **unmodified** startup-recovery result. The real second-host failure above supplies one labelled full frame; the old application frame supplies another. A controlled real Chromium font environment then reproduces blank passing and splash failing before the model is called. No upstream application bytes are changed. This is a concrete unfamiliar appearance change, not a claim that all future workflow changes are covered.
+
+With `deepseek-flash`, explicit `low` and the same **600-second** model budget, the agent finished in **172.282 seconds**. It read the native failure reports, re-observed and operated the current application, read and compared the original image pixels, changed `SplashStorage` from title `TemplateMatch` to `ColorMatch`, and checked the new rule. The initial count of 15000 failed on positive frames with 14676/14701 matching pixels. After changing it to 14000, all seven cases passed; the agent completed a local segment and both fresh saved-task starts. It added exact `scenario_urls`, and the real task context finished **accepted/current**, two attempts used and eight remaining.
+
+The independent business oracle passed **12/12**: changed/reference environments × blank/splash × three new contexts. The original goal node, other ten nodes, templates, old screenshots and labels remained unchanged. The protected task budget and scenario identities also remained unchanged. On the original failing second host, the unmodified new submission passed blank **3/3** and splash **3/3**. An isolated installed v0.4.0 wheel also executed both starts and recovered aggregate `accepted` in a new manager after closing the browser workers, without source changes.
+
+The [original project](../examples/agent-generated/drawio-change-low/README.md), [result](records/drawio-change-43208826944.json), [baseline](records/drawio-change-43208826944-baseline.json), [activity](records/drawio-change-43208826944-activity.json), [task context](records/drawio-change-43208826944-task-context.json), [second-host replay](records/drawio-change-local-replay.json) and [complete original publication](records/archives/drawio-change-43208826944.zip) are retained. Independent review verified 232 manifest entries across the original starter, submission and seventeen native-evidence archives. Visible commands show no other answer, grader, network solution or DOM access. Image-view items are not retained, but the PIL calls explicitly read the supplied screenshots. Output fields are bounded, so this is not complete information-flow proof.
+
+The new ColorMatch is **context dependent** on `SplashOpen` having entered the storage dialog: blank/Device frames also contain enough light pixels to match that rule in isolation. The model did not merely lower the old template threshold, but its new count was tuned. The demonstrated claim is the actual branch and business matrix, not a universal dialog classifier. The earlier manual icon experiment was not used for this model submission and is not counted as autonomous success. The post-trial Skill records the need to preserve failures, re-observe changes, rerun prior starts, and state contextual recognition dependencies.
+
+| Reported metric | Value |
+| --- | ---: |
+| Tool items / failed completed shell commands | 47 / 1 |
+| Input tokens, including cached | 1,958,783 |
+| Cached input | 1,893,376 |
+| Output / reasoning output | 20,864 / 6,944 |
+
+The failed shell command used an unavailable `identify` binary; the model continued with the installed Pillow library. Counters are not prices. The job allows 25 minutes for provisioning and model-free verification; the model budget remains 600 seconds. Tool contracts changed between trials, so timing differences cannot be attributed to reasoning alone.
+
+## Next evidence to collect
 
 Expand application and unseen-start-state coverage, retain original outputs and failure evidence, and improve tool ergonomics from observed command errors. Keep offline recognition cases, fixture results and real application outcomes distinct.

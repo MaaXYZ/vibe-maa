@@ -1,0 +1,62 @@
+{
+  "passed": false,
+  "target": "drawio",
+  "scope": "application",
+  "starting_states": [
+    "blank",
+    "splash"
+  ],
+  "repetitions_per_state": 1,
+  "checks": [
+    {
+      "starting_state": "blank",
+      "repetition": 1,
+      "initial_state": {
+        "current_file": true,
+        "graph_enabled": true,
+        "dialog_count": 0
+      },
+      "final_state": {
+        "current_file": true,
+        "graph_enabled": true,
+        "dialog_count": 0
+      },
+      "execution_status": "succeeded",
+      "label_in_canvas": true,
+      "document": [
+        {
+          "label": "Vibe Maa",
+          "style": "rounded=0;whiteSpace=wrap;html=1;",
+          "shape": "label",
+          "rectangle_renderer": true,
+          "ellipse_renderer": false,
+          "width": 120,
+          "height": 60
+        }
+      ],
+      "run_id": "run_6965ac78a6fa4e1ebc6e1e11b7f8d1c3",
+      "passed": true
+    },
+    {
+      "starting_state": "splash",
+      "repetition": 1,
+      "initial_state": {
+        "current_file": false,
+        "graph_enabled": false,
+        "dialog_count": 1
+      },
+      "final_state": {
+        "current_file": false,
+        "graph_enabled": false,
+        "dialog_count": 1
+      },
+      "execution_status": "failed",
+      "label_in_canvas": false,
+      "document": [],
+      "run_id": "run_9ef946b5baba4d28bd543ad53cbaf1bd",
+      "passed": false
+    }
+  ],
+  "blocked_external_requests": [],
+  "oracle": "fresh real application canvas DOM, independent from agent-supplied goals"
+}

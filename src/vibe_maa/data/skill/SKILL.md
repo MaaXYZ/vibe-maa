@@ -45,6 +45,8 @@ The installed package includes the workflow and demo data. `agent show` returns 
 5. Never change a goal or expected test label solely to obtain a passing result. If a completion condition needs correction, explain the evidence for the correction.
 6. Re-read `context --task NAME` after editing or resuming; use `task context NAME` for details. Acceptance is tied to the saved task and current input files; a passing old run is not validation of new source. Check whether the attempt budget remains available rather than silently changing or replacing the task to evade it.
 
+When a previously working target changes, treat the new failure as development input. Preserve the last working source and failing native report, observe the current interface again, and compare the failed recognition/action with its saved pixels. Add grounded cases for the new state while retaining earlier labels. Choose the repair from those observations, then rerun both the changed state and earlier required starts from fresh sessions. Earlier acceptance covers its recorded source, target and checks; it does not prove that the current application has stayed unchanged. Recognition inside a branch may depend on its predecessor's established state: test that whole branch and document such dependencies rather than presenting a contextual match as a general UI detector.
+
 ## Preserve verification
 
 - Curate labeled full screenshots into `dev/cases/` and use `case check --session SESSION_ID --cases dev/cases/NAME.json`.

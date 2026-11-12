@@ -37,6 +37,8 @@ vibe-maa 与 Codex、Claude Code 等编程 AI 配合工作。
 
 我们已经使用 `deepseek-flash`，通过开源编程 Agent 在真实的 diagrams.net / draw.io 中探索并开发自动化，产出脚本、图片素材、用例和任务文件，再从新会话独立重跑检查结果。
 
+也验证了已有脚本遇到新启动弹窗和后续界面变化时，AI 根据失败现场重新观察、修改，再验证新旧起点的开发闭环。[查看这次自主修复的项目与证据](examples/agent-generated/drawio-change-low/README.md)。
+
 项目的真实应用测试覆盖 Windows 和 Ubuntu。模型原始交付物与跨平台参考流程分别保留，成功、失败及适用范围都记录在[验收记录](docs/benchmarks.md)中。
 
 ![真实模型生成的 draw.io 自动化结果](examples/agent-generated/drawio-low-isolated/dev/cases/VibeMaa_positive.png)

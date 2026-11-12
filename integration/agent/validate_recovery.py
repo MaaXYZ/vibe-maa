@@ -97,7 +97,12 @@ def main() -> int:
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--cache", default=Path("work/targets"), type=Path)
     parser.add_argument("--browser-executable")
+    parser.add_argument("--require-installed", action="store_true")
     args = parser.parse_args()
+    if args.require_installed and Path(vibe_maa.__file__).resolve().is_relative_to(
+        Path(__file__).resolve().parents[2] / "src"
+    ):
+        parser.error("Use an isolated installed wheel for this check")
     result = validate(args.project, args.output, args.cache, args.browser_executable)
     print(
         json.dumps(
