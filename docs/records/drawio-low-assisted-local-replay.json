@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "mode": "replay_no_model_calls",
+  "grade": {
+    "passed": true,
+    "target": "drawio",
+    "scope": "application",
+    "checks": [
+      {
+        "repetition": 1,
+        "execution_status": "succeeded",
+        "label_in_canvas": true,
+        "document": [
+          {
+            "label": "Vibe Maa",
+            "style": "rounded=0;whiteSpace=wrap;html=1;",
+            "shape": "label",
+            "rectangle_renderer": true,
+            "ellipse_renderer": false,
+            "width": 120,
+            "height": 60
+          }
+        ],
+        "run_id": "run_ccb411dc8c5c4d7eb2cff33a2ea5ad92",
+        "passed": true
+      },
+      {
+        "repetition": 2,
+        "execution_status": "succeeded",
+        "label_in_canvas": true,
+        "document": [
+          {
+            "label": "Vibe Maa",
+            "style": "rounded=0;whiteSpace=wrap;html=1;",
+            "shape": "label",
+            "rectangle_renderer": true,
+            "ellipse_renderer": false,
+            "width": 120,
+            "height": 60
+          }
+        ],
+        "run_id": "run_699c65665b1444729c124a56a8be1d98",
+        "passed": true
+      }
+    ],
+    "blocked_external_requests": [],
+    "oracle": "fresh real application canvas DOM, independent from agent-supplied goals"
+  },
+  "source_unchanged": true,
+  "source_hashes": {
+    "ORIGIN.json": "4436a25cb993f41aceea828de3c418650e285acc00def0ccdbcd314213563bb1",
+    "README.md": "2b5682dda7c7b6c8c0a2849e16a4bb09e0b95303be085bf68538425ece8ff967",
+    "dev/assets/rectangle_tool.json": "5866d3b924c9f9cb1ddb806f1211c8e05db469015eed01020bc4867c7ae1a596",
+    "dev/assets/vibe_maa_label.json": "cdfae4c7b6e80a4c98ceccba5f2f77bf94737156de00c4d51692f9b63ef2d1df",
+    "dev/tasks/diagrams-rectangle-vibe-maa.json": "9c61bc7211c90ed3f7eab61ba950b9a55eea22da6f90b7e8edc4f4504e65441e",
+    "interface.json": "0a6a448b57ed9ac98f034ac521de9f60a200e661ad7326ab8db3125901007283",
+    "manifest.json": "a016ba58fe71c61fbfd85891c987b9e8909e3ac48c281323b45408878899648f",
+    "resource/image/rectangle_tool.png": "6703db07cff83bd14aaaa295fc892ba68756b51014eca59d6c8002933b83d66c",
+    "resource/image/vibe_maa_label.png": "c7ab2d81a2e7aa9fb44ff9e5a6e2d56dc5d0517ee12f977fb1d76be8489d4fb1",
+    "resource/pipeline/AgentTask.json": "14484b455a289c8c561e5090f817a4df19f8dc3fe959c934d102a853973bcbca"
+  },
+  "upstream": {
+    "name": "diagrams.net / draw.io",
+    "repository": "https://github.com/jgraph/drawio",
+    "release": "v32.6.10",
+    "commit": "c72c9a98b7a6ce392556ed04c05e0ff19f43f5c3",
+    "archive_url": "https://github.com/jgraph/drawio/releases/download/v32.6.10/draw.war",
+    "archive_sha256": "a57b06b3b6a876a351dacfe65d027d9509319cd030e9bacf6ae04a034d66a38f",
+    "archive_size": 49729549,
+    "launch_path": "/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0",
+    "license": "Apache-2.0",
+    "license_url": "https://github.com/jgraph/drawio/blob/c72c9a98b7a6ce392556ed04c05e0ff19f43f5c3/LICENSE",
+    "attribution": "Copyright JGraph Ltd and draw.io AG; diagrams.net/draw.io is an independent upstream project. Other bundled assets retain their upstream licenses."
+  },
+  "original_manifest": {
+    "present": true,
+    "verified_files": 7,
+    "manifest_sha256": "a016ba58fe71c61fbfd85891c987b9e8909e3ac48c281323b45408878899648f"
+  }
+}

@@ -1,0 +1,140 @@
+{
+  "run_url": "https://github.com/MaaXYZ/vibe-maa/actions/runs/43196041030",
+  "classification": "reference_assisted_task_completed",
+  "acceptance": {
+    "schema_version": 1,
+    "target": "drawio",
+    "agent": {
+      "returncode": 0,
+      "timed_out": false,
+      "harness": "openai/codex",
+      "harness_version": "codex-cli 0.167.2",
+      "wall_time_budget_seconds": 600,
+      "elapsed_seconds": 135.097,
+      "budget_scope": "wall_time_only_not_a_currency_or_token_limit",
+      "error": null,
+      "infrastructure_error": null,
+      "tool_service": {
+        "project": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project",
+        "pid": 3110,
+        "version": "0.3.0",
+        "build_id": "ca1679d28bb3beac4356bcbdbef6c9c7783f4b6ad576d6dc43554d1e36e4c84a",
+        "ownership": "harness"
+      },
+      "usage": {
+        "input_tokens": 1265484,
+        "cached_input_tokens": 1220096,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 14931,
+        "reasoning_output_tokens": 5641
+      },
+      "usage_last_turn": {
+        "input_tokens": 1265484,
+        "cached_input_tokens": 1220096,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 14931,
+        "reasoning_output_tokens": 5641
+      },
+      "completed_turns": 1,
+      "usage_measurement": "sum_of_reported_turn.completed_events",
+      "terminal_state": "completed",
+      "activity_trace": "agent-activity.json",
+      "historical_error_count": 0,
+      "tool_items": 53,
+      "failed_command_items": 1,
+      "command_failure_measurement": "retained_completed_command_items",
+      "activity_truncated_records": 0
+    },
+    "configuration": {
+      "model": "deepseek-flash",
+      "base_url": "https://api.deepseek.com",
+      "authentication": "api_key",
+      "wire_api": "responses",
+      "reasoning_effort_requested": "low",
+      "configuration_source": {
+        "authentication": "api_key_environment",
+        "model": "environment",
+        "base_url": "environment",
+        "reasoning_effort": "run_override"
+      }
+    },
+    "source_revision": "bd9a92b47b10aa53278d591ef4bd94f55f588ff8",
+    "upstream": {
+      "name": "diagrams.net / draw.io",
+      "repository": "https://github.com/jgraph/drawio",
+      "release": "v32.6.10",
+      "commit": "c72c9a98b7a6ce392556ed04c05e0ff19f43f5c3",
+      "archive_url": "https://github.com/jgraph/drawio/releases/download/v32.6.10/draw.war",
+      "archive_sha256": "a57b06b3b6a876a351dacfe65d027d9509319cd030e9bacf6ae04a034d66a38f",
+      "archive_size": 49729549,
+      "launch_path": "/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0",
+      "license": "Apache-2.0",
+      "license_url": "https://github.com/jgraph/drawio/blob/c72c9a98b7a6ce392556ed04c05e0ff19f43f5c3/LICENSE",
+      "attribution": "Copyright JGraph Ltd and draw.io AG; diagrams.net/draw.io is an independent upstream project. Other bundled assets retain their upstream licenses."
+    },
+    "grade": {
+      "passed": true,
+      "target": "drawio",
+      "scope": "application",
+      "checks": [
+        {
+          "repetition": 1,
+          "execution_status": "succeeded",
+          "label_in_canvas": true,
+          "document": [
+            {
+              "label": "Vibe Maa",
+              "style": "rounded=0;whiteSpace=wrap;html=1;",
+              "shape": "label",
+              "rectangle_renderer": true,
+              "ellipse_renderer": false,
+              "width": 120,
+              "height": 60
+            }
+          ],
+          "run_id": "run_7c0347c844d4444c98d6feb026436273",
+          "passed": true
+        },
+        {
+          "repetition": 2,
+          "execution_status": "succeeded",
+          "label_in_canvas": true,
+          "document": [
+            {
+              "label": "Vibe Maa",
+              "style": "rounded=0;whiteSpace=wrap;html=1;",
+              "shape": "label",
+              "rectangle_renderer": true,
+              "ellipse_renderer": false,
+              "width": 120,
+              "height": 60
+            }
+          ],
+          "run_id": "run_3283b7afefa348c39352e9eb64d0fa8e",
+          "passed": true
+        }
+      ],
+      "blocked_external_requests": [],
+      "oracle": "fresh real application canvas DOM, independent from agent-supplied goals"
+    }
+  },
+  "audit": {
+    "tool_items": 53,
+    "capabilities_queries": 7,
+    "context_snapshots": 2,
+    "task_context_queries": 1,
+    "act_calls": 3,
+    "probe_calls": 3,
+    "asset_extract_calls": 2,
+    "pipeline_nodes": 6,
+    "image_templates": 2,
+    "case_manifests": 0,
+    "source_archive_sha256": "8af8bdd602f6c87e6981e305454bf2906a89affb62f46294d590d5440aa502e8",
+    "reference_exposure": [
+      "examples/agent-generated/drawio/",
+      "examples/drawio-portable/interface.json"
+    ],
+    "interpretation": "Native exploration and output validation succeeded after service-lifetime repair, with same-task reference material visible. This is not a from-scratch independent-development result.",
+    "activity_limit": "Published activity retains shell commands but does not independently establish image-view tool usage. No direct DOM/Playwright application access was visible in the retained commands."
+  }
+}

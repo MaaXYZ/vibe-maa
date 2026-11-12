@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "scope": "pinned_codex_sandbox_native_demo_no_model_api",
+  "harness_version": "codex-cli 0.167.2",
+  "separate_sandbox_invocations": 4,
+  "session_reused_across_commands": true,
+  "managed_stop_denied": true,
+  "source_isolation": {
+    "scope": "checkout_runtime_allowlist",
+    "denied_reads": {
+      "published_solution": true,
+      "grader": true,
+      "benchmarks": true,
+      "benchmark_record": true,
+      "test_source": true,
+      "git_history": true,
+      "private_sentinel": true,
+      "solution_symlink": true
+    },
+    "tool_import_version": "0.3.0"
+  },
+  "checks": [
+    {
+      "operation": "session open",
+      "separate_pid_namespace": true,
+      "same_host_owner": true,
+      "returncode": 0,
+      "ok": true
+    },
+    {
+      "operation": "observe --session",
+      "separate_pid_namespace": true,
+      "same_host_owner": true,
+      "returncode": 0,
+      "ok": true
+    },
+    {
+      "operation": "daemon stop",
+      "separate_pid_namespace": true,
+      "same_host_owner": true,
+      "returncode": 1,
+      "ok": false
+    },
+    {
+      "operation": "session close",
+      "separate_pid_namespace": true,
+      "same_host_owner": true,
+      "returncode": 0,
+      "ok": true
+    }
+  ],
+  "elapsed_seconds": 1.275
+}

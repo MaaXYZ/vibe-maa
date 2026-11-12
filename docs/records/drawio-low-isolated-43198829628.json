@@ -1,0 +1,144 @@
+{
+  "run_url": "https://github.com/MaaXYZ/vibe-maa/actions/runs/43198829628",
+  "classification": "filesystem_isolated_task_completed",
+  "acceptance": {
+    "schema_version": 1,
+    "target": "drawio",
+    "agent": {
+      "returncode": 0,
+      "timed_out": false,
+      "harness": "openai/codex",
+      "harness_version": "codex-cli 0.167.2",
+      "wall_time_budget_seconds": 600,
+      "elapsed_seconds": 151.232,
+      "budget_scope": "wall_time_only_not_a_currency_or_token_limit",
+      "error": null,
+      "infrastructure_error": null,
+      "tool_service": {
+        "project": "/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project",
+        "pid": 3121,
+        "version": "0.3.0",
+        "build_id": "3fe14cbd2de286aed98a2f379f207766b4b7c7ed9f4092928bfd463815d34d6b",
+        "ownership": "harness"
+      },
+      "source_isolation": {
+        "scope": "checkout_runtime_allowlist",
+        "profile": "vibe_agent",
+        "rules_sha256": "c5f8a19af375c89badfe0189c2258f94edb751ede849c315aca8db550c558538",
+        "network_egress": "not_isolated_by_this_filesystem_policy"
+      },
+      "usage": {
+        "input_tokens": 1440197,
+        "cached_input_tokens": 1395200,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 18335,
+        "reasoning_output_tokens": 5750
+      },
+      "usage_last_turn": {
+        "input_tokens": 1440197,
+        "cached_input_tokens": 1395200,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 18335,
+        "reasoning_output_tokens": 5750
+      },
+      "completed_turns": 1,
+      "usage_measurement": "sum_of_reported_turn.completed_events",
+      "terminal_state": "completed",
+      "activity_trace": "agent-activity.json",
+      "historical_error_count": 0,
+      "tool_items": 41,
+      "failed_command_items": 1,
+      "command_failure_measurement": "retained_completed_command_items",
+      "activity_truncated_records": 0
+    },
+    "configuration": {
+      "model": "deepseek-flash",
+      "base_url": "https://api.deepseek.com",
+      "authentication": "api_key",
+      "wire_api": "responses",
+      "reasoning_effort_requested": "low",
+      "configuration_source": {
+        "authentication": "api_key_environment",
+        "model": "environment",
+        "base_url": "environment",
+        "reasoning_effort": "run_override"
+      }
+    },
+    "source_revision": "40d5b51ed343101dfe6912eccffdb2be8702ee63",
+    "upstream": {
+      "name": "diagrams.net / draw.io",
+      "repository": "https://github.com/jgraph/drawio",
+      "release": "v32.6.10",
+      "commit": "c72c9a98b7a6ce392556ed04c05e0ff19f43f5c3",
+      "archive_url": "https://github.com/jgraph/drawio/releases/download/v32.6.10/draw.war",
+      "archive_sha256": "a57b06b3b6a876a351dacfe65d027d9509319cd030e9bacf6ae04a034d66a38f",
+      "archive_size": 49729549,
+      "launch_path": "/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0",
+      "license": "Apache-2.0",
+      "license_url": "https://github.com/jgraph/drawio/blob/c72c9a98b7a6ce392556ed04c05e0ff19f43f5c3/LICENSE",
+      "attribution": "Copyright JGraph Ltd and draw.io AG; diagrams.net/draw.io is an independent upstream project. Other bundled assets retain their upstream licenses."
+    },
+    "grade": {
+      "passed": true,
+      "target": "drawio",
+      "scope": "application",
+      "checks": [
+        {
+          "repetition": 1,
+          "execution_status": "succeeded",
+          "label_in_canvas": true,
+          "document": [
+            {
+              "label": "Vibe Maa",
+              "style": "rounded=0;whiteSpace=wrap;html=1;",
+              "shape": "label",
+              "rectangle_renderer": true,
+              "ellipse_renderer": false,
+              "width": 120,
+              "height": 60
+            }
+          ],
+          "run_id": "run_a08593ee40fc47949daeb61f4d35d062",
+          "passed": true
+        },
+        {
+          "repetition": 2,
+          "execution_status": "succeeded",
+          "label_in_canvas": true,
+          "document": [
+            {
+              "label": "Vibe Maa",
+              "style": "rounded=0;whiteSpace=wrap;html=1;",
+              "shape": "label",
+              "rectangle_renderer": true,
+              "ellipse_renderer": false,
+              "width": 120,
+              "height": 60
+            }
+          ],
+          "run_id": "run_cc21b0a6a982400281bc856199866b18",
+          "passed": true
+        }
+      ],
+      "blocked_external_requests": [],
+      "oracle": "fresh real application canvas DOM, independent from agent-supplied goals"
+    }
+  },
+  "audit": {
+    "native_repetitions_passed": 2,
+    "pipeline_nodes": 8,
+    "templates": 2,
+    "task_files": 1,
+    "case_manifests": 1,
+    "labeled_cases": 2,
+    "case_labels": "positive and negative",
+    "tool_items": 41,
+    "completed_shell_commands": 40,
+    "reference_access": "No prior-solution, privileged-grader or network-answer retrieval appeared in the visible command history.",
+    "isolation": "The exact shared Codex filesystem policy passed eight denied-read checks and native cross-command session checks before model execution. Network egress was not isolated.",
+    "activity_scope": "Retained shell commands do not independently establish complete screenshot-view tool coverage.",
+    "observed_command_failure": "Unsupported task context --max-bytes; no UI operation failure reported in the retained commands.",
+    "source_archive_sha256": "6550b6bc62456ba7e67d4c143a48700dd8ae47091aa83214aea39823f840b189",
+    "individual_outputs_truncated": true
+  }
+}

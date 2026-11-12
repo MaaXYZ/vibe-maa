@@ -11,7 +11,7 @@ import json5
 import numpy as np
 
 from .backends.base import Backend
-from .errors import DevError
+from .errors import DevError, failure_detail
 from .evidence import EvidenceStore, identifier, now, read_image, save_image, write_json
 from .leases import acquire_device
 from .tasks import TaskManager
@@ -345,9 +345,16 @@ class DevelopmentService:
         try:
             success = session.backend.act(action)
             record["status"] = "succeeded" if success else "failed"
+            if not success:
+                record["failure"] = {
+                    "code": "ACTION_FAILED",
+                    "message": "The controller did not confirm action success; inspect the resulting observation before retrying",
+                    "details": {},
+                }
         except Exception as exc:
             record["status"] = "failed"
             record["error"] = str(exc)
+            record["failure"] = failure_detail(exc)
         finally:
             record["finished_at"] = now()
             try:
@@ -356,6 +363,7 @@ class DevelopmentService:
             except Exception as exc:
                 after = None
                 record["observation_error"] = str(exc)
+                record["observation_failure"] = failure_detail(exc)
             self.store.write("actions", aid, record)
         return {**record, "observation": after}
 
@@ -513,6 +521,7 @@ class DevelopmentService:
             )
         except Exception as exc:
             report.update(execution_status="failed", error=str(exc))
+            report["failure"] = failure_detail(exc)
         finally:
             if last_recognition is not None:
                 event, image = last_recognition
@@ -531,6 +540,7 @@ class DevelopmentService:
                     report["goal_status"] = "passed" if check["hit"] else "failed"
             except Exception as exc:
                 report["verification_error"] = str(exc)
+                report["verification_failure"] = failure_detail(exc)
             report["finished_at"] = now()
             try:
                 report["inputs_changed"] = self._snapshot(session.resource_path) != report["inputs"]

@@ -1,0 +1,95 @@
+{
+  "run_url": "https://github.com/MaaXYZ/vibe-maa/actions/runs/43192717285",
+  "classification": "tool_service_lifecycle_blocked",
+  "acceptance": {
+    "schema_version": 1,
+    "target": "drawio",
+    "agent": {
+      "returncode": -15,
+      "timed_out": true,
+      "harness": "openai/codex",
+      "harness_version": "codex-cli 0.167.2",
+      "wall_time_budget_seconds": 600,
+      "elapsed_seconds": 600.059,
+      "budget_scope": "wall_time_only_not_a_currency_or_token_limit",
+      "error": null,
+      "usage": null,
+      "usage_last_turn": null,
+      "completed_turns": 0,
+      "usage_measurement": "sum_of_reported_turn.completed_events",
+      "terminal_state": "started",
+      "activity_trace": "agent-activity.json",
+      "historical_error_count": 0,
+      "tool_items": 24,
+      "failed_command_items": 1,
+      "command_failure_measurement": "retained_completed_command_items",
+      "activity_truncated_records": 0
+    },
+    "configuration": {
+      "model": "deepseek-flash",
+      "base_url": "https://api.deepseek.com",
+      "authentication": "api_key",
+      "wire_api": "responses",
+      "reasoning_effort_requested": "low",
+      "configuration_source": {
+        "authentication": "api_key_environment",
+        "model": "environment",
+        "base_url": "environment",
+        "reasoning_effort": "run_override"
+      }
+    },
+    "source_revision": "7071d1cfa93359f49d08ee152f4424b0d3476e4c",
+    "upstream": {
+      "name": "diagrams.net / draw.io",
+      "repository": "https://github.com/jgraph/drawio",
+      "release": "v32.6.10",
+      "commit": "c72c9a98b7a6ce392556ed04c05e0ff19f43f5c3",
+      "archive_url": "https://github.com/jgraph/drawio/releases/download/v32.6.10/draw.war",
+      "archive_sha256": "a57b06b3b6a876a351dacfe65d027d9509319cd030e9bacf6ae04a034d66a38f",
+      "archive_size": 49729549,
+      "launch_path": "/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0",
+      "license": "Apache-2.0",
+      "license_url": "https://github.com/jgraph/drawio/blob/c72c9a98b7a6ce392556ed04c05e0ff19f43f5c3/LICENSE",
+      "attribution": "Copyright JGraph Ltd and draw.io AG; diagrams.net/draw.io is an independent upstream project. Other bundled assets retain their upstream licenses."
+    },
+    "grade": {
+      "passed": false,
+      "error": {
+        "type": "DevError",
+        "message": "Deliver a standard Pipeline with entry AgentTask"
+      }
+    },
+    "export_error": "No Pipeline files were found in the project resources"
+  },
+  "audit": {
+    "source": "published_tool_activity",
+    "tool_items": 24,
+    "completed_commands": 23,
+    "failed_commands": 1,
+    "capabilities_calls": 4,
+    "context_calls": 1,
+    "image_views": 0,
+    "input_operations": 0,
+    "pipeline_files": 0,
+    "templates": 0,
+    "activity_truncated_records": 0,
+    "sequence": [
+      "session.open returned a browser session",
+      "next observe returned SESSION_NOT_FOUND",
+      "session.list returned no sessions",
+      "daemon status reported stopped with stale metadata"
+    ],
+    "finding": "Per-command Linux PID namespaces killed the detached device service after the opening shell command exited. Reproduced without a model using unshare. This trial does not establish low-reasoning task capability.",
+    "usage": "not_reported_before_timeout; not zero cost",
+    "viewport_observed": {
+      "width": 1440,
+      "height": 900
+    },
+    "viewport_required_by_grader": {
+      "width": 1280,
+      "height": 720
+    },
+    "publication_note": "The affected workflow artifact was removed after retaining this result record and a re-sanitized tool-activity derivative. An expired local daemon token was stripped; no LLM API key was found exposed.",
+    "original_artifact_sha256": "32d17ff36fa8c009f59ffbd6d33ff7580cbb5d2f272a638318006f18a7ec1d24"
+  }
+}

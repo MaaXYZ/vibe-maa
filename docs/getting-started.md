@@ -2,6 +2,8 @@
 
 ## 安装与升级
 
+需要 Python 3.11+ 和 [uv](https://docs.astral.sh/uv/)。工具使用 MaaFramework 5.16+；浏览器支持按需安装。
+
 用户安装推荐使用独立工具环境：
 
 ```bash
@@ -9,7 +11,9 @@ uv tool install 'vibe-maa[browser] @ git+https://github.com/MaaXYZ/vibe-maa'
 vibe-maa browser install
 ```
 
-只用 ADB 或邮箱示例时去掉 `[browser]`。升级前关闭项目服务，再重新安装工具；常驻服务会核验版本，不会静默继续使用旧实现：
+只用 ADB 或邮箱示例时去掉 `[browser]`，无需安装 Chromium。也可以从 [GitHub Releases](https://github.com/MaaXYZ/vibe-maa/releases) 获取 wheel，再运行 `uv tool install ./vibe_maa-VERSION-py3-none-any.whl`。
+
+升级前关闭项目服务，再重新安装工具；常驻服务会核验版本，不会静默继续使用旧实现：
 
 ```bash
 vibe-maa --project PATH daemon stop
@@ -38,15 +42,43 @@ vibe-maa --project ./example agent install --target codex
 vibe-maa --project ./example agent show
 ```
 
-Codex 的 Skill 放在项目 `.agents/skills/vibe-maa/`；Claude Code 放在 `.claude/skills/vibe-maa/`。安装已有目录会明确失败，便于保留用户修改。可以用 `agent export --output skills-copy` 先导出并比较内容。安装后刷新编程 AI 会话。
+Codex 的 Skill 放在项目 `.agents/skills/vibe-maa/`；Claude Code 放在 `.claude/skills/vibe-maa/`。安装已有目录会明确失败，便于保留用户修改。可以用 `agent export --output skills-copy` 先导出并比较内容。安装后刷新编程 AI 会话。Skill 和示例数据都包含在安装包中，无需额外克隆本仓库。
 
-AI 应先读取项目说明和 `task context`，再操作软件。任务定义保存在 `dev/tasks/`，可以进入版本控制：
+编程 AI 的多次工具调用需要共用一个持续运行的服务。在 Codex 等按命令隔离进程的环境中，先通过执行工具的持久 exec 或 PTY 会话运行下列命令，让工具返回会话 ID，保留命令继续运行；也可以由稳定的宿主终端或进程管理器运行：
+
+```bash
+vibe-maa --project ./example daemon serve
+```
+
+随后在另一次工具调用中运行 `vibe-maa --project ./example daemon status`，确认 `running` 和 `compatible` 都为 `true`，再打开设备会话。`daemon serve` 在前台等待，完成工作后用另一条命令 `daemon stop` 结束。不要只在短命 shell 里追加 `&`：沙箱退出时可能清理整个 PID 命名空间，连同后台服务一起终止。项目上下文和历史证据可以保留，设备会话则会随服务退出而失效。
+
+已有运行且兼容的服务可以直接复用。若测试 harness 或外部进程管理器声明它负责服务生命周期，AI 只关闭自己打开的设备会话；服务的启动、重启和停止由外部管理者负责。
+
+可以给 AI 这样的任务描述：
+
+> 使用 vibe-maa 完成 mailbox 任务。先读取任务上下文，再探索界面、修改 Pipeline 并验证；保留 HomeVisible 完成条件和已有样本标签，最后交付项目与验证报告。
+
+邮箱是可复位测试场景，识别与执行使用真实 MaaFW 原生运行时。起步项目故意缺少公告处理分支；AI 应在公告起点观察失败、修改源文件并重跑。真实软件验收采用单独的 [Draw.io 目标](test-targets.md)。
+
+AI 应先读取项目说明，用 `capabilities` 发现能力，再用 `context` 恢复项目状态。两者不会连接设备或启动服务：
+
+```bash
+vibe-maa capabilities
+vibe-maa capabilities --method act
+vibe-maa --project ./example context --max-bytes 6000
+```
+
+能力索引提供方法清单；按方法查询返回参数 JSON Schema、CLI 示例、前置条件和结果语义。上下文默认限制在 12 KB，可选 2–64 KB；超出预算的内容会被截断，并在结果中注明省略项数量。保存的图片标为历史，不构成当前输入授权。需要完整约束、证据和验收解释时继续读取 `task context NAME`。
+
+任务定义保存在 `dev/tasks/`，可以进入版本控制：
 
 ```bash
 vibe-maa --project ./example task create mailbox --objective "打开邮箱并返回主页" --entry OpenMailbox --goal HomeVisible --cases dev/cases/mailbox.json --max-attempts 10
 vibe-maa --project ./example task list
 vibe-maa --project ./example task context mailbox
 ```
+
+恢复已有任务时使用 `vibe-maa --project ./example context --task mailbox`。
 
 可重复使用 `--constraint` 记录资源使用等要求。这些文字要求由编程 AI 遵守，工具不会声称它们已被自动验证。入口与完成条件要由可观察事实支撑，不能把 `DirectHit` 当作完成证明。
 
@@ -59,6 +91,8 @@ vibe-maa --project ./example session open --backend demo --initial-state popup
 vibe-maa --project ./android-project session open --backend adb --device 127.0.0.1:16384 --adb-path adb
 vibe-maa --project ./web-project session open --backend browser --url http://127.0.0.1:8080 --width 1280 --height 720
 ```
+
+若返回 `DAEMON_REQUIRES_SUPERVISOR`，需要先在持久会话中启动 `daemon serve`。若返回 `SESSION_OWNER_LOST`，先读取已保存的任务和操作证据，修复服务生命周期，再建立新设备会话并重新观察当前界面。反复打开新会话无法修复短命服务；响应丢失前的输入可能已经发生，不要自动重放。
 
 浏览器默认无头运行；`--headed` 用于需要观看窗口的本机调试。`--browser-executable PATH` 可指定已有 Chromium。连接浏览器不会给 AI 页面脚本或 DOM 操作能力；输入依赖观察和 MaaFW 图像识别。
 
@@ -98,6 +132,20 @@ vibe-maa --project ./example task context mailbox
 ## 恢复任务与解释结果
 
 服务重启会使连接和会话 ID 失效；任务定义、尝试记录和历史图片保留。重新打开正确后端，读取 `task context NAME`，从最新证据继续。历史图片可继续用于 `probe`，但不能再次作为设备点击依据。
+
+CLI 在 stdout 返回一个版本化 JSON 对象。请求处理、原生执行和业务完成分别记录：
+
+| 字段 | 含义 |
+| --- | --- |
+| `ok` | CLI 请求是否处理完成 |
+| `execution_status` | 原生任务成功、失败或超时 |
+| `goal_status` | 独立完成条件通过、失败或无法确认 |
+| 任务 `state` | 当前源文件与所选用例是否已有有效验收记录 |
+| `scope` | 证据来自测试场景还是实际设备/应用 |
+
+动作和运行失败时，`failure` 保留可编程判断的 `code`、`message` 和 `details`；输入后的观察失败记录为 `observation_failure`，目标检查异常记录为 `verification_failure`。先检查当前界面和证据再重试输入，避免重复操作。
+
+未检查目标时保持 `unknown`。`run` 默认返回简明结果，完整记录可以通过保存的报告或 `--full` 读取。
 
 任务的 `accepted` 只表示当前源文件、任务定义及所选用例满足已配置检查，且证据标记了 `fixture/device` 范围。修改其中任何一项后需重新验证。异常或中断的尝试会留痕并消耗预算；响应丢失时先检查记录，不能假定输入未发生。
 

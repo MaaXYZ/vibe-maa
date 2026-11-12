@@ -1,0 +1,42 @@
+{
+  "files": [
+    {
+      "path": "dev/assets/rectangle_tool.json",
+      "sha256": "5866d3b924c9f9cb1ddb806f1211c8e05db469015eed01020bc4867c7ae1a596",
+      "size": 331
+    },
+    {
+      "path": "dev/assets/vibe_maa_label.json",
+      "sha256": "cdfae4c7b6e80a4c98ceccba5f2f77bf94737156de00c4d51692f9b63ef2d1df",
+      "size": 332
+    },
+    {
+      "path": "dev/tasks/diagrams-rectangle-vibe-maa.json",
+      "sha256": "9c61bc7211c90ed3f7eab61ba950b9a55eea22da6f90b7e8edc4f4504e65441e",
+      "size": 536
+    },
+    {
+      "path": "interface.json",
+      "sha256": "0a6a448b57ed9ac98f034ac521de9f60a200e661ad7326ab8db3125901007283",
+      "size": 388
+    },
+    {
+      "path": "resource/image/rectangle_tool.png",
+      "sha256": "6703db07cff83bd14aaaa295fc892ba68756b51014eca59d6c8002933b83d66c",
+      "size": 194
+    },
+    {
+      "path": "resource/image/vibe_maa_label.png",
+      "sha256": "c7ab2d81a2e7aa9fb44ff9e5a6e2d56dc5d0517ee12f977fb1d76be8489d4fb1",
+      "size": 762
+    },
+    {
+      "path": "resource/pipeline/AgentTask.json",
+      "sha256": "14484b455a289c8c561e5090f817a4df19f8dc3fe959c934d102a853973bcbca",
+      "size": 1556
+    }
+  ],
+  "kind": "maa_project",
+  "schema_version": 1,
+  "verification": "Packaging alone does not establish task acceptance."
+}

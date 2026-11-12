@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "vibe-maa"
-version = "0.2.0"
+version = "0.3.0"
 description = "Evidence-driven MaaFramework development tools for coding agents"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -18,7 +18,7 @@ browser = ["playwright>=1.56,<2"]
 vibe-maa = "vibe_maa.cli:main"
 
 [dependency-groups]
-dev = ["pytest>=8", "ruff>=0.11"]
+dev = ["pytest>=8", "ruff>=0.11", "jsonschema>=4.24"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

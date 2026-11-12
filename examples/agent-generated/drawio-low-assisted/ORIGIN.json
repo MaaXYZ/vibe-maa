@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "origin": "coding_agent_generated_unmodified_reference_assisted_submission",
+  "original_workflow": "https://github.com/MaaXYZ/vibe-maa/actions/runs/43196041030",
+  "source_revision": "bd9a92b47b10aa53278d591ef4bd94f55f588ff8",
+  "upstream": "jgraph/drawio v32.6.10",
+  "harness": "openai/codex 0.167.2",
+  "model": "deepseek-flash",
+  "reasoning_effort_requested": "low",
+  "reasoning_configuration_source": "run_override",
+  "source_archive_sha256": "8af8bdd602f6c87e6981e305454bf2906a89affb62f46294d590d5440aa502e8",
+  "source_modified_after_agent": false,
+  "reference_assisted": true,
+  "independent_no_reference_benchmark": false,
+  "visible_reference_reads": [
+    "examples/agent-generated/drawio/dev/tasks/diagrams-rectangle-vibe-maa.json",
+    "examples/agent-generated/drawio/resource/pipeline/AgentTask.json",
+    "examples/drawio-portable/interface.json"
+  ],
+  "reference_assistance_note": "Visible commands read existing solutions for this exact draw.io task. This successful run is reference-assisted and must not be reported as a clean independent benchmark.",
+  "visible_command_audit": "Application exploration used native vibe-maa observations and input. No direct application DOM or Playwright access was visible. The bounded tool trace contains command records and does not prove complete screenshot-view tool coverage.",
+  "wall_time_budget_seconds": 600,
+  "elapsed_seconds": 135.097,
+  "tool_items": 53,
+  "failed_command_items": 1,
+  "pipeline_nodes": 6,
+  "image_templates": 2,
+  "durable_tasks": 1,
+  "case_files": 0,
+  "grade": {
+    "passed": true,
+    "fresh_context_checks": 2,
+    "scope": "real_application_rectangle_renderer_and_exact_label"
+  },
+  "tested_environment": "Original Ubuntu GitHub Actions runner, bundled Chromium, 1280x720 viewport",
+  "cross_platform_tested": false,
+  "usage": {
+    "input_tokens": 1265484,
+    "cached_input_tokens": 1220096,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 14931,
+    "reasoning_output_tokens": 5641
+  },
+  "scope": "one_reference_assisted_pinned_application_task_not_general_game_automation",
+  "preservation_note": "manifest.json and its seven listed original files are unchanged. ORIGIN.json and README.md are maintainer-added provenance outside that original manifest."
+}

@@ -44,15 +44,30 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("init", help="Initialize a standard MaaFW project without overwrites.")
+    capabilities = commands.add_parser(
+        "capabilities",
+        help="Discover operations and exact parameter schemas without connecting a device.",
+    )
+    capabilities.add_argument("--method")
+    context = commands.add_parser(
+        "context",
+        help="Read a bounded project/task snapshot for an AI without starting a device session.",
+    )
+    context.add_argument("--task")
+    context.add_argument("--max-bytes", type=int, default=12000)
     reference = commands.add_parser(
         "reference", help="Read concise offline MaaFW protocol guidance."
     )
     reference.add_argument(
-        "--topic", choices=["pipeline", "recognition", "actions", "errors"], default="pipeline"
+        "--topic",
+        choices=["pipeline", "recognition", "actions", "errors", "project"],
+        default="pipeline",
     )
 
-    daemon = commands.add_parser("daemon", help="Inspect or stop the project-local daemon.")
-    daemon.add_argument("operation", choices=["status", "stop"])
+    daemon = commands.add_parser(
+        "daemon", help="Run the project daemon in the foreground, inspect it, or stop it."
+    )
+    daemon.add_argument("operation", choices=["serve", "status", "stop"])
 
     sessions = commands.add_parser("session")
     session_commands = sessions.add_subparsers(dest="operation", required=True)
@@ -63,7 +78,10 @@ def _parser() -> argparse.ArgumentParser:
     opening.add_argument("--resource-path", default="resource")
     opening.add_argument("--initial-state", choices=["home", "mailbox", "popup"], default="home")
     opening.add_argument("--url")
-    opening.add_argument("--headed", action="store_false", dest="headless", default=True)
+    visibility = opening.add_mutually_exclusive_group()
+    visibility.add_argument("--headed", action="store_false", dest="headless")
+    visibility.add_argument("--headless", action="store_true", dest="headless")
+    opening.set_defaults(headless=True)
     opening.add_argument("--width", type=int, default=1280)
     opening.add_argument("--height", type=int, default=720)
     opening.add_argument("--browser-executable")
@@ -216,6 +234,14 @@ def main(argv: list[str] | None = None) -> int:
         command = arguments.pop("command")
         if command == "init":
             response = envelope(initialize(project))
+        elif command == "capabilities":
+            from .capabilities import show
+
+            response = envelope(show(**arguments))
+        elif command == "context":
+            from .context import show
+
+            response = envelope(show(project, **arguments))
         elif command == "reference":
             from .reference import show
 
@@ -328,6 +354,14 @@ def main(argv: list[str] | None = None) -> int:
             response = envelope(result)
         elif command == "daemon":
             operation = arguments.pop("operation")
+            if operation == "serve":
+                from .daemon import run_daemon
+
+                try:
+                    run_daemon(project)
+                except KeyboardInterrupt:
+                    pass
+                return 0
             response = (
                 envelope(daemon_status(project)) if operation == "status" else stop_daemon(project)
             )

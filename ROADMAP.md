@@ -8,9 +8,17 @@
 - Run the same pinned open-source draw.io UI on Windows and Ubuntu, with an independent result oracle.
 - Run a real coding-agent acceptance job with repository-configured model credentials. Record failures honestly; deterministic examples are separate tests.
 
+## 0.3: AI-oriented discovery and resumption
+
+- Discover a compact method index and retrieve exact request schemas only when needed.
+- Resume a project in one read-only, byte-bounded context snapshot; keep historical images separate from current input authorization.
+- Preserve typed operation and verification failures so agents can choose the next action without parsing error text.
+- Keep product introduction in the README and operational instructions in the installed Agent Skill.
+- Select a reasoning setting per real-agent CI run and retain configuration and usage evidence.
+
 ## Next acceptance work
 
-1. Establish repeatable real-agent results for the configured inexpensive model; compare requested reasoning settings on the same tasks, with run links, tool activity and token usage.
+1. Repeat the filesystem-isolated `low` acceptance across runs and additional applications; retain run links, tool activity, original deliverables and token usage. The first constrained draw.io success and earlier blocked/assisted trials are recorded in [benchmarks](docs/benchmarks.md).
 2. Add unseen application states to the benchmark while keeping the grader and task contract independent from agent edits.
 3. Turn observed failures into smaller tool responses, better local references and reusable recognition cases. Do not compensate by silently changing models or weakening acceptance.
 4. Add further controller adapters and AgentServer lifecycle support when concrete target tasks require them.

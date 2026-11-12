@@ -1,0 +1,50 @@
+{
+  "model_calls": 0,
+  "method": "unshare --user --map-root-user --pid --fork --mount-proc",
+  "evidence": {
+    "before": {
+      "open_exit": 0,
+      "open_result": {
+        "schema_version": 1,
+        "ok": true,
+        "result": {
+          "session_id": "session_5e749180056f4c528793e79ed1580f88",
+          "backend": "demo",
+          "device": "",
+          "coordinates": "controller screenshot pixels",
+          "runtime": {}
+        }
+      },
+      "status_after_command_exit": {
+        "running": false,
+        "stale_metadata": true
+      },
+      "observe_exit": 1,
+      "observe_result": {
+        "schema_version": 1,
+        "ok": false,
+        "error": {
+          "code": "SESSION_NOT_FOUND",
+          "message": "Session expired or unknown; open a new session",
+          "details": {}
+        }
+      }
+    },
+    "after": {
+      "scope": "separate Linux PID namespaces, no model call",
+      "supervisor": "foreground host CLI daemon serve",
+      "owner_pid": 40258,
+      "open_exit": 0,
+      "owner_survived_first_namespace": true,
+      "observe_exit": 0,
+      "same_session": true,
+      "observation_id": "obs_8f40fc84fbf64cee8ff73ca8a24fb71d",
+      "image_exists": true,
+      "owner_survived_second_namespace": true,
+      "managed_stop_rejected": "EXTERNAL_DAEMON_MANAGED",
+      "supervisor_stop_exit": 0,
+      "foreground_exit": 0,
+      "owner_stopped": true
+    }
+  }
+}

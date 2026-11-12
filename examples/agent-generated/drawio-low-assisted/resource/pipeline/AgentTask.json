@@ -1,0 +1,89 @@
+{
+  "AgentTask": {
+    "recognition": "DirectHit",
+    "action": "DoNothing",
+    "next": [
+      "CreateRectangle"
+    ],
+    "timeout": 1000,
+    "rate_limit": 20
+  },
+  "CreateRectangle": {
+    "recognition": "TemplateMatch",
+    "template": "rectangle_tool.png",
+    "roi": [
+      0,
+      120,
+      240,
+      500
+    ],
+    "threshold": 0.9,
+    "action": "Swipe",
+    "begin": [
+      34,
+      179
+    ],
+    "end": [
+      500,
+      300
+    ],
+    "duration": 600,
+    "pre_delay": 100,
+    "post_delay": 500,
+    "next": [
+      "StartLabelEditing"
+    ],
+    "timeout": 3000,
+    "rate_limit": 20
+  },
+  "StartLabelEditing": {
+    "recognition": "DirectHit",
+    "action": "ClickKey",
+    "key": 113,
+    "pre_delay": 100,
+    "post_delay": 400,
+    "next": [
+      "EnterVibeMaaLabel"
+    ],
+    "timeout": 2000
+  },
+  "EnterVibeMaaLabel": {
+    "recognition": "DirectHit",
+    "action": "InputText",
+    "input_text": "Vibe Maa",
+    "pre_delay": 100,
+    "post_delay": 400,
+    "next": [
+      "CommitLabel"
+    ],
+    "timeout": 2000
+  },
+  "CommitLabel": {
+    "recognition": "DirectHit",
+    "action": "Click",
+    "target": [
+      800,
+      550
+    ],
+    "pre_delay": 100,
+    "post_delay": 400,
+    "next": [
+      "VibeMaaLabelVisible"
+    ],
+    "timeout": 2000
+  },
+  "VibeMaaLabelVisible": {
+    "recognition": "TemplateMatch",
+    "template": "vibe_maa_label.png",
+    "roi": [
+      350,
+      220,
+      420,
+      260
+    ],
+    "threshold": 0.88,
+    "action": "DoNothing",
+    "timeout": 2000,
+    "rate_limit": 20
+  }
+}

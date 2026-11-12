@@ -108,6 +108,39 @@ def test_action_exception_leaves_durable_intent(service):
     assert reopened.artifact_read("actions", result["action_id"])["status"] == "failed"
 
 
+def test_typed_failure_remains_machine_readable_in_saved_evidence(service, monkeypatch):
+    engine, device = service
+
+    def fail_action(_action):
+        raise DevError("DEVICE_TIMEOUT", "Input acknowledgement timed out", {"phase": "input"})
+
+    monkeypatch.setattr(device, "act", fail_action)
+    observation = engine.observe("s1")
+    result = engine.act("s1", observation["observation_id"], target="e1")
+    assert result["status"] == "failed"
+    assert result["failure"]["code"] == "DEVICE_TIMEOUT"
+    assert result["failure"]["details"] == {"phase": "input"}
+    assert result["after_observation"]
+    saved = engine.store.read("actions", result["action_id"])
+    assert saved["failure"] == result["failure"]
+
+
+def test_run_failure_keeps_typed_cause_and_does_not_claim_goal(service, monkeypatch):
+    from vibe_maa.reports import Reports
+
+    engine, device = service
+
+    def fail_run(*_args):
+        raise DevError("RESOURCE_ERROR", "Resource cannot load", {"file": "task.json"})
+
+    monkeypatch.setattr(device, "run", fail_run)
+    report = engine.run("s1", "Start")
+    summary = Reports(engine.project).summary(report["run_id"])
+    assert summary["execution_status"] == "failed"
+    assert summary["goal_status"] == "unknown"
+    assert summary["failure"]["code"] == "RESOURCE_ERROR"
+
+
 def test_probe_accepts_historical_session_but_action_does_not(service):
     engine, device = service
     obs = engine.observe("s1")

@@ -15,6 +15,12 @@ on:
         required: true
         default: 600
         type: number
+      reasoning_effort:
+        description: Reasoning setting for this run only; configured retains the repository setting
+        required: true
+        default: configured
+        type: choice
+        options: [configured, low, high]
 
 permissions:
   contents: read
@@ -44,6 +50,8 @@ jobs:
           uv sync --locked --extra browser
           npm ci --prefix integration/agent
           uv run playwright install --with-deps chromium
+      - name: Prove tool service persistence across real Codex sandboxes without model calls
+        run: uv run python integration/agent/preflight.py --output work/codex-preflight.json
       - name: Develop and independently grade the automation
         env:
           VIBE_MAA_LLM_API_KEY: ${{ secrets.VIBE_MAA_LLM_API_KEY }}
@@ -52,6 +60,7 @@ jobs:
           VIBE_MAA_LLM_REASONING_EFFORT: ${{ secrets.VIBE_MAA_LLM_REASONING_EFFORT || vars.VIBE_MAA_LLM_REASONING_EFFORT }}
           AGENT_TARGET: ${{ inputs.target || 'drawio' }}
           AGENT_BUDGET: ${{ inputs.timeout_seconds || '600' }}
+          AGENT_REASONING_EFFORT: ${{ inputs.reasoning_effort || 'configured' }}
         run: |
           python - <<'PY'
           import os
@@ -62,7 +71,15 @@ jobs:
           uv run python integration/agent/run.py \
             --target "$AGENT_TARGET" \
             --output work/agent-acceptance \
-            --timeout-seconds "$AGENT_BUDGET"
+            --timeout-seconds "$AGENT_BUDGET" \
+            --reasoning-effort "$AGENT_REASONING_EFFORT"
+      - name: Preserve the API-free service preflight result
+        if: always()
+        run: |
+          if [ -f work/codex-preflight.json ]; then
+            mkdir -p work/agent-acceptance/published
+            cp work/codex-preflight.json work/agent-acceptance/published/preflight.json
+          fi
       - name: Upload independent results and ordinary MaaFW deliverable
         if: always()
         uses: actions/upload-artifact@v7.0.2

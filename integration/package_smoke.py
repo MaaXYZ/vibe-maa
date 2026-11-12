@@ -43,6 +43,20 @@ def main() -> None:
     with tempfile.TemporaryDirectory(prefix="vibe-maa-wheel-") as temporary:
         project = Path(temporary) / "project"
         project.mkdir()
+        capabilities = cli(project, "capabilities")
+        assert capabilities["schema_version"] == 1
+        assert capabilities["readiness"] == "not_checked"
+        assert any(method["method"] == "act" for method in capabilities["methods"])
+        focused = cli(project, "capabilities", "--method", "act")
+        assert focused["method"] == "act"
+        assert focused["input_schema"]["type"] == "object"
+        assert focused["input_schema"]["additionalProperties"] is False
+        assert "observation_id" in focused["input_schema"]["required"]
+        assert focused["example"]["params"]["observation_id"]
+        empty_context = cli(project, "context")
+        assert empty_context["daemon"]["running"] is False
+        assert empty_context["inventory"]["node_count"] == 0
+        assert not (project / ".maa-dev").exists(), "Discovery/context must remain read-only"
         cli(project, "demo", "init")
         cli(project, "agent", "install", "--target", "codex")
         assert (project / ".agents/skills/vibe-maa/SKILL.md").is_file()
@@ -95,6 +109,13 @@ def main() -> None:
         assert run_id is not None
         context = cli(project, "task", "context", "package-smoke")
         assert context["state"] == "accepted"
+        orientation = cli(project, "context", "--task", "package-smoke")
+        assert orientation["daemon"]["running"] is False
+        assert orientation["task"]["name"] == "package-smoke"
+        assert orientation["task"]["state"] == "accepted"
+        assert orientation["task"]["scope"] == "fixture"
+        assert orientation["task"]["freshness"] == "current"
+        assert orientation["task"]["acceptance_scope"] == "configured_checks_only"
         assert cli(project, "report", "show", run_id)["scope"] == "fixture"
         assert cli(project, "daemon", "status")["running"] is False
         print(
@@ -104,7 +125,7 @@ def main() -> None:
                     "version": vibe_maa.__version__,
                     "task_state": context["state"],
                     "scope": context["scope"],
-                    "checks": "installed fixture, Skill, task, resume, reports, exports",
+                    "checks": "discovery, read-only context, installed fixture, Skill, task, resume, reports, exports",
                 }
             )
         )

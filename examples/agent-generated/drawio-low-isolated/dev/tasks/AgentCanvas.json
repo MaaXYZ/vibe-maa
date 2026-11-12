@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "name": "AgentCanvas",
+  "objective": "In diagrams.net, create a rectangle on the application canvas labeled exactly Vibe Maa from a fresh blank document, repeatably.",
+  "entry": "AgentTask",
+  "goal": "VibeMaaVisible",
+  "cases": null,
+  "constraints": [
+    "Use standard MaaFramework Pipeline actions only; no Shell, Command, or Custom actions.",
+    "Expose entry AgentTask through interface.json for normal MaaFW handoff.",
+    "Each run must create the result from a fresh blank document at 1280x720."
+  ],
+  "max_attempts": 10,
+  "scenarios": null,
+  "created_at": "2026-11-12T10:18:22.121731+00:00"
+}

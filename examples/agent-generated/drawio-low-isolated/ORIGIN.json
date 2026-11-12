@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "origin": "coding_agent_generated_unmodified_filesystem_isolated_submission",
+  "original_workflow": "https://github.com/MaaXYZ/vibe-maa/actions/runs/43198829628",
+  "source_revision": "40d5b51ed343101dfe6912eccffdb2be8702ee63",
+  "upstream": "jgraph/drawio v32.6.10",
+  "harness": "openai/codex 0.167.2",
+  "model": "deepseek-flash",
+  "reasoning_effort_requested": "low",
+  "reasoning_configuration_source": "run_override",
+  "source_archive_sha256": "6550b6bc62456ba7e67d4c143a48700dd8ae47091aa83214aea39823f840b189",
+  "source_modified_after_agent": false,
+  "source_isolation": {
+    "scope": "checkout_runtime_allowlist",
+    "profile": "vibe_agent",
+    "rules_sha256": "c5f8a19af375c89badfe0189c2258f94edb751ede849c315aca8db550c558538",
+    "network_egress": "not_isolated_by_this_filesystem_policy"
+  },
+  "same_task_reference_access_observed": false,
+  "visible_command_audit": "Retained visible commands show no access to existing task solutions, grader code, application DOM/Playwright internals, or network answer retrieval. This is a bounded tool trace audit, not complete information-flow proof or a guarantee about model prior knowledge. Screenshot-view tool coverage is not established by these command records.",
+  "isolation_limitation": "The frozen checkout filesystem policy blocks existing solutions, grader, tests, records, and Git history. Network egress is not isolated by this policy.",
+  "wall_time_budget_seconds": 600,
+  "elapsed_seconds": 151.232,
+  "tool_items": 41,
+  "failed_command_items": 1,
+  "failed_command_note": "The nonzero command used unsupported task context --max-bytes; the agent then used task context successfully. This is CLI discovery friction, not an application failure.",
+  "pipeline_nodes": 8,
+  "image_templates": 2,
+  "durable_tasks": 1,
+  "case_files": 1,
+  "case_examples": 2,
+  "case_screenshots": 2,
+  "grade": {
+    "passed": true,
+    "fresh_context_checks": 2,
+    "scope": "real_application_rectangle_renderer_and_exact_label"
+  },
+  "tested_environment": "Original Ubuntu GitHub Actions runner, bundled Chromium, 1280x720 viewport",
+  "cross_platform_tested": false,
+  "usage": {
+    "input_tokens": 1440197,
+    "cached_input_tokens": 1395200,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 18335,
+    "reasoning_output_tokens": 5750
+  },
+  "scope": "one_filesystem_isolated_pinned_application_task_not_general_game_automation",
+  "preservation_note": "manifest.json and its ten listed original files are unchanged. ORIGIN.json and README.md are maintainer-added provenance outside that original manifest."
+}

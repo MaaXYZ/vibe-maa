@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.0
+
+- Add compact capability discovery with method-specific JSON Schemas, examples, prerequisites and recovery guidance; include a generic ProjectInterface handoff reference and explicit browser display flags.
+- Add a bounded, read-only project context snapshot to help coding agents resume without scanning full histories or reconnecting devices.
+- Preserve structured action, execution and verification failures in saved evidence and compact reports.
+- Make the README a product introduction and move operational details into the Agent Skill and dedicated documentation.
+- Allow per-run reasoning-effort selection in real-agent CI and record configuration provenance, elapsed time and tool activity.
+- Keep device services alive across coding-agent PID namespaces with foreground serving and externally supervised CI ownership; reject lost-session retries without replacing the owner.
+- Redact authentication fields in mixed native logs and JSON, and keep metrics consistent with the final published activity trace.
+- Preserve reference-assisted model results explicitly, and use a real sandbox preflight to block access to prior solutions and privileged acceptance code before independent trials.
+- Retain the successful isolated `deepseek-flash` low-reasoning draw.io deliverable, positive/negative cases and independent replay records; add model-free Linux regression replays.
+
 ## 0.2.0
 
 - Include the mailbox starter, positive/negative screenshot cases, and Agent Skill in installed distributions.
