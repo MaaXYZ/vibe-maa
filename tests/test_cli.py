@@ -73,7 +73,9 @@ def invoke(project: Path, *arguments: str) -> subprocess.CompletedProcess:
 
 
 def test_independent_cli_processes_share_daemon_state(running_daemon):
-    project, process = running_daemon
+    project, _ = running_daemon
+    # Windows venv launchers can redirect to a child interpreter with a different PID.
+    initial_pid = daemon.daemon_status(project)["pid"]
     first = invoke(project, "session", "open", "--backend", "demo")
     second = invoke(project, "observe", "--session", "session-one")
     assert first.returncode == second.returncode == 0
@@ -82,7 +84,7 @@ def test_independent_cli_processes_share_daemon_state(running_daemon):
     assert two["result"]["counter"] == 2
     assert two["result"]["params"] == {"session_id": "session-one", "ocr": True}
     status = json.loads(invoke(project, "daemon", "status").stdout)
-    assert status["result"]["pid"] == process.pid
+    assert status["result"]["pid"] == initial_pid
     assert "token" not in status["result"]
 
 
@@ -171,12 +173,13 @@ def test_stop_rejects_accepted_queued_mutation(tmp_path):
 
 
 def test_single_owner_rejects_second_daemon(running_daemon):
-    project, process = running_daemon
+    project, _ = running_daemon
+    initial_pid = daemon.daemon_status(project)["pid"]
     second = subprocess.run(
         [sys.executable, "-c", FAKE_DAEMON, str(project)], capture_output=True, timeout=5
     )
     assert second.returncode != 0
-    assert daemon.daemon_status(project)["pid"] == process.pid
+    assert daemon.daemon_status(project)["pid"] == initial_pid
 
 
 def test_copied_metadata_cannot_attach_to_another_project(running_daemon, tmp_path):
