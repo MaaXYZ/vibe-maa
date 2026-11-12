@@ -1,0 +1,12 @@
+{
+  "box": [
+    513,
+    306,
+    70,
+    32
+  ],
+  "image_path": "resource/image/vibe_maa_label.png",
+  "observation_id": "obs_27054eb1db59468f8a248947feaa2fc3",
+  "sha256": "c7ab2d81a2e7aa9fb44ff9e5a6e2d56dc5d0517ee12f977fb1d76be8489d4fb1",
+  "source_sha256": "eb01e2a376fb7668830b774632c08cd9908e9903ae8f8e561091d43c956dcdcb"
+}

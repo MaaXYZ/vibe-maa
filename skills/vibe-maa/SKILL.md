@@ -56,6 +56,6 @@ The installed package includes the workflow and demo data. `agent show` returns 
 ## Keep tool use small and explicit
 
 - Use `context --max-bytes 6000` when you need a smaller orientation snapshot; check omission counts and request only the missing detail. Avoid repeatedly dumping project trees, full reports or all method schemas.
-- Read `vibe-maa reference --topic pipeline` before writing unfamiliar node fields. Other topics: recognition, actions, errors.
+- Read `vibe-maa reference --topic pipeline` before writing unfamiliar node fields. Other topics: recognition, actions, errors. For an ordinary ProjectInterface handoff, read `reference --topic project` instead of browsing unrelated automation solutions.
 - `run` returns a compact summary by default. Use `--full` or saved artifacts only when needed.
 - If the objective requires multiple starting states, declare `task create ... --scenario NAME=START_NODE` for each and validate using `task run ... --scenario NAME`. One passing start does not cover the others.

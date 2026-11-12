@@ -239,3 +239,17 @@ def test_daemon_failure_recovery_preserves_external_owner_and_avoids_open_loops(
     assert "SESSION_OWNER_LOST" not in capabilities.show("session.open")["recovery"]
     for method in ["task.create", "task.list", "task.context"]:
         assert "DAEMON_REQUIRES_SUPERVISOR" not in capabilities.show(method)["recovery"]
+
+
+def test_browser_display_parameter_description_names_real_cli_flags():
+    from vibe_maa.cli import _parser
+
+    description = capabilities.show("session.open")
+    display = description["input_schema"]["properties"]["headless"]
+    command = ["session", "open", "--backend", "browser", "--url", "http://127.0.0.1:8765"]
+    parser = _parser()
+    assert parser.parse_args(command).headless == display["default"]
+    for flag, expected in [("--headless", True), ("--headed", False)]:
+        assert flag in display["description"]
+        assert parser.parse_args([*command, flag]).headless is expected
+    assert any("--topic project|" in tool for tool in capabilities.show()["cli_tools"])

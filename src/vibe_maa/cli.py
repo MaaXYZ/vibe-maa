@@ -59,7 +59,9 @@ def _parser() -> argparse.ArgumentParser:
         "reference", help="Read concise offline MaaFW protocol guidance."
     )
     reference.add_argument(
-        "--topic", choices=["pipeline", "recognition", "actions", "errors"], default="pipeline"
+        "--topic",
+        choices=["pipeline", "recognition", "actions", "errors", "project"],
+        default="pipeline",
     )
 
     daemon = commands.add_parser(
@@ -76,7 +78,10 @@ def _parser() -> argparse.ArgumentParser:
     opening.add_argument("--resource-path", default="resource")
     opening.add_argument("--initial-state", choices=["home", "mailbox", "popup"], default="home")
     opening.add_argument("--url")
-    opening.add_argument("--headed", action="store_false", dest="headless", default=True)
+    visibility = opening.add_mutually_exclusive_group()
+    visibility.add_argument("--headed", action="store_false", dest="headless")
+    visibility.add_argument("--headless", action="store_true", dest="headless")
+    opening.set_defaults(headless=True)
     opening.add_argument("--width", type=int, default=1280)
     opening.add_argument("--height", type=int, default=720)
     opening.add_argument("--browser-executable")

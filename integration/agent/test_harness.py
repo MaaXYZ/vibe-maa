@@ -165,6 +165,9 @@ def test_execute_passes_only_the_requested_reasoning_to_harness(tmp_path, monkey
     assert result["tool_items"] == 2
     assert result["failed_command_items"] == 1
     assert result["elapsed_seconds"] >= 0
+    assert 'default_permissions="vibe_agent"' in command
+    assert "--sandbox" not in command
+    assert any(value.startswith("permissions.vibe_agent.filesystem=") for value in command)
 
 
 def test_grader_rejects_executable_pipeline(tmp_path):
@@ -659,3 +662,53 @@ def test_execute_aborts_on_lost_service_as_infrastructure_failure(tmp_path, monk
     assert result["returncode"] == -15 and result["timed_out"] is False
     assert result["infrastructure_error"]["code"] == "HARNESS_DAEMON_LOST"
     assert result["error"] == result["infrastructure_error"]
+
+
+def test_checkout_projection_blocks_answers_but_preserves_installed_tool(tmp_path, monkeypatch):
+    monkeypatch.syspath_prepend(str(DIRECTORY))
+    module = _module("isolation")
+    root = tmp_path / "checkout"
+    for relative in [
+        "src",
+        ".venv",
+        "integration/agent/node_modules",
+        "examples/answer",
+        "docs/records",
+        "tests",
+        ".git",
+    ]:
+        (root / relative).mkdir(parents=True)
+    (root / "integration/agent/grader.py").write_text("protected grader")
+    (root / "README.md").write_text("protected checkout documentation")
+    project = root / "work/run/project"
+    project.mkdir(parents=True)
+    (project.parent / "private").mkdir()
+    rules = module.filesystem_policy(project, root)
+    assert rules[str(root / "src")] == rules[str(root / ".venv")] == "read"
+    assert rules[str(root / "integration/agent/node_modules")] == "read"
+    assert rules[str(project)] == "write"
+    for path in [
+        root / "examples",
+        root / "docs",
+        root / "tests",
+        root / ".git",
+        root / "integration/agent/grader.py",
+        project.parent / "private",
+    ]:
+        assert rules[str(path)] == "deny"
+    assert str(root) not in rules  # No denied parent that could hide a required runtime descendant.
+
+
+def test_private_auth_and_logs_are_denied_for_project_outside_checkout(tmp_path, monkeypatch):
+    monkeypatch.syspath_prepend(str(DIRECTORY))
+    module = _module("isolation")
+    root = tmp_path / "checkout"
+    root.mkdir()
+    project = tmp_path / "external-run/project"
+    project.mkdir(parents=True)
+    private, published = project.parent / "private", project.parent / "published"
+    private.mkdir()
+    published.mkdir()
+    rules = module.filesystem_policy(project, root)
+    assert rules[str(project)] == "write"
+    assert rules[str(private)] == rules[str(published)] == "deny"

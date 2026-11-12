@@ -1,0 +1,20 @@
+{
+  "scope": "pinned0.167.2 partitioned filesystem, hostnative demo, no model calls",
+  "policy_entries": 43,
+  "protected_reads_denied": true,
+  "denial_details": {
+    "published_example": "PermissionError",
+    "grader": "PermissionError",
+    "private_fixture": "PermissionError",
+    "docs": "PermissionError",
+    "tests": "PermissionError",
+    "git_config": "PermissionError",
+    "symlink_to_published": "PermissionError"
+  },
+  "capabilities_ok": true,
+  "session_open_ok": true,
+  "observation_ok": true,
+  "same_session": true,
+  "same_owner": true,
+  "private_fixture_in_repository_work": true
+}

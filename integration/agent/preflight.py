@@ -12,6 +12,8 @@ import time
 from pathlib import Path
 from typing import Any
 
+from isolation import PROFILE, profile_arguments
+
 from vibe_maa.bootstrap import initialize_demo
 from vibe_maa.daemon import daemon_status, stop_daemon
 
@@ -31,6 +33,36 @@ print(json.dumps({
     'returncode': result.returncode,
     'response': json.loads(result.stdout),
 }))
+"""
+
+ISOLATION_CHECK = """
+import json,sys
+from pathlib import Path
+project, root, private = map(Path, sys.argv[1:4])
+targets = {
+    'published_solution': root / 'examples/agent-generated/drawio/resource/pipeline/AgentTask.json',
+    'grader': root / 'integration/agent/grader.py',
+    'benchmarks': root / 'docs/benchmarks.md',
+    'benchmark_record': Path(sys.argv[4]),
+    'test_source': root / 'tests/test_demo.py',
+    'git_history': root / '.git/config',
+    'private_sentinel': private / 'private-sentinel.txt',
+}
+alias = project / 'forbidden-symlink'
+alias.symlink_to(targets['published_solution'])
+targets['solution_symlink'] = alias
+checks = {}
+for label,path in targets.items():
+    try:
+        path.read_bytes()
+        checks[label] = False
+    except PermissionError:
+        checks[label] = True
+alias.unlink()
+from vibe_maa import __version__
+print(json.dumps({'denied_reads':checks,'tool_import_version':__version__}))
+if not all(checks.values()):
+    raise SystemExit(1)
 """
 
 
@@ -69,6 +101,9 @@ def run_preflight(binary: str, work_root: Path | None = None) -> dict[str, Any]:
         # An empty Codex home prevents loading local provider credentials/configuration.
         codex_home = temporary / "codex-home"
         codex_home.mkdir()
+        (temporary / "private-sentinel.txt").write_text(
+            "preflight-read-denial-sentinel", encoding="utf-8"
+        )
         environment["CODEX_HOME"] = str(codex_home)
         environment["PYTHONDONTWRITEBYTECODE"] = "1"
         host_namespace = os.readlink("/proc/self/ns/pid")
@@ -96,27 +131,21 @@ def run_preflight(binary: str, work_root: Path | None = None) -> dict[str, Any]:
                 expected_pid = status["pid"]
                 environment["VIBE_MAA_EXTERNAL_DAEMON_PROJECT"] = str(project)
                 environment["VIBE_MAA_EXTERNAL_DAEMON_PID"] = str(expected_pid)
-                filesystem = (
-                    "{"
-                    + ",".join(
-                        f"{json.dumps(path)}={json.dumps(mode)}"
-                        for path, mode in {
-                            "/": "read",
-                            "/tmp": "write",
-                            str(project): "write",
-                        }.items()
-                    )
-                    + "}"
+                permission_arguments = profile_arguments(
+                    project,
+                    select=False,
+                    protected=(
+                        codex_home,
+                        temporary / "private-sentinel.txt",
+                        temporary / "host-service.log",
+                    ),
                 )
                 command = [
                     binary,
                     "sandbox",
                     "-P",
-                    "preflight",
-                    "-c",
-                    f"permissions.preflight.filesystem={filesystem}",
-                    "-c",
-                    "permissions.preflight.network.enabled=true",
+                    PROFILE,
+                    *permission_arguments,
                     "-C",
                     str(project),
                     "--",
@@ -178,6 +207,35 @@ def run_preflight(binary: str, work_root: Path | None = None) -> dict[str, Any]:
                 closed = invoke("session", "close", "--session", session)
                 if closed["returncode"] or not closed["response"].get("ok"):
                     raise RuntimeError("Sandbox client could not close its session")
+                isolated = subprocess.run(
+                    [
+                        binary,
+                        "sandbox",
+                        "-P",
+                        PROFILE,
+                        *permission_arguments,
+                        "-C",
+                        str(project),
+                        "--",
+                        sys.executable,
+                        "-c",
+                        ISOLATION_CHECK,
+                        str(project),
+                        str(ROOT),
+                        str(temporary),
+                        str(next((ROOT / "docs/records").glob("*.json"))),
+                    ],
+                    env=environment,
+                    text=True,
+                    capture_output=True,
+                    check=False,
+                    timeout=30,
+                )
+                if isolated.returncode:
+                    raise RuntimeError(
+                        "Checkout read isolation failed: " + isolated.stderr.strip()[:1000]
+                    )
+                isolation = json.loads(isolated.stdout)
             finally:
                 # The supervisor, outside all command namespaces, owns shutdown.
                 try:
@@ -200,6 +258,7 @@ def run_preflight(binary: str, work_root: Path | None = None) -> dict[str, Any]:
             "separate_sandbox_invocations": len(records),
             "session_reused_across_commands": True,
             "managed_stop_denied": True,
+            "source_isolation": {"scope": "checkout_runtime_allowlist", **isolation},
             "checks": records,
             "elapsed_seconds": round(time.monotonic() - started, 3),
         }

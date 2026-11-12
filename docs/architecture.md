@@ -89,4 +89,4 @@ dev/assets/                    extracted asset provenance
 .maa-dev/native-logs/           MaaFW logs
 ```
 
-Runtime records are ignored by Git. Stable cases and asset provenance may be curated into the project. Exported automation continues to run with MaaFramework independently from the development daemon.
+Runtime records are ignored by Git. Stable cases and asset provenance may be curated into the project. Exported Pipeline files and assets are independent of the development evidence store. Execution still requires a compatible MaaFramework controller and any CustomController bindings. The browser transport currently comes from vibe-maa; an external runner needs an equivalent bridge. The initializer's default Android/Adb metadata does not itself provide browser control.

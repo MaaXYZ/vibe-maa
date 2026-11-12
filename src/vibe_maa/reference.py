@@ -39,6 +39,49 @@ _FLOW = {
 }
 
 _TOPICS: dict[str, dict[str, Any]] = {
+    "project": {
+        "content": (
+            "An ordinary MaaFramework handoff has interface.json beside its resource directory. "
+            "interface_version is the number 2. resource is an array of named bundles; each "
+            "path is an array of project-relative directories, loaded in order. task is an array "
+            "of exposed tasks: name is the task ID, label is optional display text, and entry is "
+            "the exact Pipeline node name to start, not a file path or a list. The entry must "
+            "exist in the selected resource/pipeline/*.json or *.jsonc; task names and entry "
+            "names may differ. Keep existing declarations and add the intended task instead of "
+            "replacing unrelated tasks or resources. The example declares an Android Adb "
+            "controller, matching init; choose the intended client's supported controller. "
+            "vibe-maa's browser backend uses a CustomController adapter. "
+            "vibe-maa browser/demo sessions are separate transports, not new ProjectInterface "
+            "controller types. A browser-tested resource still needs a suitable browser "
+            "controller integration when distributed to another runner. dev/tasks/*.json is "
+            "vibe-maa's development acceptance ledger; its goal, cases and max_attempts do not "
+            "belong in interface.json task items. Declaring or exporting an entry does not "
+            "prove it works: run current source and retain evidence for the configured goal."
+        ),
+        "examples": {
+            "interface.json": {
+                "interface_version": 2,
+                "name": "sample-project",
+                "controller": [{"name": "Android", "type": "Adb"}],
+                "resource": [{"name": "Default", "path": ["./resource"]}],
+                "task": [{"name": "MainTask", "label": "Run task", "entry": "TaskEntry"}],
+            },
+        },
+        "layout": {
+            "interface.json": "ProjectInterface metadata and public task entries",
+            "resource/pipeline/*.json": "Pipeline nodes, including the declared TaskEntry",
+            "resource/image/": "Observed templates referenced by Pipeline recognition",
+            "dev/tasks/*.json": "Development acceptance contracts, separate from public tasks",
+            "dev/cases/": "Labeled screenshots and recognition case manifests",
+        },
+        "commands": {
+            "initialize": "vibe-maa --project PATH init",
+            "inspect": "vibe-maa --project PATH context",
+            "pipeline_contract": "vibe-maa reference --topic pipeline",
+            "export": "vibe-maa --project PATH export --output project.zip",
+        },
+        "source": "https://github.com/MaaXYZ/MaaFramework/blob/main/docs/en_us/3.3-ProjectInterfaceV2.md",
+    },
     "pipeline": {
         "content": (
             "Write a JSON/JSONC object mapping unique node names to node objects in "
@@ -180,12 +223,15 @@ _TOPICS: dict[str, dict[str, Any]] = {
 def show(topic: str = "pipeline") -> dict[str, Any]:
     if not isinstance(topic, str) or topic not in _TOPICS:
         raise DevError(
-            "INVALID_ARGUMENT", "Reference topic must be pipeline, recognition, actions or errors"
+            "INVALID_ARGUMENT",
+            "Reference topic must be project, pipeline, recognition, actions or errors",
         )
     return {
         "schema_version": 1,
         "version": __version__,
-        "protocol": "MaaFramework 5.16 core subset",
+        "protocol": "MaaFramework ProjectInterface V2"
+        if topic == "project"
+        else "MaaFramework 5.16 core subset",
         "topic": topic,
         **deepcopy(_TOPICS[topic]),
     }

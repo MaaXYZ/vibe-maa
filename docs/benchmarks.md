@@ -48,6 +48,24 @@ Usage is unreported, not zero spend. Historical runs did not retain precise mode
 
 The failed run also exposed a mixed-log redaction gap for an expired local daemon token. No LLM API key was found exposed. The affected artifact was removed after preserving a [re-sanitized activity record](records/drawio-low-43192717285-activity.json); publication now removes authentication fields even when JSON follows non-JSON log text.
 
+## Low rerun after service repair: reference-assisted success
+
+[Run 43196041030](https://github.com/MaaXYZ/vibe-maa/actions/runs/43196041030) at `bd9a92b` passed the API-free real Codex sandbox preflight, then completed with `deepseek-flash`, explicit `low`, and the same 600-second budget. The agent took 135.097 seconds and produced six nodes, two templates and a task definition. The independent real-application oracle passed both fresh-context repetitions. No offline case manifest was delivered. The original manifest and source also passed an unchanged two-context replay on a separate Linux host; Linux CI now retains a free replay of this assisted sample. Windows replay of this exact sample has not been established.
+
+**This was reference-assisted.** The visible command history includes reading the existing same-task draw.io solution and the portable example's interface file. The model also performed native observation, three guarded inputs and recognition probes, but this result cannot establish independent development without prior solution access. The [unaltered deliverable](../examples/agent-generated/drawio-low-assisted/README.md), [result record](records/drawio-low-assisted-43196041030.json) and [published activity](records/drawio-low-assisted-43196041030-activity.json) retain that distinction.
+
+| Reported metric | Value |
+| --- | ---: |
+| Tool items | 53 |
+| Input tokens, including cached | 1,265,484 |
+| Cached input tokens | 1,220,096 |
+| Output tokens | 14,931 |
+| Reasoning output tokens | 5,641 |
+
+These figures are one observation, not a price or success-rate claim. The retained shell activity shows no direct DOM or Playwright app access; it does not independently establish image-view tool use. The single nonzero command used an unsupported explicit `--headless` flag and was corrected using help. The CLI now accepts that ordinary flag, and a generic ProjectInterface reference reduces the need to inspect unrelated examples for handoff syntax.
+
 ## Next comparison
 
-Fix and verify cross-command service ownership without model calls first, then repeat the bounded `low` trial with the same model and protected grader. Declare the actual time budget and the grader's existing 1280×720 viewport explicitly. Keep this infrastructure-blocked result alongside the rerun; do not replace it with the later outcome.
+The shared permission policy now exposes the installed tool runtime and current submission, while blocking existing solutions, the privileged grader, old results, tests, Git metadata and private logs. The [actual Codex sandbox check](records/codex-isolation-proof.json) verifies denied direct and symlink reads while native session reuse still succeeds. A final preflight uses the same policy helper as model execution. This filesystem policy does not isolate network egress; the task contract also forbids fetching prior solutions and retained tool activity remains subject to audit.
+
+Repeat the bounded `low` task under this policy. Keep both earlier trials and their limitations visible rather than replacing their records with a later result.

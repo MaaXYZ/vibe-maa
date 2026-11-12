@@ -25,7 +25,10 @@ _METHODS = {
         ],
         "returns": ["session_id", "backend", "device", "coordinates", "runtime"],
         "example": {"backend": "browser", "url": "http://127.0.0.1:8765"},
-        "notes": ["ADB requires device; browser requires url; demo is synthetic, not a game."],
+        "notes": [
+            "ADB requires device; browser requires url; demo is synthetic, not a game.",
+            "Browser is headless by default. The RPC headless boolean maps to CLI --headless (true) or --headed (false). Other RPC field names are not automatically CLI flags; follow cli_example or command --help.",
+        ],
     },
     "session.list": {
         "handler": ("service", "DevelopmentService", "session_list"),
@@ -383,6 +386,9 @@ def _schema(method: str) -> dict[str, Any]:
     }
     if method == "session.open":
         properties["backend"]["enum"] = ["demo", "adb", "browser"]
+        properties["headless"]["description"] = (
+            "Browser display mode: true by default. CLI --headless sets true; --headed sets false."
+        )
         properties["initial_state"]["enum"] = ["home", "mailbox", "popup"]
         for name in ["width", "height"]:
             properties[name].update(minimum=64, maximum=4096)
@@ -562,7 +568,7 @@ def show(method: str | None = None) -> dict[str, Any]:
         "cli_tools": [
             "context [--task NAME]: bounded project orientation and retained evidence",
             "daemon serve|status|stop: persistent foreground owner, readiness and shutdown; externally managed owners belong to their runner",
-            "reference --topic pipeline|recognition|actions|errors: offline protocol examples",
+            "reference --topic project|pipeline|recognition|actions|errors: offline handoff and protocol examples",
             "doctor / devices: readiness checks and ADB discovery",
             "agent show|install|export: bundled Skill integration",
             "demo init --starter: intentionally incomplete, repeatable fixture project",

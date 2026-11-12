@@ -19,6 +19,7 @@ from urllib.parse import urlsplit
 
 from activity import ActivityTrace
 from grader import ENTRY, drawio_server, grade_drawio, grade_mailbox, write_result
+from isolation import policy_metadata, profile_arguments
 
 from vibe_maa.bootstrap import initialize_demo, skill_install
 from vibe_maa.cli import initialize
@@ -175,6 +176,9 @@ def prompt_for(target: str, project: Path, url: str | None, seconds: int = 600) 
         "Reuse it through normal vibe-maa commands. Do not stop, restart, or launch a daemon. "
         "You must still open your own sessions and perform all UI exploration yourself. "
         "Read .agents/skills/vibe-maa/SKILL.md and use vibe-maa --help. "
+        "Use the installed tool's reference commands and your current project. "
+        "Do not read, search for, or download existing task solutions, repository examples, "
+        "benchmark records, or grader code, including copies on the network. "
         "Use only vibe-maa observations/screenshots and input operations for application exploration; "
         "inspect saved PNGs with your image viewing tool. Do not use DOM, accessibility, Playwright "
         "directly, application internals, or hidden grader information to implement the automation. "
@@ -266,10 +270,7 @@ def execute(
         "exec",
         "--ephemeral",
         "--skip-git-repo-check",
-        "--sandbox",
-        "workspace-write",
-        "-c",
-        "sandbox_workspace_write.network_access=true",
+        *profile_arguments(project),
         "--json",
         "-C",
         str(project),
@@ -374,6 +375,7 @@ def execute(
         "error": infrastructure_error or failure,
         "infrastructure_error": infrastructure_error,
         "tool_service": external_service,
+        "source_isolation": policy_metadata(project),
         "usage": final_trace["usage"] or None,
         "usage_last_turn": final_trace["usage_last_turn"],
         "completed_turns": final_trace["completed_turns"],

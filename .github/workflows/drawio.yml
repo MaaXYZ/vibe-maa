@@ -38,6 +38,9 @@ jobs:
       - name: Replay the exact AI-authored deliverable without calling a model
         if: runner.os == 'Linux'
         run: uv run python integration/agent/regrade.py --project examples/agent-generated/drawio --output work/drawio-authored-replay --cache .cache/drawio
+      - name: Replay the reference-assisted low-reasoning deliverable
+        if: runner.os == 'Linux'
+        run: uv run python integration/agent/regrade.py --project examples/agent-generated/drawio-low-assisted --output work/drawio-low-assisted-replay --cache .cache/drawio
       - name: Verify the portable reference in fresh application contexts
         run: uv run python integration/agent/regrade.py --project examples/drawio-portable --output work/drawio-portable-replay --cache .cache/drawio
       - if: always()
@@ -47,6 +50,7 @@ jobs:
           path: |
             work/drawio-tests/
             work/drawio-authored-replay/
+            work/drawio-low-assisted-replay/
             work/drawio-portable-replay/
           include-hidden-files: true
           if-no-files-found: warn
