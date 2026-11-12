@@ -62,9 +62,25 @@ def verify_publication(directory: Path, secret: str | None) -> None:
             )
 
 
-def configuration(local_auth: bool) -> dict[str, str]:
+def configuration(local_auth: bool, reasoning_effort: str = "configured") -> dict[str, Any]:
+    if reasoning_effort not in {"configured", "low", "high"}:
+        raise ValueError("reasoning-effort must be configured, low, or high")
+    explicit_effort = reasoning_effort != "configured"
     if local_auth:
-        return {"authentication": "existing_local_codex_login"}
+        return {
+            "authentication": "existing_local_codex_login",
+            "reasoning_effort_requested": reasoning_effort
+            if explicit_effort
+            else "local_harness_default",
+            "configuration_source": {
+                "authentication": "existing_local_codex_login",
+                "model": "local_codex_configuration",
+                "base_url": "local_codex_configuration",
+                "reasoning_effort": "run_override"
+                if explicit_effort
+                else "local_codex_configuration",
+            },
+        }
     key = os.environ.get("VIBE_MAA_LLM_API_KEY", "")
     model = os.environ.get("VIBE_MAA_LLM_MODEL", "")
     base = os.environ.get("VIBE_MAA_LLM_BASE_URL", "https://api.openai.com/v1").rstrip("/")
@@ -74,22 +90,45 @@ def configuration(local_auth: bool) -> dict[str, str]:
         raise ValueError(
             "Set repository Secret or Variable VIBE_MAA_LLM_MODEL to a vision/tool-capable model"
         )
-    if not base.startswith(("https://", "http://127.0.0.1:", "http://localhost:")):
+    try:
+        parsed = urlsplit(base)
+        port = parsed.port
+    except ValueError as exc:
+        raise ValueError("VIBE_MAA_LLM_BASE_URL must contain a valid host and port") from exc
+    if not parsed.hostname or not (
+        parsed.scheme == "https"
+        or (
+            parsed.scheme == "http"
+            and parsed.hostname in {"127.0.0.1", "localhost", "::1"}
+            and port is not None
+        )
+    ):
         raise ValueError("VIBE_MAA_LLM_BASE_URL must be HTTPS or an explicit loopback endpoint")
     if base.endswith("/responses") or base.endswith("/chat/completions"):
         raise ValueError(
             "VIBE_MAA_LLM_BASE_URL is the API base, for example https://api.openai.com/v1"
         )
-    parsed = urlsplit(base)
     if parsed.username or parsed.password or parsed.query or parsed.fragment:
         raise ValueError("Put API credentials in the secret, not in VIBE_MAA_LLM_BASE_URL")
+    configured_effort = os.environ.get("VIBE_MAA_LLM_REASONING_EFFORT", "").strip()
     return {
         "model": model,
         "base_url": base,
         "authentication": "api_key",
         "wire_api": "responses",
-        "reasoning_effort_requested": os.environ.get("VIBE_MAA_LLM_REASONING_EFFORT", "").strip()
-        or "provider_default",
+        "reasoning_effort_requested": reasoning_effort
+        if explicit_effort
+        else configured_effort or "provider_default",
+        "configuration_source": {
+            "authentication": "api_key_environment",
+            "model": "environment",
+            "base_url": "environment" if "VIBE_MAA_LLM_BASE_URL" in os.environ else "default",
+            "reasoning_effort": "run_override"
+            if explicit_effort
+            else "environment"
+            if configured_effort
+            else "provider_default",
+        },
     }
 
 
@@ -139,7 +178,7 @@ def execute(
     binary: str,
     project: Path,
     prompt: str,
-    config: dict[str, str],
+    config: dict[str, Any],
     seconds: int,
     private: Path,
     local_auth: bool,
@@ -182,11 +221,9 @@ def execute(
             "-c",
             'model_providers.vibe_ci.wire_api="responses"',
         ]
-        if config.get("reasoning_effort_requested") != "provider_default":
-            command += [
-                "-c",
-                f"model_reasoning_effort={json.dumps(config['reasoning_effort_requested'])}",
-            ]
+    effort = config.get("reasoning_effort_requested")
+    if effort and effort not in {"provider_default", "local_harness_default"}:
+        command += ["-c", f"model_reasoning_effort={json.dumps(effort)}"]
     command.append(prompt)
     # The launcher keeps auth outside the writable project; no auth/log directory is published.
     raw_path = private / "agent-output.private.jsonl"
@@ -243,12 +280,18 @@ def execute(
     version = subprocess.run(
         [binary, "--version"], text=True, capture_output=True, check=True
     ).stdout.strip()
+    completed_commands = {
+        item.get("item_id", f"record_{index}"): item
+        for index, item in enumerate(activity.events)
+        if item.get("tool_type") == "command_execution" and item.get("event") == "item.completed"
+    }
     return {
         "returncode": returncode,
         "timed_out": timed_out,
         "harness": "openai/codex",
         "harness_version": version,
         "wall_time_budget_seconds": seconds,
+        "elapsed_seconds": round(time.monotonic() - started, 3),
         "budget_scope": "wall_time_only_not_a_currency_or_token_limit",
         "error": failure,
         "usage": dict(activity.usage) or None,
@@ -259,11 +302,18 @@ def execute(
         "activity_trace": trace_path.name,
         "historical_error_count": activity.event_types["error"]
         + activity.event_types["turn.failed"],
+        "tool_items": len(activity.tool_ids),
+        "failed_command_items": sum(
+            type(item.get("exit_code")) is int and item["exit_code"] != 0
+            for item in completed_commands.values()
+        ),
+        "command_failure_measurement": "retained_completed_command_items",
+        "activity_truncated_records": activity.dropped,
     }
 
 
 def run(arguments: argparse.Namespace) -> dict[str, Any]:
-    config = configuration(arguments.local_auth)
+    config = configuration(arguments.local_auth, arguments.reasoning_effort)
     binary = harness(arguments.local_auth)
     output = arguments.output.resolve()
     if output.exists():
@@ -319,6 +369,7 @@ def run(arguments: argparse.Namespace) -> dict[str, Any]:
                 "target": arguments.target,
                 "agent": agent,
                 "configuration": config,
+                "source_revision": os.environ.get("GITHUB_SHA"),
                 "upstream": upstream,
                 "grade": grade,
             }
@@ -354,6 +405,12 @@ def main() -> int:
         help="Developer experiment using an existing local Codex login; CI uses API secrets",
     )
     parser.add_argument("--browser-executable")
+    parser.add_argument(
+        "--reasoning-effort",
+        choices=["configured", "low", "high"],
+        default="configured",
+        help="Override reasoning for this run only; configured uses the repository/local setting",
+    )
     arguments = parser.parse_args()
     if not 30 <= arguments.timeout_seconds <= 900:
         parser.error("timeout-seconds must be in [30,900]")

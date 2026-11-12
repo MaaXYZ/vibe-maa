@@ -71,6 +71,7 @@ class Reports:
             "backend",
             "device",
             "scope",
+            "runtime",
             "inputs_changed",
             "report_path",
         ]
@@ -109,7 +110,9 @@ class Reports:
             "before_observation": record.get("before_observation"),
             "after_observation": record.get("after_observation"),
             "error": record.get("error"),
+            "failure": record.get("failure"),
             "verification_error": record.get("verification_error"),
+            "verification_failure": record.get("verification_failure"),
             "evidence": {
                 "events": len(events),
                 "missing": missing[-20:],

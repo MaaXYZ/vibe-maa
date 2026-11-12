@@ -9,8 +9,8 @@ Use this workflow when the user asks to implement or repair a MaaFramework autom
 
 ## Establish the task
 
-1. Read the project's instructions and existing resources. Run `vibe-maa --help` to confirm the installed command interface.
-2. Read `task list`, then `task context NAME` for an existing task before starting a new exploration. Context records the objective, constraints, previous attempts, current validation status, and useful evidence paths. A service restart expires device sessions, not the saved task.
+1. Read the project's instructions. Run `vibe-maa capabilities` once to discover the installed methods, then `vibe-maa capabilities --method METHOD` only for the operation you need. The focused response gives exact request fields, CLI examples, prerequisites and result semantics without loading a full manual. `--help` lists local CLI commands.
+2. Run `vibe-maa --project PATH context` on entry, or `context --task NAME` when resuming a known task. This bounded, read-only snapshot covers project nodes, saved tasks, existing sessions and recent evidence without starting a service. Follow its next commands as needed. Read `task context NAME` for the full objective, constraints and authoritative acceptance details before continuing a task. A service restart expires device sessions, not the saved task.
 3. Establish the task's starting conditions and observable completion condition from the request or project. Ask only for information that cannot be obtained from the device or project. For a new task, use `task create NAME --objective "OBJECTIVE" --entry ENTRY --goal GOAL`, adding `--cases PATH`, repeated `--constraint "REQUIREMENT"`, and `--max-attempts N` as appropriate.
 4. Start with a repeatable segment where possible. Existing rewards, resources, or server-side state may make a completed task impossible to repeat immediately. Natural-language constraints are requirements you must honor; the task ledger does not automatically enforce their business semantics.
 5. Check `doctor` for environment/project readiness and `devices` for discoverable Android targets. Follow an actionable failed check rather than guessing an address or treating missing OCR as an empty screen.
@@ -23,8 +23,8 @@ The installed package includes the workflow and demo data. `agent show` returns 
 - Call `observe --session SESSION_ID`, then inspect the returned original image. OCR and element boxes refer to this exact observation's controller coordinate system.
 - Pass its observation ID with `act`; target references such as `e2` belong only to that observation. Use the returned new observation after an action.
 - Key/text inputs also require a target or guard box that identifies the relevant current UI region.
-- If input is rejected as stale, inspect the replacement observation or observe again. Do not bypass the check or retry old coordinates blindly.
-- Check action `status` separately from the JSON envelope's `ok`. If the response is lost, inspect persisted evidence before retrying: the input may already have happened.
+- Context snapshots mark retained observations as historical; they do not authorize input. Observe the current device before acting. If input is rejected as stale, inspect the replacement observation or observe again. Do not bypass the check or retry old coordinates blindly.
+- Check action `status` separately from the JSON envelope's `ok`. Use structured `failure.code` and `observation_failure.code` when present. If input times out or the response is lost, inspect persisted evidence and observe the current state before retrying: the input may already have happened.
 - Missing OCR models produce an explicit warning, not proof that the screen contains no text. Use original images or provision appropriate project models.
 
 ## Implement and probe
@@ -38,10 +38,10 @@ The installed package includes the workflow and demo data. `agent show` returns 
 
 1. Run a bounded experiment: `run --session SESSION_ID --entry ENTRY --goal GOAL --timeout-seconds 20`. This is useful for temporary debugging. To validate a saved task against the actual source and its selected cases, use `task run NAME --session SESSION_ID --timeout-seconds 20`.
 2. Read both `execution_status` and `goal_status`. A completed RPC or succeeded native task is insufficient proof that the user's goal occurred. Missing or unavailable checks remain `unknown`.
-3. If the experiment fails, inspect its `report_path`, native events, failed recognition records, and original images. Distinguish observed facts from suspected causes.
+3. If the experiment fails, inspect its `report_path`, structured `failure` or `verification_failure`, native events, failed recognition records, and original images. An unavailable completion check stays `unknown`. Distinguish observed facts from suspected causes.
 4. Modify the relevant nodes or assets, then repeat. Resources are reloaded between experiments. Use temporary `--override` only for deliberate experiments and record any changes that should become permanent in source files.
 5. Never change a goal or expected test label solely to obtain a passing result. If a completion condition needs correction, explain the evidence for the correction.
-6. Re-read `task context NAME` after editing or resuming. Acceptance is tied to the saved task and current input files; a passing old run is not validation of new source. Check whether the attempt budget remains available rather than silently changing or replacing the task to evade it.
+6. Re-read `context --task NAME` after editing or resuming; use `task context NAME` for details. Acceptance is tied to the saved task and current input files; a passing old run is not validation of new source. Check whether the attempt budget remains available rather than silently changing or replacing the task to evade it.
 
 ## Preserve verification
 
@@ -53,6 +53,7 @@ The installed package includes the workflow and demo data. `agent show` returns 
 
 ## Keep tool use small and explicit
 
+- Use `context --max-bytes 6000` when you need a smaller orientation snapshot; check omission counts and request only the missing detail. Avoid repeatedly dumping project trees, full reports or all method schemas.
 - Read `vibe-maa reference --topic pipeline` before writing unfamiliar node fields. Other topics: recognition, actions, errors.
 - `run` returns a compact summary by default. Use `--full` or saved artifacts only when needed.
 - If the objective requires multiple starting states, declare `task create ... --scenario NAME=START_NODE` for each and validate using `task run ... --scenario NAME`. One passing start does not cover the others.

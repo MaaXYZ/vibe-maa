@@ -1,4 +1,5 @@
 import importlib.util
+import os
 from pathlib import Path
 
 import pytest
@@ -34,6 +35,136 @@ def test_configuration_requires_real_key_and_model(monkeypatch):
     configured = module.configuration(False)
     assert configured["wire_api"] == "responses"
     assert "do-not-record" not in str(configured)
+
+
+def test_run_reasoning_override_preserves_repository_model_and_setting(monkeypatch):
+    monkeypatch.syspath_prepend(str(DIRECTORY))
+    module = _module("run")
+    monkeypatch.setenv("VIBE_MAA_LLM_API_KEY", "fixture-key-not-for-logs")
+    monkeypatch.setenv("VIBE_MAA_LLM_MODEL", "repository-model")
+    monkeypatch.setenv("VIBE_MAA_LLM_BASE_URL", "https://example.test/v1/")
+    monkeypatch.setenv("VIBE_MAA_LLM_REASONING_EFFORT", "high")
+    configured = module.configuration(False)
+    low = module.configuration(False, "low")
+    assert configured["reasoning_effort_requested"] == "high"
+    assert configured["configuration_source"]["reasoning_effort"] == "environment"
+    assert low["reasoning_effort_requested"] == "low"
+    assert low["configuration_source"]["reasoning_effort"] == "run_override"
+    assert low["model"] == configured["model"] == "repository-model"
+    assert low["base_url"] == "https://example.test/v1"
+    assert os.environ["VIBE_MAA_LLM_REASONING_EFFORT"] == "high"
+    assert "fixture-key-not-for-logs" not in str(low)
+
+
+def test_unset_reasoning_and_local_configuration_remain_explicitly_unknown(monkeypatch):
+    monkeypatch.syspath_prepend(str(DIRECTORY))
+    module = _module("run")
+    monkeypatch.setenv("VIBE_MAA_LLM_API_KEY", "fixture-key")
+    monkeypatch.setenv("VIBE_MAA_LLM_MODEL", "repository-model")
+    monkeypatch.delenv("VIBE_MAA_LLM_BASE_URL", raising=False)
+    monkeypatch.delenv("VIBE_MAA_LLM_REASONING_EFFORT", raising=False)
+    configured = module.configuration(False)
+    assert configured["reasoning_effort_requested"] == "provider_default"
+    assert configured["configuration_source"]["reasoning_effort"] == "provider_default"
+    assert module.configuration(True)["reasoning_effort_requested"] == "local_harness_default"
+    assert module.configuration(True, "low")["reasoning_effort_requested"] == "low"
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://fixture-secret@example.test/v1",
+        "https://user:fixture-secret@example.test/v1",
+        "https://example.test/v1?api_key=fixture-secret",
+        "https://example.test/v1#fixture-secret",
+        "https:///v1",
+        "http://example.test/v1",
+    ],
+)
+def test_api_base_cannot_publish_embedded_credentials(monkeypatch, url):
+    monkeypatch.syspath_prepend(str(DIRECTORY))
+    module = _module("run")
+    monkeypatch.setenv("VIBE_MAA_LLM_API_KEY", "fixture-key")
+    monkeypatch.setenv("VIBE_MAA_LLM_MODEL", "repository-model")
+    monkeypatch.setenv("VIBE_MAA_LLM_BASE_URL", url)
+    with pytest.raises(ValueError) as error:
+        module.configuration(False)
+    assert "fixture-secret" not in str(error.value)
+
+
+@pytest.mark.parametrize("effort", ["low", "configured"])
+def test_execute_passes_only_the_requested_reasoning_to_harness(tmp_path, monkeypatch, effort):
+    import subprocess
+    import sys
+    from types import SimpleNamespace
+
+    monkeypatch.syspath_prepend(str(DIRECTORY))
+    module = _module("run")
+    monkeypatch.setenv("VIBE_MAA_LLM_API_KEY", "fixture-key-not-for-logs")
+    monkeypatch.setenv("VIBE_MAA_LLM_MODEL", "repository-model")
+    monkeypatch.delenv("VIBE_MAA_LLM_REASONING_EFFORT", raising=False)
+    monkeypatch.setenv("GH_TOKEN", "unrelated-github-token")
+    monkeypatch.setenv("GITHUB_TOKEN", "unrelated-github-token")
+    captured = []
+    real_popen = subprocess.Popen
+    records = [
+        {"type": "turn.started"},
+        {
+            "type": "item.completed",
+            "item": {
+                "type": "command_execution",
+                "id": "item_1",
+                "command": "failing trial",
+                "status": "completed",
+                "exit_code": 2,
+            },
+        },
+        {
+            "type": "item.completed",
+            "item": {
+                "type": "command_execution",
+                "id": "item_2",
+                "command": "successful trial",
+                "status": "completed",
+                "exit_code": 0,
+            },
+        },
+        {"type": "turn.completed", "usage": {"input_tokens": 10, "output_tokens": 4}},
+    ]
+    child = (
+        "import json; records="
+        + repr(records)
+        + "; [print(json.dumps(r),flush=True) for r in records]"
+    )
+
+    def start(command, **kwargs):
+        captured.append((command, kwargs["env"]))
+        return real_popen([sys.executable, "-c", child], **kwargs)
+
+    monkeypatch.setattr(module.subprocess, "Popen", start)
+    monkeypatch.setattr(
+        module.subprocess, "run", lambda *a, **k: SimpleNamespace(stdout="codex-cli fixture")
+    )
+    private = tmp_path / "private"
+    private.mkdir()
+    result = module.execute(
+        "fixture",
+        tmp_path,
+        "fixture prompt",
+        module.configuration(False, effort),
+        3,
+        private,
+        False,
+    )
+    command, environment = captured[0]
+    setting = [value for value in command if value.startswith("model_reasoning_effort=")]
+    assert setting == (['model_reasoning_effort="low"'] if effort == "low" else [])
+    assert command[command.index("--model") + 1] == "repository-model"
+    assert "fixture-key-not-for-logs" not in " ".join(command)
+    assert "GH_TOKEN" not in environment and "GITHUB_TOKEN" not in environment
+    assert result["tool_items"] == 2
+    assert result["failed_command_items"] == 1
+    assert result["elapsed_seconds"] >= 0
 
 
 def test_grader_rejects_executable_pipeline(tmp_path):

@@ -15,6 +15,12 @@ on:
         required: true
         default: 600
         type: number
+      reasoning_effort:
+        description: Reasoning setting for this run only; configured retains the repository setting
+        required: true
+        default: configured
+        type: choice
+        options: [configured, low, high]
 
 permissions:
   contents: read
@@ -52,6 +58,7 @@ jobs:
           VIBE_MAA_LLM_REASONING_EFFORT: ${{ secrets.VIBE_MAA_LLM_REASONING_EFFORT || vars.VIBE_MAA_LLM_REASONING_EFFORT }}
           AGENT_TARGET: ${{ inputs.target || 'drawio' }}
           AGENT_BUDGET: ${{ inputs.timeout_seconds || '600' }}
+          AGENT_REASONING_EFFORT: ${{ inputs.reasoning_effort || 'configured' }}
         run: |
           python - <<'PY'
           import os
@@ -62,7 +69,8 @@ jobs:
           uv run python integration/agent/run.py \
             --target "$AGENT_TARGET" \
             --output work/agent-acceptance \
-            --timeout-seconds "$AGENT_BUDGET"
+            --timeout-seconds "$AGENT_BUDGET" \
+            --reasoning-effort "$AGENT_REASONING_EFFORT"
       - name: Upload independent results and ordinary MaaFW deliverable
         if: always()
         uses: actions/upload-artifact@v7.0.2

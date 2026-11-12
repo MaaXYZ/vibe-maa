@@ -44,6 +44,17 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("init", help="Initialize a standard MaaFW project without overwrites.")
+    capabilities = commands.add_parser(
+        "capabilities",
+        help="Discover operations and exact parameter schemas without connecting a device.",
+    )
+    capabilities.add_argument("--method")
+    context = commands.add_parser(
+        "context",
+        help="Read a bounded project/task snapshot for an AI without starting a device session.",
+    )
+    context.add_argument("--task")
+    context.add_argument("--max-bytes", type=int, default=12000)
     reference = commands.add_parser(
         "reference", help="Read concise offline MaaFW protocol guidance."
     )
@@ -216,6 +227,14 @@ def main(argv: list[str] | None = None) -> int:
         command = arguments.pop("command")
         if command == "init":
             response = envelope(initialize(project))
+        elif command == "capabilities":
+            from .capabilities import show
+
+            response = envelope(show(**arguments))
+        elif command == "context":
+            from .context import show
+
+            response = envelope(show(project, **arguments))
         elif command == "reference":
             from .reference import show
 

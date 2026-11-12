@@ -24,6 +24,25 @@ Secret 优先于同名 Variable。密钥始终只使用 Secret。
 随后打开 **Actions → Real agent acceptance → Run workflow**。默认目标是 `drawio`；
 `mailbox` 是更小的工具链自检场景。缺少 API 密钥或模型 ID 会明确失败，不会跳过后显示成功。
 
+每次运行还可以选择 `reasoning_effort`：
+
+| 运行选项 | 行为 |
+| --- | --- |
+| `configured` | 沿用仓库 Secret/Variable；未设置时不传思考参数 |
+| `low` | 仅本次明确请求低思考强度，不修改仓库配置或模型名称 |
+| `high` | 仅本次明确请求高思考强度，不修改仓库配置或模型名称 |
+
+命令行也能明确选择：
+
+```bash
+gh workflow run agent-acceptance.yml --repo MaaXYZ/vibe-maa \
+  -f target=drawio -f timeout_seconds=600 -f reasoning_effort=low
+```
+
+`acceptance.json.configuration` 同时保留请求值和 `configuration_source`，区分单次覆盖、
+仓库环境配置及未覆盖的提供方默认值。提供方可能把不同请求档位映射成同一实际档位；
+未请求某档位不能当作已经测过该档位。
+
 ## 验收内容
 
 - `drawio`：运行固定版本的真实 diagrams.net/draw.io，上游发布包经 SHA256 校验后在本地提供。
@@ -57,7 +76,6 @@ Artifact `agent-acceptance-TARGET` 包含：
 - `agent-activity.json`：最多 1 MiB 的安全工具活动摘要，仅保留工具命令、状态、截断输出及用量；不包含模型思考、加密内容或认证字段。
 - `automation.zip`：普通 MaaFW 项目及来源清单，可继续开发或独立执行。
 - `evidence-RUN_ID.zip`：独立验收各次运行的可移植记录、原图和配置来源，不包含服务认证元数据。
-- `activity.json`：有界的工具操作摘要与用量；不包含模型思考文本、认证内容或完整私有事件流。
 
 只有 `published/` 上传。认证目录、daemon token、原始 Agent 事件流和私有日志不上传。
 运行失败或超时会使 job 失败；没有真实调用模型的运行不能声明通过 Agent 验收。
@@ -67,6 +85,14 @@ Artifact `agent-acceptance-TARGET` 包含：
 仅在提供方返回时记录，不估算缺失值。暂时错误保留在历史摘要中；后续成功完成的 turn 会清除
 终态错误，不会因为已恢复的重试记录而错误拒绝成功交付。
 
+报告另保留 Agent 的实际经过时间、唯一工具项数量、被保留的已完成命令中非零退出码的数量，
+以及工具活动是否截断。失败命令计数不等同于业务失败：负例检查可以故意产生非零退出码，
+而处理成功的 CLI 请求也可能报告任务未完成。指标用于定位交互负担，最终通过仍由独立检查决定。
+
+对比不同思考设置时，应保持模型、目标、时间预算和工具源码提交一致；报告中的
+`source_revision` 记录 CI 提交。历史默认档位与升级工具后的 `low` 运行可以作为观察记录，
+但不能把结果差异只归因于思考强度。
+
 ## 本地复现
 
 ```bash
@@ -74,6 +100,12 @@ uv sync --locked --extra browser
 npm ci --prefix integration/agent
 uv run playwright install chromium
 uv run python integration/agent/run.py --target drawio --output work/agent-run
+```
+
+在保留本机环境中的模型设置时，仅覆盖本次思考参数：
+
+```bash
+uv run python integration/agent/run.py --target drawio --output work/agent-low --reasoning-effort low
 ```
 
 本地同样使用以上环境变量。开发者已有 Codex 登录时，可以显式传入 `--local-auth`；

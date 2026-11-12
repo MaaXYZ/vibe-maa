@@ -9,3 +9,9 @@ class DevError(Exception):
 
     def as_dict(self) -> dict[str, Any]:
         return {"code": self.code, "message": str(self), "details": self.details}
+
+
+def failure_detail(error: Exception) -> dict[str, Any]:
+    if isinstance(error, DevError):
+        return error.as_dict()
+    return {"code": "OPERATION_FAILED", "message": str(error), "details": {}}

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0
+
+- Add compact capability discovery with method-specific JSON Schemas, examples, prerequisites and recovery guidance.
+- Add a bounded, read-only project context snapshot to help coding agents resume without scanning full histories or reconnecting devices.
+- Preserve structured action, execution and verification failures in saved evidence and compact reports.
+- Make the README a product introduction and move operational details into the Agent Skill and dedicated documentation.
+- Allow per-run reasoning-effort selection in real-agent CI and record configuration provenance, elapsed time and tool activity.
+
 ## 0.2.0
 
 - Include the mailbox starter, positive/negative screenshot cases, and Agent Skill in installed distributions.
