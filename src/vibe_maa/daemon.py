@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import hashlib
 import json
 import math
 import os
@@ -18,11 +19,19 @@ import traceback
 from pathlib import Path
 from typing import Any, Iterator
 
+from . import __version__
 from .errors import DevError
 
 MAX_MESSAGE_BYTES = 1024 * 1024
 MAX_RESPONSE_BYTES = 16 * 1024 * 1024
 SCHEMA_VERSION = 1
+
+_BUILD_ID = hashlib.sha256(
+    b"".join(
+        p.relative_to(Path(__file__).parent).as_posix().encode() + p.read_bytes()
+        for p in sorted(Path(__file__).parent.rglob("*.py"))
+    )
+).hexdigest()
 
 
 def envelope(result: Any = None, error: DevError | None = None) -> dict[str, Any]:
@@ -95,7 +104,13 @@ def _exchange(
     try:
         packet = (
             json.dumps(
-                {"token": state["token"], "method": method, "params": params},
+                {
+                    "token": state["token"],
+                    "method": method,
+                    "params": params,
+                    "version": __version__,
+                    "build_id": _BUILD_ID,
+                },
                 allow_nan=False,
             ).encode()
             + b"\n"
@@ -145,7 +160,12 @@ def daemon_status(project: Path) -> dict[str, Any]:
         return {"running": False, "stale_metadata": True}
     if response["result"].get("project") != str(project.resolve()):
         return {"running": False, "stale_metadata": True}
-    return {"running": True, **response["result"]}
+    result = response["result"]
+    return {
+        "running": True,
+        **result,
+        "compatible": result.get("version") == __version__ and result.get("build_id") == _BUILD_ID,
+    }
 
 
 def ensure_daemon(project: Path) -> dict[str, Any]:
@@ -153,7 +173,13 @@ def ensure_daemon(project: Path) -> dict[str, Any]:
     directory = project / ".maa-dev"
     directory.mkdir(parents=True, exist_ok=True, mode=0o700)
     with project_lock(directory / "daemon.start.lock"):
-        if daemon_status(project)["running"]:
+        status = daemon_status(project)
+        if status["running"]:
+            if not status.get("compatible"):
+                raise DevError(
+                    "DAEMON_VERSION_MISMATCH",
+                    "The running service uses a different build; run daemon stop, then retry",
+                )
             return _read_state(project)  # type: ignore[return-value]
         # An unresponsive existing owner must not be replaced by a second controller.
         try:
@@ -195,7 +221,7 @@ def ensure_daemon(project: Path) -> dict[str, Any]:
 def request(project: Path, method: str, params: dict[str, Any]) -> dict[str, Any]:
     state = ensure_daemon(project)
     timeout = 60.0
-    if method == "run":
+    if method in {"run", "task.run"}:
         duration = params.get("timeout_seconds", 20)
         if isinstance(duration, (int, float)) and not isinstance(duration, bool):
             if math.isfinite(duration) and 0 < duration <= 3600:
@@ -255,9 +281,18 @@ class _Handler(socketserver.StreamRequestHandler):
             method, params = message.get("method"), message.get("params", {})
             if not isinstance(method, str) or not isinstance(params, dict):
                 raise DevError("INVALID_REQUEST", "Expected method string and params object.")
+            if method not in {"ping", "daemon.stop"} and (
+                message.get("version") != __version__ or message.get("build_id") != _BUILD_ID
+            ):
+                raise DevError(
+                    "DAEMON_VERSION_MISMATCH",
+                    "Client and service builds differ; stop the daemon before continuing",
+                )
             if method == "ping":
                 result = {
                     "pid": os.getpid(),
+                    "version": __version__,
+                    "build_id": _BUILD_ID,
                     "project": str(self.server.project),
                     "stopping": self.server.stopping.is_set(),
                 }

@@ -14,6 +14,7 @@ from .backends.base import Backend
 from .errors import DevError
 from .evidence import EvidenceStore, identifier, now, read_image, save_image, write_json
 from .leases import acquire_device
+from .tasks import TaskManager
 
 
 def box_value(value: Any, width: int, height: int) -> list[int]:
@@ -71,6 +72,7 @@ class DevelopmentService:
         self.store = EvidenceStore(self.project)
         self.sessions: dict[str, Session] = {}
         self._lock = threading.RLock()
+        self.tasks = TaskManager(self.project)
 
     def dispatch(self, method: str, params: dict[str, Any]) -> dict[str, Any]:
         methods = {
@@ -84,6 +86,10 @@ class DevelopmentService:
             "asset.extract": self.asset_extract,
             "case.check": self.case_check,
             "artifact.read": self.artifact_read,
+            "task.create": self.tasks.create,
+            "task.list": self.tasks.list,
+            "task.context": self.tasks.context,
+            "task.run": self.task_run,
         }
         if method not in methods:
             raise DevError("UNKNOWN_METHOD", f"Unknown method: {method}")
@@ -97,11 +103,16 @@ class DevelopmentService:
 
     def session_open(
         self,
-        backend: str = "demo",
+        backend: str,
         device: str = "",
         adb_path: str = "adb",
         resource_path: str = "resource",
         initial_state: str = "home",
+        url: str | None = None,
+        headless: bool = True,
+        width: int = 1280,
+        height: int = 720,
+        browser_executable: str | None = None,
     ) -> dict[str, Any]:
         lease = None
         if backend == "adb" and any(
@@ -128,8 +139,23 @@ class DevelopmentService:
             except BaseException:
                 lease.__exit__(None, None, None)
                 raise
+        elif backend == "browser":
+            from .backends.browser import BrowserBackend
+
+            if not isinstance(url, str) or not url:
+                raise DevError("INVALID_ARGUMENT", "Browser sessions require --url")
+            adapter = BrowserBackend(
+                self.project,
+                url=url,
+                headless=headless,
+                width=width,
+                height=height,
+                resource_path=resource_path,
+                executable_path=browser_executable,
+            )
+            device = url
         else:
-            raise DevError("INVALID_ARGUMENT", "backend must be demo or adb")
+            raise DevError("INVALID_ARGUMENT", "backend must be demo, adb, or browser")
         sid = identifier("session")
         self.sessions[sid] = Session(sid, adapter, backend, device, resource_path, lease=lease)
         return {
@@ -179,6 +205,9 @@ class DevelopmentService:
             "observation_id": oid,
             "session_id": session.id,
             "generation": session.generation,
+            "backend": session.kind,
+            "device": session.device,
+            "scope": "fixture" if session.kind == "demo" else "device",
             "captured_at": captured_at,
             "resource_path": session.resource_path,
             "image_path": str(image_path),
@@ -412,6 +441,10 @@ class DevelopmentService:
             "schema_version": 1,
             "run_id": rid,
             "session_id": session_id,
+            "backend": session.kind,
+            "device": session.device,
+            "scope": "fixture" if session.kind == "demo" else "device",
+            "resource_path": session.resource_path,
             "entry": entry,
             "override": override or {},
             "timeout_seconds": timeout_seconds,
@@ -580,6 +613,11 @@ class DevelopmentService:
 
     def artifact_read(self, kind: str, id: str) -> dict[str, Any]:
         return self.store.read(kind, id)
+
+    def task_run(
+        self, session_id: str, name: str, timeout_seconds: float = 20, scenario: str | None = None
+    ) -> dict[str, Any]:
+        return self.tasks.run(self, session_id, name, timeout_seconds, scenario=scenario)
 
     def close(self) -> None:
         with self._lock:

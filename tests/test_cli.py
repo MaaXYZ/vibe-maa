@@ -190,6 +190,18 @@ def test_copied_metadata_cannot_attach_to_another_project(running_daemon, tmp_pa
     assert daemon.daemon_status(other) == {"running": False, "stale_metadata": True}
 
 
+def test_upgraded_client_rejects_old_service_without_mutation(running_daemon, monkeypatch):
+    project, _ = running_daemon
+    monkeypatch.setattr(daemon, "_BUILD_ID", "upgraded-client-build")
+    status = daemon.daemon_status(project)
+    assert status["running"] is True
+    assert status["compatible"] is False
+    with pytest.raises(DevError) as caught:
+        daemon.request(project, "act", {})
+    assert caught.value.code == "DAEMON_VERSION_MISMATCH"
+    assert daemon.stop_daemon(project)["ok"] is True
+
+
 def test_lost_mutation_response_is_not_retried(monkeypatch, tmp_path):
     calls = []
     monkeypatch.setattr(daemon, "ensure_daemon", lambda _: {"port": 1, "token": "token"})

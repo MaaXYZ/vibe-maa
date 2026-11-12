@@ -1,0 +1,27 @@
+[
+  {
+    "node": "HomeVisible",
+    "image": "home.png",
+    "expected_hit": true
+  },
+  {
+    "node": "HomeVisible",
+    "image": "mailbox.png",
+    "expected_hit": false
+  },
+  {
+    "node": "HomeVisible",
+    "image": "popup.png",
+    "expected_hit": false
+  },
+  {
+    "node": "MailboxVisible",
+    "image": "mailbox.png",
+    "expected_hit": true
+  },
+  {
+    "node": "MailboxVisible",
+    "image": "home.png",
+    "expected_hit": false
+  }
+]

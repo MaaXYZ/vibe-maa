@@ -6,3 +6,5 @@ __pycache__/
 dist/
 .maa-dev/
 work/
+node_modules/
+.cache/

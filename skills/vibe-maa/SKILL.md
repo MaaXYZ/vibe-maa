@@ -10,9 +10,13 @@ Use this workflow when the user asks to implement or repair a MaaFramework autom
 ## Establish the task
 
 1. Read the project's instructions and existing resources. Run `vibe-maa --help` to confirm the installed command interface.
-2. Establish the task's starting conditions and observable completion condition from the request or project. Ask only for information that cannot be obtained from the device or project.
-3. Start with a repeatable segment where possible. Existing rewards, resources, or server-side state may make a completed task impossible to repeat immediately.
-4. Open a session for the intended device with `vibe-maa --project PATH session open --backend adb --device ADDRESS`. Use `--backend demo` only for the resettable fixture, and label fixture results as such.
+2. Read `task list`, then `task context NAME` for an existing task before starting a new exploration. Context records the objective, constraints, previous attempts, current validation status, and useful evidence paths. A service restart expires device sessions, not the saved task.
+3. Establish the task's starting conditions and observable completion condition from the request or project. Ask only for information that cannot be obtained from the device or project. For a new task, use `task create NAME --objective "OBJECTIVE" --entry ENTRY --goal GOAL`, adding `--cases PATH`, repeated `--constraint "REQUIREMENT"`, and `--max-attempts N` as appropriate.
+4. Start with a repeatable segment where possible. Existing rewards, resources, or server-side state may make a completed task impossible to repeat immediately. Natural-language constraints are requirements you must honor; the task ledger does not automatically enforce their business semantics.
+5. Check `doctor` for environment/project readiness and `devices` for discoverable Android targets. Follow an actionable failed check rather than guessing an address or treating missing OCR as an empty screen.
+6. Explicitly open the intended backend with `vibe-maa --project PATH session open --backend adb --device ADDRESS`. Backend selection is required. Use `--backend demo` only for the resettable fixture, and label fixture results as such.
+
+The installed package includes the workflow and demo data. `agent show` returns these instructions; `agent install --target codex` or `agent install --target claude` installs a new project-local Skill without changing home directories or overwriting an existing Skill. Refresh the coding-agent session after installation. For a reproducible development exercise, `demo init --starter` creates a project with a genuinely missing announcement-handling branch, ready for source editing.
 
 ## Observe and explore
 
@@ -32,11 +36,12 @@ Use this workflow when the user asks to implement or repair a MaaFramework autom
 
 ## Run and repair
 
-1. Run a bounded experiment: `run --session SESSION_ID --entry ENTRY --goal GOAL --timeout-seconds 20`.
+1. Run a bounded experiment: `run --session SESSION_ID --entry ENTRY --goal GOAL --timeout-seconds 20`. This is useful for temporary debugging. To validate a saved task against the actual source and its selected cases, use `task run NAME --session SESSION_ID --timeout-seconds 20`.
 2. Read both `execution_status` and `goal_status`. A completed RPC or succeeded native task is insufficient proof that the user's goal occurred. Missing or unavailable checks remain `unknown`.
 3. If the experiment fails, inspect its `report_path`, native events, failed recognition records, and original images. Distinguish observed facts from suspected causes.
 4. Modify the relevant nodes or assets, then repeat. Resources are reloaded between experiments. Use temporary `--override` only for deliberate experiments and record any changes that should become permanent in source files.
 5. Never change a goal or expected test label solely to obtain a passing result. If a completion condition needs correction, explain the evidence for the correction.
+6. Re-read `task context NAME` after editing or resuming. Acceptance is tied to the saved task and current input files; a passing old run is not validation of new source. Check whether the attempt budget remains available rather than silently changing or replacing the task to evade it.
 
 ## Preserve verification
 
@@ -45,3 +50,9 @@ Use this workflow when the user asks to implement or repair a MaaFramework autom
 - Report offline recognition checks separately from live device runs. Keep untested branches and unknown completion states explicit.
 - Runtime files in `.maa-dev/` are ignored by Git. Deliver standard project files, selected verification samples, asset provenance, and a concise statement of what was actually tested.
 - Close sessions or stop the project daemon when finished. Never claim a real game's daily task was validated using only the mailbox fixture.
+
+## Keep tool use small and explicit
+
+- Read `vibe-maa reference --topic pipeline` before writing unfamiliar node fields. Other topics: recognition, actions, errors.
+- `run` returns a compact summary by default. Use `--full` or saved artifacts only when needed.
+- If the objective requires multiple starting states, declare `task create ... --scenario NAME=START_NODE` for each and validate using `task run ... --scenario NAME`. One passing start does not cover the others.

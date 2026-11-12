@@ -2,59 +2,157 @@
   "OpenMailbox": {
     "recognition": "DirectHit",
     "action": "DoNothing",
-    "next": ["DismissAnnouncement", "ClickMailbox", "MailboxVisible"],
+    "next": [
+      "DismissAnnouncement",
+      "ClickMailbox",
+      "MailboxVisible"
+    ],
     "timeout": 1000,
     "rate_limit": 20
   },
   "DismissAnnouncement": {
     "recognition": "ColorMatch",
-    "roi": [220, 210, 200, 60],
-    "lower": [220, 220, 220],
-    "upper": [220, 220, 220],
+    "roi": [
+      220,
+      210,
+      200,
+      60
+    ],
+    "lower": [
+      220,
+      220,
+      220
+    ],
+    "upper": [
+      220,
+      220,
+      220
+    ],
     "count": 100,
     "action": "Click",
-    "next": ["ClickMailbox"],
+    "next": [
+      "ClickMailbox"
+    ],
     "timeout": 1000,
     "rate_limit": 20
   },
   "ClickMailbox": {
     "recognition": "ColorMatch",
-    "roi": [220, 140, 200, 60],
-    "lower": [200, 200, 200],
-    "upper": [200, 200, 200],
+    "roi": [
+      220,
+      140,
+      200,
+      60
+    ],
+    "lower": [
+      200,
+      200,
+      200
+    ],
+    "upper": [
+      200,
+      200,
+      200
+    ],
     "count": 100,
     "action": "Click",
-    "next": ["MailboxVisible"],
+    "next": [
+      "MailboxVisible"
+    ],
     "timeout": 1000,
     "rate_limit": 20
   },
   "MailboxVisible": {
     "recognition": "ColorMatch",
-    "roi": [0, 0, 10, 10],
-    "lower": [40, 40, 40],
-    "upper": [40, 40, 40],
+    "roi": [
+      0,
+      0,
+      10,
+      10
+    ],
+    "lower": [
+      40,
+      40,
+      40
+    ],
+    "upper": [
+      40,
+      40,
+      40
+    ],
     "count": 50,
     "action": "DoNothing",
-    "next": ["ClickBack"],
+    "next": [
+      "ClickBack"
+    ],
     "timeout": 1000,
     "rate_limit": 20
   },
   "ClickBack": {
     "recognition": "ColorMatch",
-    "roi": [20, 20, 100, 50],
-    "lower": [160, 160, 160],
-    "upper": [160, 160, 160],
+    "roi": [
+      20,
+      20,
+      100,
+      50
+    ],
+    "lower": [
+      160,
+      160,
+      160
+    ],
+    "upper": [
+      160,
+      160,
+      160
+    ],
     "count": 100,
     "action": "Click",
-    "next": ["HomeVisible"],
+    "next": [
+      "HomeVisible"
+    ],
     "timeout": 1000,
     "rate_limit": 20
   },
   "HomeVisible": {
     "recognition": "ColorMatch",
-    "roi": [0, 0, 10, 10],
-    "lower": [20, 20, 20],
-    "upper": [20, 20, 20],
+    "roi": [
+      0,
+      0,
+      10,
+      10
+    ],
+    "lower": [
+      20,
+      20,
+      20
+    ],
+    "upper": [
+      20,
+      20,
+      20
+    ],
+    "count": 50,
+    "action": "DoNothing"
+  },
+  "PopupVisible": {
+    "recognition": "ColorMatch",
+    "roi": [
+      0,
+      0,
+      10,
+      10
+    ],
+    "lower": [
+      60,
+      60,
+      60
+    ],
+    "upper": [
+      60,
+      60,
+      60
+    ],
     "count": 50,
     "action": "DoNothing"
   }

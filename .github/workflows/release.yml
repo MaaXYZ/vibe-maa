@@ -1,0 +1,60 @@
+name: Prepare draft release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag to build, for example v0.2.0
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    env:
+      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v10.3.3
+      - name: Validate version and tag
+        run: |
+          python - <<'PY'
+          import os
+          import tomllib
+          from pathlib import Path
+          version = tomllib.loads(Path("pyproject.toml").read_text())["project"]["version"]
+          if os.environ["RELEASE_TAG"] != f"v{version}":
+              raise SystemExit("Tag must match pyproject.toml version")
+          PY
+          git rev-parse --verify "refs/tags/$RELEASE_TAG"
+      - run: uv sync --locked
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run pytest tests integration/targets/drawio/test_prepare.py
+      - run: uv build
+      - name: Smoke-test installed distribution
+        run: uv run --isolated --no-project --with dist/*.whl python integration/package_smoke.py
+      - uses: actions/upload-artifact@v7.0.2
+        with:
+          name: release-distributions
+          path: dist/*
+          if-no-files-found: error
+      - name: Create draft GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$RELEASE_TAG" dist/* --verify-tag --draft --generate-notes --title "vibe-maa $RELEASE_TAG" --notes "Wheel and sdist passed the installed-package workflow. See CHANGELOG.md for behavior and coverage."

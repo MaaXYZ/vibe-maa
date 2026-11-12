@@ -1,0 +1,9 @@
+{
+  "name": "vibe-maa-agent-acceptance",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pinned open-source Codex CLI for opt-in real-agent acceptance",
+  "dependencies": {
+    "@openai/codex": "0.167.2"
+  }
+}
