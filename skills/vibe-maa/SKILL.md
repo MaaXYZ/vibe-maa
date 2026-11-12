@@ -14,7 +14,8 @@ Use this workflow when the user asks to implement or repair a MaaFramework autom
 3. Establish the task's starting conditions and observable completion condition from the request or project. Ask only for information that cannot be obtained from the device or project. For a new task, use `task create NAME --objective "OBJECTIVE" --entry ENTRY --goal GOAL`, adding `--cases PATH`, repeated `--constraint "REQUIREMENT"`, and `--max-attempts N` as appropriate.
 4. Start with a repeatable segment where possible. Existing rewards, resources, or server-side state may make a completed task impossible to repeat immediately. Natural-language constraints are requirements you must honor; the task ledger does not automatically enforce their business semantics.
 5. Check `doctor` for environment/project readiness and `devices` for discoverable Android targets. Follow an actionable failed check rather than guessing an address or treating missing OCR as an empty screen.
-6. Explicitly open the intended backend with `vibe-maa --project PATH session open --backend adb --device ADDRESS`. Backend selection is required. Use `--backend demo` only for the resettable fixture, and label fixture results as such.
+6. Keep the service alive across tool calls. Run `daemon status` first and reuse a running compatible service. Otherwise, in a coding-agent sandbox, launch `vibe-maa --project PATH daemon serve` once in a long-lived exec or PTY session: let the execution tool yield while the command continues running. A stable host terminal or supervisor can also own it. Run `daemon status` in a separate call and confirm `running` and `compatible` before opening a session. Appending shell `&` is insufficient when the sandbox destroys a command's PID namespace after exit. Keep the foreground session alive until work finishes. If the harness declares the service externally managed, use that service, close only sessions you opened, and leave service shutdown/restart to its owner.
+7. Explicitly open the intended backend with `vibe-maa --project PATH session open --backend adb --device ADDRESS`. Backend selection is required. Use `--backend demo` only for the resettable fixture, and label fixture results as such.
 
 The installed package includes the workflow and demo data. `agent show` returns these instructions; `agent install --target codex` or `agent install --target claude` installs a new project-local Skill without changing home directories or overwriting an existing Skill. Refresh the coding-agent session after installation. For a reproducible development exercise, `demo init --starter` creates a project with a genuinely missing announcement-handling branch, ready for source editing.
 
@@ -25,6 +26,7 @@ The installed package includes the workflow and demo data. `agent show` returns 
 - Key/text inputs also require a target or guard box that identifies the relevant current UI region.
 - Context snapshots mark retained observations as historical; they do not authorize input. Observe the current device before acting. If input is rejected as stale, inspect the replacement observation or observe again. Do not bypass the check or retry old coordinates blindly.
 - Check action `status` separately from the JSON envelope's `ok`. Use structured `failure.code` and `observation_failure.code` when present. If input times out or the response is lost, inspect persisted evidence and observe the current state before retrying: the input may already have happened.
+- If `DAEMON_REQUIRES_SUPERVISOR` or `SESSION_OWNER_LOST` occurs, fix the service lifetime first and read saved context/evidence. Establish a new session only after a stable service exists, then observe its current state. Repeatedly opening replacement sessions does not repair process lifetime; never replay old inputs automatically.
 - Missing OCR models produce an explicit warning, not proof that the screen contains no text. Use original images or provision appropriate project models.
 
 ## Implement and probe
@@ -49,7 +51,7 @@ The installed package includes the workflow and demo data. `agent show` returns 
 - Each case has `node`, `image` relative to the manifest, and explicit boolean `expected_hit`. Labels need support from the request, visible evidence, or established project cases. Your own prediction is not independent ground truth.
 - Report offline recognition checks separately from live device runs. Keep untested branches and unknown completion states explicit.
 - Runtime files in `.maa-dev/` are ignored by Git. Deliver standard project files, selected verification samples, asset provenance, and a concise statement of what was actually tested.
-- Close sessions or stop the project daemon when finished. Never claim a real game's daily task was validated using only the mailbox fixture.
+- Close your sessions when finished; stop a project daemon only when you own its lifecycle. An externally managed service belongs to its harness or supervisor. Never claim a real game's daily task was validated using only the mailbox fixture.
 
 ## Keep tool use small and explicit
 

@@ -7,6 +7,8 @@
 - Preserve structured action, execution and verification failures in saved evidence and compact reports.
 - Make the README a product introduction and move operational details into the Agent Skill and dedicated documentation.
 - Allow per-run reasoning-effort selection in real-agent CI and record configuration provenance, elapsed time and tool activity.
+- Keep device services alive across coding-agent PID namespaces with foreground serving and externally supervised CI ownership; reject lost-session retries without replacing the owner.
+- Redact authentication fields in mixed native logs and JSON, and keep metrics consistent with the final published activity trace.
 
 ## 0.2.0
 

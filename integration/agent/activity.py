@@ -23,12 +23,19 @@ EVENT_TYPES = {
 PRIVATE_KEYS = {
     "authorization",
     "authentication",
+    "auth",
+    "auth_token",
+    "authtoken",
     "api_key",
     "apikey",
     "access_token",
     "refresh_token",
     "id_token",
     "token",
+    "secret",
+    "client_secret",
+    "secrets",
+    "password",
     "session_token",
     "sessiontoken",
     "encrypted_content",
@@ -41,13 +48,17 @@ PRIVATE_KEYS = {
     "thoughts",
 }
 PRIVATE_LINE = re.compile(
-    r"(?i)(?:authorization|authentication|api[_-]?key|(?:access|refresh|session|id)[_-]?token|"
-    r"encrypted[_-]?content|set-cookie|cookie|reasoning_content)\s*[\"']?\s*[:=]"
+    r"(?i)(?:authorization|authentication|api[_-]?key|(?:access|refresh|session|id|auth)[_-]?token|"
+    r"\btoken|\bauth|\bsecret|client[_-]?secret|password|encrypted[_-]?content|set-cookie|cookie|"
+    r"reasoning_content)\s*[\"']?\s*[:=]"
 )
 
 
 def _strip_private(value: Any) -> Any:
     if isinstance(value, dict):
+        kind = value.get("type")
+        if isinstance(kind, str) and kind in {"reasoning", "thinking", "analysis"}:
+            return {"type": kind, "content": "[omitted model reasoning]"}
         return {
             key: _strip_private(item)
             for key, item in value.items()
@@ -56,6 +67,27 @@ def _strip_private(value: Any) -> Any:
     if isinstance(value, list):
         return [_strip_private(item) for item in value]
     return value
+
+
+def _strip_embedded_json(text: str) -> str:
+    """Sanitize complete JSON objects even when a tool concatenates them with native logs."""
+    decoder = json.JSONDecoder()
+    pieces = []
+    cursor = 0
+    for match in re.finditer(r"[\[{]", text):
+        position = match.start()
+        if position < cursor:
+            continue
+        try:
+            value, end = decoder.raw_decode(text, position)
+        except ValueError:
+            continue
+        pieces.extend(
+            (text[cursor:position], json.dumps(_strip_private(value), ensure_ascii=False))
+        )
+        cursor = end
+    pieces.append(text[cursor:])
+    return "".join(pieces)
 
 
 def safe_text(value: Any, secret: str | None, limit: int = MAX_OUTPUT_BYTES) -> str:
@@ -70,6 +102,7 @@ def safe_text(value: Any, secret: str | None, limit: int = MAX_OUTPUT_BYTES) -> 
         pass
     else:
         text = json.dumps(_strip_private(structured), ensure_ascii=False)
+    text = _strip_embedded_json(text)
     text = "\n".join(
         "[REDACTED private/auth field]" if PRIVATE_LINE.search(line) else line
         for line in text.splitlines()

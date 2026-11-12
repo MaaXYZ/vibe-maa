@@ -1,0 +1,429 @@
+{
+  "provenance": {
+    "original_run": "https://github.com/MaaXYZ/vibe-maa/actions/runs/43192717285",
+    "original_trace_sha256": "db3c788a34f053c684d70541e67a9a808c6f63ba2433deac3c124d82653a55b3",
+    "sanitizer_sha256": "53f4aaeae057c93c3b39791bd2f864d15bf5e69e2d326c722ad45c442ff0e256",
+    "note": "Re-sanitized derivative of published tool activity, excluding authentication fields from mixed logs. No model reasoning included."
+  },
+  "trace": {
+    "schema_version": 1,
+    "scope": "tool_activity_only_no_model_reasoning",
+    "event_count": 63,
+    "event_types": {
+      "thread.started": 1,
+      "item.completed": 37,
+      "turn.started": 1,
+      "item.started": 24
+    },
+    "tool_items": 24,
+    "records": [
+      {
+        "event": "item.started",
+        "tool_type": "command_execution",
+        "item_id": "item_2",
+        "status": "in_progress",
+        "command": "/bin/bash -c 'cat .agents/skills/vibe-maa/SKILL.md'",
+        "output": ""
+      },
+      {
+        "event": "item.completed",
+        "tool_type": "command_execution",
+        "item_id": "item_2",
+        "status": "completed",
+        "command": "/bin/bash -c 'cat .agents/skills/vibe-maa/SKILL.md'",
+        "exit_code": 0,
+        "output": "---\nname: vibe-maa\ndescription: Develop and debug ordinary MaaFramework resources using persistent device sessions, same-frame observations, recognition-only probes, and recorded execution evidence.\n---\n\n# MaaFramework development workflow\n\nUse this workflow when the user asks to implement or repair a MaaFramework automation and `vibe-maa` is installed. Operate on the requested project. The CLI does not contain a model; you remain responsible for understanding the task, editing project files, and assessing evidence.\n\n## Establish the task\n\n1. Read the project's instructions. Run `vibe-maa capabilities` once to discover the installed methods, then `vibe-maa capabilities --method METHOD` only for the operation you need. The focused response gives exact request fields, CLI examples, prerequisites and result semantics without loading a full manual. `--help` lists local CLI commands.\n2. Run `vibe-maa --project PATH context` on entry, or `context --task NAME` when resuming a known task. This bounded, read-only snapshot covers project nodes, saved tasks, existing sessions and recent evidence without starting a service. Follow its next commands as needed. Read `task context NAME` for the full objective, constraints and authoritative acceptance details before continuing a task. A service restart expires device sessions, not the saved task.\n3. Establish the task's starting conditions and observable completion condition from the request or project. Ask only for information that cannot be obtained from the device or project. For a new task, use `task create NAME --objective \"OBJECTIVE\" --entry ENTRY --goal GOAL`, adding `--cases PATH`, repeated `--constraint \"REQUIREMENT\"`, and `--max-attempts N` as appropriate.\n4. Start with a repeatable segment where possible. Existing rewards, resources, or server-side state may make a completed task impossible to repeat immediately. Natural-language constraints are requirements you must honor; the task ledger does not automatically enforce their business semantics.\n5. Check `doctor` for environment/project readiness and `devices` for discoverable Android targets. Follow an actionable failed check rather than guessing an address or treating missing OCR as an empty screen.\n6. Explicitly open the intended backend with `vibe-maa --project PATH session open --backend adb --device ADDRESS`. Backend selection is required. Use `--backend demo` only for the resettable fixture, and label fixture results as such.\n\nThe installed package includes the workflow and demo data. `agent show` returns these instructions; `agent install --target codex` or `agent install --target claude` installs a new project-local Skill without changing home directories or overwriting an existing Skill. Refresh the coding-agent session after installation. For a reproducible development exercise, `demo init --starter` creates a project with a genuinely missing announcement-handling branch, ready for source editing.\n\n## Observe and explore\n\n- Call `observe --session SESSION_ID`, then inspect the returned original image. OCR and element boxes refer to this exact observation's controller coordinate system.\n- Pass its observation ID with `act`; target references such as `e2` belong only to that observation. Use the returned new observation after an action.\n- Key/text inputs also require a target or guard box that identifies the relevant current UI region.\n- Context snapshots mark retained observations as historical; they do not authorize input. Observe the current device before acting. If input is rejected as stale, inspect the replacement observation or observe again. Do not bypass the check or retry old coordinates blindly.\n- Check action `status` separately from the JSON envelope's `ok`. Use structured `failure.code` and `observation_failure.code` when present. If input times out or the response is lost, inspect persisted evidence and observe the current state before retrying: the input may already have happened.\n- Missing OCR models produce an explicit warning, not proof that the screen contains no text. Use original images or provision appropriate project models.\n\n## Implement and probe\n\n- Edit standard files under `resource/pipeline/` and related custom code using normal coding tools.\n- Use `probe --session SESSION_ID --observation OBS_ID --node NODE` to evaluate recognition on saved pixels without input. Check `result.hit`, not only candidate lists or scores.\n- Probe both relevant positive and negative screenshots. Offline Custom/context-dependent nodes may be unsupported; do not replace an unsupported result with a fabricated match.\n- Use `asset extract --observation OBS_ID --box X,Y,W,H --name NAME` to generate a template with source provenance. Keep the original frame available while debugging.\n\n## Run and repair\n\n1. Run a bounded experiment: `run --session SESSION_ID --entry ENTRY --goal GOAL --timeout-seconds 20`. This is useful for temporary debugging. To validate a saved task against the actual source and its selected cases, use `task run NAME --session SESSION_ID --timeout-seconds 20`.\n2. Read both `execution_status` and `goal_status`. A completed RPC or succeeded native task is insufficient proof that the user's goal occurred. Missing or unavailable checks remain `unknown`.\n3. If the experiment fails, inspect its `report_path`, structured `failure` or `verification_failure`, native events, failed recognition records, and original images. An unavailable completion check stays `unknown`. Distinguish observed facts from suspected causes.\n4. Modify the relevant nodes or assets, then repeat. Resources are reloaded between experiments. Use temporary `--override` only for deliberate experiments and record any changes that should become permanent in source files.\n5. Never change a goal or expected test label solely to obtain a passing result. If a completion condition needs correction, explain the evidence for the correction.\n6. Re-read `context --task NAME` after editing or resuming; use `task \n[truncated]"
+      },
+      {
+        "event": "item.started",
+        "tool_type": "command_execution",
+        "item_id": "item_3",
+        "status": "in_progress",
+        "command": "/bin/bash -c 'vibe-maa --help'",
+        "output": ""
+      },
+      {
+        "event": "item.completed",
+        "tool_type": "command_execution",
+        "item_id": "item_3",
+        "status": "completed",
+        "command": "/bin/bash -c 'vibe-maa --help'",
+        "exit_code": 0,
+        "output": "usage: vibe-maa [-h] [--project PROJECT] [--version]\n                {init,capabilities,context,reference,daemon,session,observe,act,probe,run,asset,case,artifact,doctor,devices,browser,target,demo,agent,task,report,export}\n                ...\n\nJSON command-line client for the persistent project-local development service.\n\npositional arguments:\n  {init,capabilities,context,reference,daemon,session,observe,act,probe,run,asset,case,artifact,doctor,devices,browser,target,demo,agent,task,report,export}\n    init                Initialize a standard MaaFW project without\n                        overwrites.\n    capabilities        Discover operations and exact parameter schemas\n                        without connecting a device.\n    context             Read a bounded project/task snapshot for an AI without\n                        starting a device session.\n    reference           Read concise offline MaaFW protocol guidance.\n    daemon              Inspect or stop the project-local daemon.\n    doctor              Check local project and optional adapters.\n    devices             Discover available ADB devices.\n    browser             Install Chromium into this package's runtime.\n    target              Prepare a pinned open-source UI target.\n\noptions:\n  -h, --help            show this help message and exit\n  --project PROJECT\n  --version             show program's version number and exit"
+      },
+      {
+        "event": "item.started",
+        "tool_type": "command_execution",
+        "item_id": "item_4",
+        "status": "in_progress",
+        "command": "/bin/bash -c \"find . -maxdepth 4 -type f | sort | sed -n '1,240p'\"",
+        "output": ""
+      },
+      {
+        "event": "item.completed",
+        "tool_type": "command_execution",
+        "item_id": "item_4",
+        "status": "completed",
+        "command": "/bin/bash -c \"find . -maxdepth 4 -type f | sort | sed -n '1,240p'\"",
+        "exit_code": 0,
+        "output": "./.agents/skills/vibe-maa/SKILL.md\n./.gitignore\n./interface.json"
+      },
+      {
+        "event": "item.started",
+        "tool_type": "command_execution",
+        "item_id": "item_6",
+        "status": "in_progress",
+        "command": "/bin/bash -c 'vibe-maa --project . capabilities'",
+        "output": ""
+      },
+      {
+        "event": "item.completed",
+        "tool_type": "command_execution",
+        "item_id": "item_6",
+        "status": "completed",
+        "command": "/bin/bash -c 'vibe-maa --project . capabilities'",
+        "exit_code": 0,
+        "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"schema_version\": 1, \"tool\": \"vibe-maa\", \"version\": \"0.3.0\", \"readiness\": \"not_checked\", \"methods\": [{\"method\": \"session.open\", \"summary\": \"Open a persistent, explicitly selected device or fixture connection.\", \"required\": [\"backend\"], \"effect\": \"writes_or_executes\", \"sends_ui_input\": false, \"details\": \"vibe-maa capabilities --method session.open\"}, {\"method\": \"session.list\", \"summary\": \"List the current service's live connections.\", \"required\": [], \"effect\": \"reads\", \"sends_ui_input\": false, \"details\": \"vibe-maa capabilities --method session.list\"}, {\"method\": \"session.close\", \"summary\": \"Stop a session and release its connection/lease.\", \"required\": [\"session_id\"], \"effect\": \"writes_or_executes\", \"sends_ui_input\": false, \"details\": \"vibe-maa capabilities --method session.close\"}, {\"method\": \"observe\", \"summary\": \"Capture one original frame and optional OCR from those exact pixels.\", \"required\": [\"session_id\"], \"effect\": \"writes_or_executes\", \"sends_ui_input\": false, \"details\": \"vibe-maa capabilities --method observe\"}, {\"method\": \"act\", \"summary\": \"Dispatch one guarded input using a current observation.\", \"required\": [\"session_id\", \"observation_id\"], \"effect\": \"writes_or_executes\", \"sends_ui_input\": true, \"details\": \"vibe-maa capabilities --method act\"}, {\"method\": \"probe\", \"summary\": \"Evaluate one node on saved pixels without executing its actions.\", \"required\": [\"session_id\", \"observation_id\", \"node\"], \"effect\": \"writes_or_executes\", \"sends_ui_input\": false, \"details\": \"vibe-maa capabilities --method probe\"}, {\"method\": \"run\", \"summary\": \"Run the current Pipeline source with a finite native execution budget.\", \"required\": [\"session_id\", \"entry\"], \"effect\": \"writes_or_executes\", \"sends_ui_input\": true, \"details\": \"vibe-maa capabilities --method run\"}, {\"method\": \"asset.extract\", \"summary\": \"Crop a source-tracked template from a saved observation.\", \"required\": [\"observation_id\", \"box\", \"name\"], \"effect\": \"writes_or_executes\", \"sends_ui_input\": false, \"details\": \"vibe-maa capabilities --method asset.extract\"}, {\"method\": \"case.check\", \"summary\": \"Check positive and negative labeled screenshots with native recognition.\", \"required\": [\"session_id\", \"cases\"], \"effect\": \"writes_or_executes\", \"sends_ui_input\": false, \"details\": \"vibe-maa capabilities --method case.check\"}, {\"method\": \"artifact.read\", \"summary\": \"Read an existing immutable-identity record by kind and ID.\", \"required\": [\"kind\", \"id\"], \"effect\": \"reads\", \"sends_ui_input\": false, \"details\": \"vibe-maa capabilities --method artifact.read\"}, {\"method\": \"task.create\", \"summary\": \"Save an objective and executable acceptance contract.\", \"required\": [\"name\", \"objective\", \"entry\", \"goal\"], \"effect\": \"writes_or_executes\", \"sends_ui_input\": false, \"details\": \"vibe-maa capabilities --method task.create\"}, {\"method\": \"task.list\", \"summary\": \"List durable objectives and their current verification states.\", \"required\": [], \"effect\": \"reads\", \"sends_ui_input\": false, \"details\": \"vibe-maa capabilities --method task.list\"}, {\"method\": \"task.context\", \"summary\": \"Recover the objective, latest evidence and remaining work after interruption.\", \"required\": [\"name\"], \"effect\": \"reads\", \"sends_ui_input\": false, \"details\": \"vibe-maa capabilities --method task.context\"}, {\"method\": \"task.run\", \"summary\": \"Validate a saved task and named starting state against current source files.\", \"required\": [\"session_id\", \"name\"], \"effect\": \"writes_or_executes\", \"sends_ui_input\": true, \"details\": \"vibe-maa capabilities --method task.run\"}], \"backends\": {\"adb\": {\"setup\": \"Android platform-tools and a reachable device address\", \"scope\": \"device\"}, \"browser\": {\"setup\": \"vibe-maa[browser] extra, Chromium, and an http(s) URL\", \"scope\": \"device\", \"perception\": \"screenshots only; no DOM/evaluate API\"}, \"demo\": {\"setup\": \"demo init creates the packaged resource fixture\", \"scope\": \"fixture\", \"perception\": \"synthetic UI/text; real native recognition and execution\"}}, \"status_fields\": {\"ok\": \"Request handling completed; not proof of action/task success.\", \"status\": \"act: succeeded/failed; inspect its new observation.\", \"execution_status\": \"run: succeeded/failed/timeout.\", \"goal_status\": \"run: passed/failed/unknown, independently checked if requested.\", \"state\": \"task: draft/needs_validation/accepted/blocked; acceptance covers configured checks only.\", \"scope\": \"fixture/device for runs; offline_recognition_only for cases. Fixture or offline success does not prove a live-game result.\"}, \"coordinates\": \"Full controller screenshot pixels. A box is [x,y,width,height], never [x1,y1,x2,y2].\", \"cli_tools\": [\"reference --topic pipeline|recognition|actions|errors: offline protocol examples\", \"doctor / devices: readiness checks and ADB discovery\", \"agent show|install|export: bundled Skill integration\", \"demo init --starter: intentionally incomplete, repeatable fixture project\", \"target prepare|serve drawio: explicit pinned-app download/local serving\", \"browser install: explicit Chromium installation\", \"report list|show|export and export: compact evidence and portable project handoff\"], \"next\": \"Check doctor, select an explicit backend, observe, then use a focused method contract. Resume work with task.context.\"}}"
+      },
+      {
+        "event": "item.started",
+        "tool_type": "command_execution",
+        "item_id": "item_7",
+        "status": "in_progress",
+        "command": "/bin/bash -c 'vibe-maa --project . context --max-bytes 12000'",
+        "output": ""
+      },
+      {
+        "event": "item.completed",
+        "tool_type": "command_execution",
+        "item_id": "item_7",
+        "status": "completed",
+        "command": "/bin/bash -c 'vibe-maa --project . context --max-bytes 12000'",
+        "exit_code": 0,
+        "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"schema_version\": 1, \"tool\": \"vibe-maa\", \"version\": \"0.3.0\", \"project\": {\"path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project\", \"exists\": true}, \"observation_policy\": \"Retained frames are historical. Observe again before input.\", \"next_steps\": [\"vibe-maa capabilities --method session.open\"], \"budget\": {\"max_bytes\": 12000, \"envelope_reserve_bytes\": 128, \"serialized_bytes\": 688, \"truncated\": false, \"omitted\": {}}, \"daemon\": {\"running\": false}, \"inventory\": {\"resource_bundles\": [\"resource\"], \"pipeline_files_read\": 0, \"node_count\": 0, \"node_names\": [], \"node_names_omitted\": 0}, \"tasks\": [], \"recent_runs\": [], \"historical_observations\": [], \"recent_actions\": []}}"
+      },
+      {
+        "event": "item.started",
+        "tool_type": "command_execution",
+        "item_id": "item_8",
+        "status": "in_progress",
+        "command": "/bin/bash -c 'vibe-maa --project . doctor'",
+        "output": ""
+      },
+      {
+        "event": "item.started",
+        "tool_type": "command_execution",
+        "item_id": "item_9",
+        "status": "in_progress",
+        "command": "/bin/bash -c 'vibe-maa --project . reference --topic pipeline'",
+        "output": ""
+      },
+      {
+        "event": "item.completed",
+        "tool_type": "command_execution",
+        "item_id": "item_9",
+        "status": "completed",
+        "command": "/bin/bash -c 'vibe-maa --project . reference --topic pipeline'",
+        "exit_code": 0,
+        "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"schema_version\": 1, \"version\": \"0.3.0\", \"protocol\": \"MaaFramework 5.16 core subset\", \"topic\": \"pipeline\", \"content\": \"Write a JSON/JSONC object mapping unique node names to node objects in resource/pipeline/*.json. Images belong in resource/image/; optional OCR files belong in resource/model/ocr/. All coordinates use the returned controller screenshot pixels. Use a DirectHit + DoNothing entry with next candidates for a predictable dispatcher. In the verified 5.16 runtime an entry with conditional recognition is also recognized before its action, so an entry may wait or fail without dispatching input. MaaFW checks next in order on each frame; the first matching candidate executes its action, then follows that candidate's next. An empty next ends that path. After a node runs, its timeout controls waiting for its NEXT list: change the predecessor timeout to extend that candidate wait. Initial entry recognition uses the entry's own timeout. timeout, rate_limit, pre_delay and post_delay are milliseconds; the vibe-maa run --timeout-seconds budget is seconds. Use bounded waits. on_error handles action failure or no next match before timeout. Verify the goal separately using observable recognition; DirectHit is not a valid completion check.\", \"examples\": {\"model_free_click_flow\": {\"Start\": {\"recognition\": \"DirectHit\", \"action\": \"DoNothing\", \"next\": [\"ClickBlack\"], \"timeout\": 1500, \"rate_limit\": 20}, \"ClickBlack\": {\"recognition\": \"ColorMatch\", \"roi\": [0, 0, 16, 16], \"lower\": [0, 0, 0], \"upper\": [5, 5, 5], \"count\": 100, \"action\": \"Click\", \"target\": [20, 20], \"next\": [\"WhiteVisible\"], \"timeout\": 1500, \"rate_limit\": 20}, \"WhiteVisible\": {\"recognition\": \"ColorMatch\", \"roi\": [0, 0, 16, 16], \"lower\": [250, 250, 250], \"upper\": [255, 255, 255], \"count\": 100, \"action\": \"DoNothing\"}}}, \"example_setup\": \"The model-free example expects a black 64x64 image and a target that turns white after clicking [20,20]. Entry: Start. Goal: WhiteVisible. Adapt observations to the real UI.\", \"commands\": {\"inspect\": \"vibe-maa --project PATH observe --session SESSION_ID\", \"probe\": \"vibe-maa --project PATH probe --session SESSION_ID --observation OBS_ID --node NODE\", \"run\": \"vibe-maa --project PATH run --session SESSION_ID --entry Start --goal WhiteVisible --timeout-seconds 10\"}}}"
+      },
+      {
+        "event": "item.completed",
+        "tool_type": "command_execution",
+        "item_id": "item_8",
+        "status": "completed",
+        "command": "/bin/bash -c 'vibe-maa --project . doctor'",
+        "exit_code": 0,
+        "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"version\": \"0.3.0\", \"project\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project\", \"ready\": true, \"checks\": [{\"name\": \"python\", \"status\": \"passed\", \"detail\": \"3.12.16\", \"remedy\": null}, {\"name\": \"maafw\", \"status\": \"passed\", \"detail\": \"v5.16.0\", \"remedy\": null}, {\"name\": \"pipeline\", \"status\": \"warning\", \"detail\": \"0 node definitions\", \"remedy\": \"Create a Pipeline, or run demo init in a new project\"}, {\"name\": \"ocr\", \"status\": \"warning\", \"detail\": \"Missing det.onnx, rec.onnx, keys.txt\", \"remedy\": \"Provision MaaFW-compatible det.onnx, rec.onnx, keys.txt under resource/model/ocr\"}, {\"name\": \"adb\", \"status\": \"warning\", \"detail\": \"ADB not found\", \"remedy\": \"Install Android platform-tools for Android device sessions\"}, {\"name\": \"browser\", \"status\": \"passed\", \"detail\": \"/home/runner/.cache/ms-playwright/chromium-1254/chrome-linux64/chrome\", \"remedy\": null}], \"scope\": \"local_readiness_only\", \"note\": \"No device connection or task execution was attempted\"}}"
+      },
+      {
+        "event": "item.started",
+        "tool_type": "command_execution",
+        "item_id": "item_10",
+        "status": "in_progress",
+        "command": "/bin/bash -c \"cat interface.json && printf '\\\\n---gitignore---\\\\n' && cat .gitignore\"",
+        "output": ""
+      },
+      {
+        "event": "item.completed",
+        "tool_type": "command_execution",
+        "item_id": "item_10",
+        "status": "completed",
+        "command": "/bin/bash -c \"cat interface.json && printf '\\\\n---gitignore---\\\\n' && cat .gitignore\"",
+        "exit_code": 0,
+        "output": "{\"interface_version\": 2, \"name\": \"vibe-maa-project\", \"controller\": [{\"name\": \"Android\", \"type\": \"Adb\"}], \"resource\": [{\"name\": \"Default\", \"path\": [\"./resource\"]}], \"task\": []}\n\n---gitignore---\n.maa-dev/"
+      },
+      {
+        "event": "item.started",
+        "tool_type": "command_execution",
+        "item_id": "item_12",
+        "status": "in_progress",
+        "command": "/bin/bash -c 'vibe-maa --project . capabilities --method session.open'",
+        "output": ""
+      },
+      {
+        "event": "item.completed",
+        "tool_type": "command_execution",
+        "item_id": "item_12",
+        "status": "completed",
+        "command": "/bin/bash -c 'vibe-maa --project . capabilities --method session.open'",
+        "exit_code": 0,
+        "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"schema_version\": 1, \"tool\": \"vibe-maa\", \"version\": \"0.3.0\", \"readiness\": \"not_checked\", \"method\": \"session.open\", \"summary\": \"Open a persistent, explicitly selected device or fixture connection.\", \"input_schema\": {\"type\": \"object\", \"properties\": {\"backend\": {\"type\": \"string\", \"enum\": [\"demo\", \"adb\", \"browser\"]}, \"device\": {\"type\": \"string\", \"default\": \"\"}, \"adb_path\": {\"type\": \"string\", \"default\": \"adb\"}, \"resource_path\": {\"type\": \"string\", \"default\": \"resource\"}, \"initial_state\": {\"type\": \"string\", \"default\": \"home\", \"enum\": [\"home\", \"mailbox\", \"popup\"]}, \"url\": {\"anyOf\": [{\"type\": \"string\"}, {\"type\": \"null\"}], \"default\": null}, \"headless\": {\"type\": \"boolean\", \"default\": true}, \"width\": {\"type\": \"integer\", \"default\": 1280, \"minimum\": 64, \"maximum\": 4096}, \"height\": {\"type\": \"integer\", \"default\": 720, \"minimum\": 64, \"maximum\": 4096}, \"browser_executable\": {\"anyOf\": [{\"type\": \"string\"}, {\"type\": \"null\"}], \"default\": null}}, \"required\": [\"backend\"], \"additionalProperties\": false, \"allOf\": [{\"if\": {\"properties\": {\"backend\": {\"const\": \"adb\"}}}, \"then\": {\"required\": [\"device\"], \"properties\": {\"device\": {\"minLength\": 1}}}}, {\"if\": {\"properties\": {\"backend\": {\"const\": \"browser\"}}}, \"then\": {\"required\": [\"url\"], \"properties\": {\"url\": {\"type\": \"string\", \"pattern\": \"^https?://\"}}}}, {\"if\": {\"properties\": {\"backend\": {\"const\": \"demo\"}}}, \"then\": {\"properties\": {\"resource_path\": {\"const\": \"resource\"}}}}]}, \"side_effects\": [\"connects a device or starts a browser/fixture\", \"retains a live session\"], \"prerequisites\": [\"existing project resource directory\", \"backend-specific setup\"], \"returns\": [\"session_id\", \"backend\", \"device\", \"coordinates\", \"runtime\"], \"notes\": [\"ADB requires device; browser requires url; demo is synthetic, not a game.\"], \"example\": {\"method\": \"session.open\", \"params\": {\"backend\": \"browser\", \"url\": \"http://127.0.0.1:8765\"}}, \"cli_example\": \"vibe-maa --project PATH session open --backend browser --url http://127.0.0.1:8765\", \"recovery\": {\"DAEMON_VERSION_MISMATCH\": {\"next\": \"daemon stop\", \"instruction\": \"Stop the old service, reopen connections and resume from saved task context.\"}, \"DEVICE_BUSY\": {\"next\": \"session.list\", \"instruction\": \"Use the intended existing session or explicitly close it; another project may own the address.\"}, \"BROWSER_UNAVAILABLE\": {\"next\": \"doctor\", \"instruction\": \"Check the browser extra and executable; install matching Chromium with browser install.\"}, \"INVALID_RESOURCE\": {\"next\": \"doctor\", \"instruction\": \"Check the configured in-project resource path. Initialize only a new project; preserve existing files.\"}, \"INVALID_ARGUMENT\": {\"next\": \"capabilities --method session.open\", \"instruction\": \"Check required and conditional parameters against this method's input_schema before retrying.\"}}, \"invocation\": \"method/params describe the service contract; use the matching CLI command or SDK dispatch, not a raw unauthenticated socket\", \"failure_delivery\": \"Request errors use envelope.error. An executed operation can return ok=true with result.failure; check status fields. verification_failure explains an unavailable goal check.\"}}"
+      },
+      {
+        "event": "item.started",
+        "tool_type": "command_execution",
+        "item_id": "item_13",
+        "status": "in_progress",
+        "command": "/bin/bash -c 'vibe-maa --project . capabilities --method act'",
+        "output": ""
+      },
+      {
+        "event": "item.completed",
+        "tool_type": "command_execution",
+        "item_id": "item_13",
+        "status": "completed",
+        "command": "/bin/bash -c 'vibe-maa --project . capabilities --method act'",
+        "exit_code": 0,
+        "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"schema_version\": 1, \"tool\": \"vibe-maa\", \"version\": \"0.3.0\", \"readiness\": \"not_checked\", \"method\": \"act\", \"summary\": \"Dispatch one guarded input using a current observation.\", \"input_schema\": {\"type\": \"object\", \"properties\": {\"session_id\": {\"type\": \"string\"}, \"observation_id\": {\"type\": \"string\"}, \"type\": {\"type\": \"string\", \"default\": \"click\", \"enum\": [\"click\", \"swipe\", \"key\", \"text\"]}, \"target\": {\"anyOf\": [{\"type\": \"string\"}, {\"type\": \"null\"}], \"default\": null}, \"box\": {\"anyOf\": [{\"type\": \"array\", \"items\": {\"type\": \"integer\"}, \"minItems\": 4, \"maxItems\": 4, \"prefixItems\": [{\"minimum\": 0}, {\"minimum\": 0}, {\"minimum\": 1}, {\"minimum\": 1}]}, {\"type\": \"null\"}], \"default\": null}, \"x2\": {\"anyOf\": [{\"type\": \"integer\"}, {\"type\": \"null\"}], \"default\": null}, \"y2\": {\"anyOf\": [{\"type\": \"integer\"}, {\"type\": \"null\"}], \"default\": null}, \"duration\": {\"type\": \"integer\", \"default\": 300}, \"key\": {\"anyOf\": [{\"type\": \"integer\"}, {\"type\": \"null\"}], \"default\": null}, \"text\": {\"anyOf\": [{\"type\": \"string\"}, {\"type\": \"null\"}], \"default\": null}}, \"required\": [\"session_id\", \"observation_id\"], \"additionalProperties\": false, \"oneOf\": [{\"required\": [\"target\"], \"properties\": {\"target\": {\"type\": \"string\", \"minLength\": 1}, \"box\": {\"type\": \"null\"}}}, {\"required\": [\"box\"], \"properties\": {\"box\": {\"type\": \"array\", \"items\": {\"type\": \"integer\"}, \"minItems\": 4, \"maxItems\": 4, \"prefixItems\": [{\"minimum\": 0}, {\"minimum\": 0}, {\"minimum\": 1}, {\"minimum\": 1}]}, \"target\": {\"type\": \"null\"}}}], \"allOf\": [{\"if\": {\"properties\": {\"type\": {\"const\": \"swipe\"}}, \"required\": [\"type\"]}, \"then\": {\"required\": [\"x2\", \"y2\"], \"properties\": {\"x2\": {\"type\": \"integer\", \"minimum\": 0}, \"y2\": {\"type\": \"integer\", \"minimum\": 0}, \"duration\": {\"minimum\": 1, \"maximum\": 10000}}}}, {\"if\": {\"properties\": {\"type\": {\"const\": \"key\"}}, \"required\": [\"type\"]}, \"then\": {\"required\": [\"key\"], \"properties\": {\"key\": {\"type\": \"integer\", \"minimum\": 0}}}}, {\"if\": {\"properties\": {\"type\": {\"const\": \"text\"}}, \"required\": [\"type\"]}, \"then\": {\"required\": [\"text\"], \"properties\": {\"text\": {\"type\": \"string\", \"maxLength\": 10000}}}}]}, \"side_effects\": [\"changes the UI\", \"records intent, result and a new observation\"], \"prerequisites\": [\"live session_id\", \"same-session current observation\", \"target or box\"], \"returns\": [\"action_id\", \"status\", \"observation\", \"failure\"], \"notes\": [\"target is an eN reference from that observation. box is [x,y,width,height].\", \"All input types require target or box, including key/text as a visual guard.\", \"Click/swipe starts at the selected box center; swipe also needs x2,y2.\", \"Inspect status and the returned new observation; do not reuse the old reference.\"], \"example\": {\"method\": \"act\", \"params\": {\"session_id\": \"session_ID\", \"observation_id\": \"obs_ID\", \"target\": \"e2\"}}, \"cli_example\": \"vibe-maa --project PATH act --session SESSION_ID --observation OBS_ID --target e2\", \"recovery\": {\"STALE_OBSERVATION\": {\"next\": \"observe\", \"instruction\": \"Inspect the replacement observation or capture anew; do not retry old coordinates.\"}, \"SESSION_NOT_FOUND\": {\"next\": \"session.open\", \"instruction\": \"Open the intended backend again; read task.context to resume.\"}, \"DAEMON_UNAVAILABLE\": {\"next\": \"daemon status\", \"instruction\": \"Inspect saved actions/runs before retrying; input may already have occurred.\"}, \"INVALID_ARGUMENT\": {\"next\": \"capabilities --method act\", \"instruction\": \"Check required and conditional parameters against this method's input_schema before retrying.\"}}, \"invocation\": \"method/params describe the service contract; use the matching CLI command or SDK dispatch, not a raw unauthenticated socket\", \"failure_delivery\": \"Request errors use envelope.error. An executed operation can return ok=true with result.failure; check status fields. verification_failure explains an unavailable goal check.\"}}"
+      },
+      {
+        "event": "item.started",
+        "tool_type": "command_execution",
+        "item_id": "item_14",
+        "status": "in_progress",
+        "command": "/bin/bash -c 'vibe-maa --project . capabilities --method observe'",
+        "output": ""
+      },
+      {
+        "event": "item.completed",
+        "tool_type": "command_execution",
+        "item_id": "item_14",
+        "status": "completed",
+        "command": "/bin/bash -c 'vibe-maa --project . capabilities --method observe'",
+        "exit_code": 0,
+        "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"schema_version\": 1, \"tool\": \"vibe-maa\", \"version\": \"0.3.0\", \"readiness\": \"not_checked\", \"method\": \"observe\", \"summary\": \"Capture one original frame and optional OCR from those exact pixels.\", \"input_schema\": {\"type\": \"object\", \"properties\": {\"session_id\": {\"type\": \"string\"}, \"ocr\": {\"type\": \"boolean\", \"default\": true}}, \"required\": [\"session_id\"], \"additionalProperties\": false}, \"side_effects\": [\"writes an observation and PNG; sends no UI input\"], \"prerequisites\": [\"live session_id\", \"OCR models for real OCR, or ocr=false\"], \"returns\": [\"observation_id\", \"image_path\", \"sha256\", \"width\", \"height\", \"elements\", \"warnings\"], \"notes\": [\"Read image_path. Missing OCR is a warning, not evidence of an empty screen.\"], \"example\": {\"method\": \"observe\", \"params\": {\"session_id\": \"session_ID\", \"ocr\": true}}, \"cli_example\": \"vibe-maa --project PATH observe --session SESSION_ID\", \"recovery\": {\"SESSION_NOT_FOUND\": {\"next\": \"session.open\", \"instruction\": \"Open the intended backend again; read task.context to resume.\"}, \"OCR_UNAVAILABLE\": {\"next\": \"observe\", \"instruction\": \"Inspect saved pixels or set ocr=false; provision project OCR models before expecting text.\"}, \"INVALID_ARGUMENT\": {\"next\": \"capabilities --method observe\", \"instruction\": \"Check required and conditional parameters against this method's input_schema before retrying.\"}}, \"invocation\": \"method/params describe the service contract; use the matching CLI command or SDK dispatch, not a raw unauthenticated socket\", \"failure_delivery\": \"Request errors use envelope.error. An executed operation can return ok=true with result.failure; check status fields. verification_failure explains an unavailable goal check.\"}}"
+      },
+      {
+        "event": "item.started",
+        "tool_type": "command_execution",
+        "item_id": "item_15",
+        "status": "in_progress",
+        "command": "/bin/bash -c 'vibe-maa --project . reference --topic actions'",
+        "output": ""
+      },
+      {
+        "event": "item.completed",
+        "tool_type": "command_execution",
+        "item_id": "item_15",
+        "status": "completed",
+        "command": "/bin/bash -c 'vibe-maa --project . reference --topic actions'",
+        "exit_code": 0,
+        "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"schema_version\": 1, \"version\": \"0.3.0\", \"protocol\": \"MaaFramework 5.16 core subset\", \"topic\": \"actions\", \"content\": \"Use exact native action names: DoNothing, Click, Swipe, ClickKey, InputText. Click target defaults to true: the just-matched box; target [x,y] is a fixed point; [x,y,width,height] is a region, with a sampled click location. Numeric coordinates must come from observations. Swipe uses begin/end and duration in milliseconds. ClickKey uses numeric key, not key_name; InputText uses input_text, not text. Key codes depend on the controller: browser/Win32 VK 113 is F2, while Android 4 is Back. Browser supports its documented subset of VK codes and no DOM selectors; some native controllers limit text to ASCII. Observe again after input. CLI act uses its own type/key/text fields and always needs a fresh observation; key/text inputs also need a target or guard box. Pipeline field names and CLI arguments differ.\", \"examples\": {\"click_matched_node\": {\"recognition\": \"OCR\", \"expected\": \"Confirm\", \"action\": \"Click\", \"target\": true}, \"browser_or_win32_f2\": {\"recognition\": \"DirectHit\", \"action\": \"ClickKey\", \"key\": 113}, \"android_back\": {\"recognition\": \"DirectHit\", \"action\": \"ClickKey\", \"key\": 4}, \"type_text\": {\"recognition\": \"DirectHit\", \"action\": \"InputText\", \"input_text\": \"Sample label\"}, \"swipe\": {\"recognition\": \"DirectHit\", \"action\": \"Swipe\", \"begin\": [200, 300], \"end\": [200, 100], \"duration\": 300}}, \"commands\": {\"click\": \"vibe-maa --project PATH act --session SESSION_ID --observation OBS_ID --target e2\", \"key\": \"vibe-maa --project PATH act --session SESSION_ID --observation OBS_ID --type key --key 113 --box 0,0,100,100\"}}}"
+      },
+      {
+        "event": "item.started",
+        "tool_type": "command_execution",
+        "item_id": "item_16",
+        "status": "in_progress",
+        "command": "/bin/bash -c 'vibe-maa --project . reference --topic recognition'",
+        "output": ""
+      },
+      {
+        "event": "item.completed",
+        "tool_type": "command_execution",
+        "item_id": "item_16",
+        "status": "completed",
+        "command": "/bin/bash -c 'vibe-maa --project . reference --topic recognition'",
+        "exit_code": 0,
+        "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"schema_version\": 1, \"version\": \"0.3.0\", \"protocol\": \"MaaFramework 5.16 core subset\", \"topic\": \"recognition\", \"content\": \"roi is [x,y,width,height], not two corner points. Prefer a small stable region with positive and negative examples. TemplateMatch uses template relative to resource/image/ and threshold in [0,1]. Crop an observed original with asset extract before using it; keep the same screenshot scale. OCR uses expected text or regex and requires det.onnx, rec.onnx and keys.txt in resource/model/ocr/. Missing OCR is not an empty-screen result. ColorMatch uses lower/upper bounds; its default method 4 uses RGB values, although adapter arrays internally use BGR. count is the minimum matching pixel count. DirectHit is unconditional. Probe uses saved pixels and never runs action/next; inspect result.hit, since nonempty all_results can still fail filtering. Offline probes reject Custom, And/Or and context-dependent ROI. A DirectHit + DoNothing entry with guarded next candidates clearly separates dispatch from UI-dependent actions.\", \"examples\": {\"template_node\": {\"recognition\": \"TemplateMatch\", \"template\": \"confirm.png\", \"roi\": [100, 100, 300, 200], \"threshold\": 0.85, \"action\": \"Click\"}, \"ocr_node\": {\"recognition\": \"OCR\", \"expected\": \"^Confirm$\", \"roi\": [100, 100, 300, 200], \"action\": \"Click\"}}, \"commands\": {\"crop\": \"vibe-maa --project PATH asset extract --observation OBS_ID --box 100,100,150,40 --name confirm\", \"check_cases\": \"vibe-maa --project PATH case check --session SESSION_ID --cases dev/cases/checks.json\"}}}"
+      },
+      {
+        "event": "item.started",
+        "tool_type": "command_execution",
+        "item_id": "item_18",
+        "status": "in_progress",
+        "command": "/bin/bash -c \"vibe-maa --project . session open --backend browser --url 'http://127.0.0.1:40607/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0' --width 1440 --height 900\"",
+        "output": ""
+      },
+      {
+        "event": "item.completed",
+        "tool_type": "command_execution",
+        "item_id": "item_18",
+        "status": "completed",
+        "command": "/bin/bash -c \"vibe-maa --project . session open --backend browser --url 'http://127.0.0.1:40607/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0' --width 1440 --height 900\"",
+        "exit_code": 0,
+        "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"session_id\": \"session_1bf67687cc0044248e6b64b4cb5fea47\", \"backend\": \"browser\", \"device\": \"http://127.0.0.1:40607/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0\", \"coordinates\": \"controller screenshot pixels\", \"runtime\": {\"browser_version\": \"158.0.8127.18\", \"playwright_version\": \"1.65.1\", \"viewport\": {\"width\": 1440, \"height\": 900, \"device_scale_factor\": 1}, \"headless\": true, \"platform\": \"Linux\"}}}"
+      },
+      {
+        "event": "item.started",
+        "tool_type": "command_execution",
+        "item_id": "item_19",
+        "status": "in_progress",
+        "command": "/bin/bash -c 'vibe-maa --project . observe --session session_1bf67687cc0044248e6b64b4cb5fea47 --no-ocr'",
+        "output": ""
+      },
+      {
+        "event": "item.completed",
+        "tool_type": "command_execution",
+        "item_id": "item_19",
+        "status": "failed",
+        "command": "/bin/bash -c 'vibe-maa --project . observe --session session_1bf67687cc0044248e6b64b4cb5fea47 --no-ocr'",
+        "exit_code": 1,
+        "output": "{\"schema_version\": 1, \"ok\": false, \"error\": {\"code\": \"SESSION_NOT_FOUND\", \"message\": \"Session expired or unknown; open a new session\", \"details\": {}}}"
+      },
+      {
+        "event": "item.started",
+        "tool_type": "command_execution",
+        "item_id": "item_21",
+        "status": "in_progress",
+        "command": "/bin/bash -c 'vibe-maa --project . session list'",
+        "output": ""
+      },
+      {
+        "event": "item.completed",
+        "tool_type": "command_execution",
+        "item_id": "item_21",
+        "status": "completed",
+        "command": "/bin/bash -c 'vibe-maa --project . session list'",
+        "exit_code": 0,
+        "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"sessions\": []}}"
+      },
+      {
+        "event": "item.started",
+        "tool_type": "command_execution",
+        "item_id": "item_22",
+        "status": "in_progress",
+        "command": "/bin/bash -c 'vibe-maa --project . daemon status'",
+        "output": ""
+      },
+      {
+        "event": "item.completed",
+        "tool_type": "command_execution",
+        "item_id": "item_22",
+        "status": "completed",
+        "command": "/bin/bash -c 'vibe-maa --project . daemon status'",
+        "exit_code": 0,
+        "output": "{\"schema_version\": 1, \"ok\": true, \"result\": {\"running\": false, \"stale_metadata\": true}}"
+      },
+      {
+        "event": "item.started",
+        "tool_type": "command_execution",
+        "item_id": "item_23",
+        "status": "in_progress",
+        "command": "/bin/bash -c \"find .maa-dev -maxdepth 3 -type f -printf '%p %s\\\\n' 2>/dev/null | sort | tail -80\"",
+        "output": ""
+      },
+      {
+        "event": "item.completed",
+        "tool_type": "command_execution",
+        "item_id": "item_23",
+        "status": "completed",
+        "command": "/bin/bash -c \"find .maa-dev -maxdepth 3 -type f -printf '%p %s\\\\n' 2>/dev/null | sort | tail -80\"",
+        "exit_code": 0,
+        "output": ".maa-dev/daemon.json 123\n.maa-dev/daemon.log 0\n.maa-dev/daemon.owner.lock 0\n.maa-dev/daemon.start.lock 0\n.maa-dev/native-logs/maafw.log 4784"
+      },
+      {
+        "event": "item.started",
+        "tool_type": "command_execution",
+        "item_id": "item_24",
+        "status": "in_progress",
+        "command": "/bin/bash -c \"cat .maa-dev/native-logs/maafw.log; printf '\\\\n---daemon.json---\\\\n'; cat .maa-dev/daemon.json\"",
+        "output": ""
+      },
+      {
+        "event": "item.completed",
+        "tool_type": "command_execution",
+        "item_id": "item_24",
+        "status": "completed",
+        "command": "/bin/bash -c \"cat .maa-dev/native-logs/maafw.log; printf '\\\\n---daemon.json---\\\\n'; cat .maa-dev/daemon.json\"",
+        "exit_code": 0,
+        "output": "[2026-11-12 09:35:49.323][DBG][Px3][Tx63168][Logger] ----------------------------- \n[2026-11-12 09:35:49.323][DBG][Px3][Tx63168][Logger] MAA Process Start \n[2026-11-12 09:35:49.323][DBG][Px3][Tx63168][Logger] Version v5.16.0 \n[2026-11-12 09:35:49.323][DBG][Px3][Tx63168][Logger] Built at Nov 10 2026 10:14:47 \n[2026-11-12 09:35:49.323][DBG][Px3][Tx63168][Logger] Linux x86_64 \n[2026-11-12 09:35:49.323][DBG][Px3][Tx63168][Logger] Working /home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project \n[2026-11-12 09:35:49.323][DBG][Px3][Tx63168][Logger] Logging /home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.maa-dev/native-logs/maafw.log \n[2026-11-12 09:35:49.323][DBG][Px3][Tx63168][Logger] ----------------------------- \n[2026-11-12 09:35:49.323][TRC][Px3][Tx63168][OptionMgr.cpp][L35][bool MaaNS::GlobalNS::OptionMgr::set_log_dir(MaaOptionValue, MaaOptionValueSize)] | leave, 0ms \n[2026-11-12 09:35:49.324][TRC][Px3][Tx63168][OptionMgr.cpp][L10][bool MaaNS::GlobalNS::OptionMgr::set_option(MaaGlobalOption, MaaOptionValue, MaaOptionValueSize)] | leave, 0ms \n[2026-11-12 09:35:49.324][TRC][Px3][Tx63168][MaaFramework.cpp][L418][MaaBool MaaGlobalSetOption(MaaGlobalOption, MaaOptionValue, MaaOptionValueSize)] | leave, 0ms \n[2026-11-12 09:35:49.324][DBG][Px3][Tx63168][MaaController.cpp][L47][MaaBool MaaControllerSetOption(MaaController *, MaaCtrlOption, MaaOptionValue, MaaOptionValueSize)] [ctrl=true] [key=2] [value=true] [val_size=4] | enter \n[2026-11-12 09:35:49.324][INF][Px3][Tx63168][ControllerAgent.cpp][L37][virtual bool MaaNS::ControllerNS::ControllerAgent::set_option(MaaCtrlOption, MaaOptionValue, MaaOptionValueSize)] [key=2] [value=true] [val_size=4] \n[2026-11-12 09:35:49.324][DBG][Px3][Tx63168][ControllerAgent.cpp][L1348][bool MaaNS::ControllerNS::ControllerAgent::set_image_target_short_side(MaaOptionValue, MaaOptionValueSize)] \n[2026-11-12 09:35:49.324][DBG][Px3][Tx63168][ControllerAgent.cpp][L1303][void MaaNS::ControllerNS::ControllerAgent::clear_target_image_size()] \n[2026-11-12 09:35:49.324][INF][Px3][Tx63168][ControllerAgent.cpp][L1361][bool MaaNS::ControllerNS::ControllerAgent::set_image_target_short_side(MaaOptionValue, MaaOptionValueSize)] image_target_height_ =  900 \n[2026-11-12 09:35:49.324][TRC][Px3][Tx63168][MaaController.cpp][L47][MaaBool MaaControllerSetOption(MaaController *, MaaCtrlOption, MaaOptionValue, MaaOptionValueSize)] | leave, 0ms \n[2026-11-12 09:35:49.324][DBG][Px3][Tx63168][MaaController.cpp][L59][MaaCtrlId MaaControllerPostConnection(MaaController *)] [ctrl=true] | enter \n[2026-11-12 09:35:49.324][DBG][Px3][Tx63168][CustomControlUnitMgr.cpp][L45][virtual bool MaaNS::CtrlUnitNs::CustomControlUnitMgr::request_uuid(std::string &)] [controller_=true] [controller_->request_uuid=true] | enter \n[2026-11-12 09:35:49.324][TRC][Px3][Tx63168][CustomControlUnitMgr.cpp][L45][virtual bool MaaNS::CtrlUnitNs::CustomControlUnitMgr::request_uuid(std::string &)] | leave, 0ms \n[2026-11-12 09:35:49.324][DBG][Px3][Tx63168][CustomControlUnitMgr.cpp][L22][virtual bool MaaNS::CtrlUnitNs::CustomControlUnitMgr::connect()] [controller_=true] [controller_->connect=true] | enter \n[2026-11-12 09:35:49.324][TRC][Px3][Tx63168][CustomControlUnitMgr.cpp][L22][virtual bool MaaNS::CtrlUnitNs::CustomControlUnitMgr::connect()] | leave, 0ms \n[2026-11-12 09:35:49.324][DBG][Px3][Tx63168][CustomControlUnitMgr.cpp][L45][virtual bool MaaNS::CtrlUnitNs::CustomControlUnitMgr::request_uuid(std::string &)] [controller_=true] [controller_->request_uuid=true] | enter \n[2026-11-12 09:35:49.324][TRC][Px3][Tx63168][CustomControlUnitMgr.cpp][L45][virtual bool MaaNS::CtrlUnitNs::CustomControlUnitMgr::request_uuid(std::string &)] | leave, 0ms \n[2026-11-12 09:35:49.324][TRC][Px3][Tx63168][MaaController.cpp][L59][MaaCtrlId MaaControllerPostConnection(MaaController *)] | leave, 0ms \n[2026-11-12 09:35:49.324][DBG][Px3][Tx63168][MaaController.cpp][L47][MaaBool MaaControllerSetOption(MaaController *, MaaCtrlOption, MaaOptionValue, MaaOptionValueSize)] [ctrl=true] [key=3] [value=true] [val_size=1] | enter \n[2026-11-12 09:35:49.324][INF][Px3][Tx63168][ControllerAgent.cpp][L37][virtual bool MaaNS::ControllerNS::ControllerAgent::set_option(MaaCtrlOption, MaaOptionValue, MaaOptionValueSize)] [key=3] [value=true] [val_size=1] \n[2026-11-12 09:35:49.324][DBG][Px3][Tx63168][ControllerAgent.cpp][L1391][bool MaaNS::ControllerNS::ControllerAgent::set_image_use_raw_size(MaaOptionValue, MaaOptionValueSize)] \n[2026-11-12 09:35:49.324][DBG][Px3][Tx63168][ControllerAgent.cpp][L1303][void MaaNS::ControllerNS::ControllerAgent::clear_target_image_size()] \n[2026-11-12 09:35:49.324][TRC][Px3][Tx63168][MaaController.cpp][L47][MaaBool MaaControllerSetOption(MaaController *, MaaCtrlOption, MaaOptionValue, MaaOptionValueSize)] | leave, 0ms \n\n---daemon.json---\n{\"schema_version\": 1, \"pid\": 3, \"port\": 54485}"
+      },
+      {
+        "event": "item.started",
+        "tool_type": "command_execution",
+        "item_id": "item_25",
+        "status": "in_progress",
+        "command": "/bin/bash -c 'vibe-maa daemon --help'",
+        "output": ""
+      },
+      {
+        "event": "item.completed",
+        "tool_type": "command_execution",
+        "item_id": "item_25",
+        "status": "completed",
+        "command": "/bin/bash -c 'vibe-maa daemon --help'",
+        "exit_code": 0,
+        "output": "usage: vibe-maa daemon [-h] {status,stop}\n\npositional arguments:\n  {status,stop}\n\noptions:\n  -h, --help     show this help message and exit"
+      },
+      {
+        "event": "item.started",
+        "tool_type": "command_execution",
+        "item_id": "item_26",
+        "status": "in_progress",
+        "command": "/bin/bash -c 'vibe-maa session --help && vibe-maa session open --help'",
+        "output": ""
+      },
+      {
+        "event": "item.completed",
+        "tool_type": "command_execution",
+        "item_id": "item_26",
+        "status": "completed",
+        "command": "/bin/bash -c 'vibe-maa session --help && vibe-maa session open --help'",
+        "exit_code": 0,
+        "output": "usage: vibe-maa session [-h] {open,list,close} ...\n\npositional arguments:\n  {open,list,close}\n\noptions:\n  -h, --help         show this help message and exit\nusage: vibe-maa session open [-h] --backend {demo,adb,browser}\n                             [--device DEVICE] [--adb-path ADB_PATH]\n                             [--resource-path RESOURCE_PATH]\n                             [--initial-state {home,mailbox,popup}]\n                             [--url URL] [--headed] [--width WIDTH]\n                             [--height HEIGHT]\n                             [--browser-executable BROWSER_EXECUTABLE]\n\noptions:\n  -h, --help            show this help message and exit\n  --backend {demo,adb,browser}\n  --device DEVICE\n  --adb-path ADB_PATH\n  --resource-path RESOURCE_PATH\n  --initial-state {home,mailbox,popup}\n  --url URL\n  --headed\n  --width WIDTH\n  --height HEIGHT\n  --browser-executable BROWSER_EXECUTABLE"
+      },
+      {
+        "event": "item.started",
+        "tool_type": "command_execution",
+        "item_id": "item_27",
+        "status": "in_progress",
+        "command": "/bin/bash -c \"ps -ef | sed -n '1,120p'\"",
+        "output": ""
+      },
+      {
+        "event": "item.completed",
+        "tool_type": "command_execution",
+        "item_id": "item_27",
+        "status": "completed",
+        "command": "/bin/bash -c \"ps -ef | sed -n '1,120p'\"",
+        "exit_code": 0,
+        "output": "UID          PID    PPID  C STIME TTY          TIME CMD\nrunner         1       0  0 09:35 ?        00:00:00 codex-linux-sandbox --sandbox-policy-cwd /home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project --command-cwd /home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project --permission-profile {\"type\": \"managed\", \"file_system\": {\"type\": \"restricted\", \"entries\": [{\"path\": {\"type\": \"special\", \"value\": {\"kind\": \"root\"}}, \"access\": \"read\"}, {\"path\": {\"type\": \"path\", \"path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project\"}, \"access\": \"write\"}, {\"path\": {\"type\": \"special\", \"value\": {\"kind\": \"slash_tmp\"}}, \"access\": \"write\"}, {\"path\": {\"type\": \"special\", \"value\": {\"kind\": \"tmpdir\"}}, \"access\": \"write\"}, {\"path\": {\"type\": \"path\", \"path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.git\"}, \"access\": \"read\", \"missing_path_behavior\": \"skip\"}, {\"path\": {\"type\": \"path\", \"path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.agents\"}, \"access\": \"read\", \"missing_path_behavior\": \"skip\"}, {\"path\": {\"type\": \"path\", \"path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.codex\"}, \"access\": \"read\", \"missing_path_behavior\": \"skip\"}, {\"path\": {\"type\": \"path\", \"path\": \"/home/runner/work/vibe-maa/vibe-maa/work/agent-acceptance/project/.aws\"}, \"access\": \"read\", \"missing_path_behavior\": \"skip\"}]}, \"network\": \"enabled\"} --apply-seccomp-then-exec -- /bin/bash -c ps -ef | sed -n '1,120p'\nrunner         2       1  0 09:35 ?        00:00:00 /bin/bash -c ps -ef | sed -n '1,120p'\nrunner         3       2  0 09:35 ?        00:00:00 ps -ef\nrunner         4       2  0 09:35 ?        00:00:00 sed -n 1,120p"
+      },
+      {
+        "event": "item.started",
+        "tool_type": "command_execution",
+        "item_id": "item_29",
+        "status": "in_progress",
+        "command": "/bin/bash -c bash",
+        "output": ""
+      },
+      {
+        "event": "item.started",
+        "tool_type": "command_execution",
+        "item_id": "item_37",
+        "status": "in_progress",
+        "command": "/bin/bash -c 'vibe-maa init --help'",
+        "output": ""
+      },
+      {
+        "event": "item.completed",
+        "tool_type": "command_execution",
+        "item_id": "item_37",
+        "status": "completed",
+        "command": "/bin/bash -c 'vibe-maa init --help'",
+        "exit_code": 0,
+        "output": "usage: vibe-maa init [-h]\n\noptions:\n  -h, --help  show this help message and exit"
+      }
+    ],
+    "truncated_records": 0,
+    "byte_budget": 1048576,
+    "terminal_state": "started",
+    "historical_errors": [],
+    "usage": {},
+    "usage_last_turn": null,
+    "completed_turns": 0,
+    "usage_measurement": "sum_of_reported_turn.completed_events"
+  }
+}

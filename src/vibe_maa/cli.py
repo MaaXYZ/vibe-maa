@@ -62,8 +62,10 @@ def _parser() -> argparse.ArgumentParser:
         "--topic", choices=["pipeline", "recognition", "actions", "errors"], default="pipeline"
     )
 
-    daemon = commands.add_parser("daemon", help="Inspect or stop the project-local daemon.")
-    daemon.add_argument("operation", choices=["status", "stop"])
+    daemon = commands.add_parser(
+        "daemon", help="Run the project daemon in the foreground, inspect it, or stop it."
+    )
+    daemon.add_argument("operation", choices=["serve", "status", "stop"])
 
     sessions = commands.add_parser("session")
     session_commands = sessions.add_subparsers(dest="operation", required=True)
@@ -347,6 +349,14 @@ def main(argv: list[str] | None = None) -> int:
             response = envelope(result)
         elif command == "daemon":
             operation = arguments.pop("operation")
+            if operation == "serve":
+                from .daemon import run_daemon
+
+                try:
+                    run_daemon(project)
+                except KeyboardInterrupt:
+                    pass
+                return 0
             response = (
                 envelope(daemon_status(project)) if operation == "status" else stop_daemon(project)
             )

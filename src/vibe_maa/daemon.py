@@ -168,8 +168,75 @@ def daemon_status(project: Path) -> dict[str, Any]:
     }
 
 
+def _external_contract() -> tuple[Path, int] | None:
+    project_key = "VIBE_MAA_EXTERNAL_DAEMON_PROJECT"
+    pid_key = "VIBE_MAA_EXTERNAL_DAEMON_PID"
+    if project_key not in os.environ and pid_key not in os.environ:
+        return None
+    project, pid = os.environ.get(project_key), os.environ.get(pid_key)
+    if not project or not pid or not pid.isdecimal() or int(pid) <= 0:
+        raise DevError(
+            "EXTERNAL_DAEMON_CONFIGURATION",
+            "The externally managed daemon requires both a project path and a positive PID.",
+        )
+    return Path(project).resolve(), int(pid)
+
+
+def _external_daemon_state(project: Path) -> dict[str, Any] | None:
+    contract = _external_contract()
+    if contract is None:
+        return None
+    expected_project, expected_pid = contract
+    if project.resolve() != expected_project:
+        raise DevError(
+            "EXTERNAL_DAEMON_PROJECT_MISMATCH",
+            "This command targets a different project from the externally managed daemon.",
+            {"expected_project": str(expected_project), "project": str(project.resolve())},
+        )
+    status = daemon_status(project)
+    if not status["running"]:
+        raise DevError(
+            "EXTERNAL_DAEMON_UNAVAILABLE",
+            "The externally managed daemon is unavailable; ask its supervisor to restore it. "
+            "No replacement service was started and no UI input was retried.",
+            {"project": str(expected_project), "expected_pid": expected_pid},
+        )
+    if status.get("pid") != expected_pid:
+        raise DevError(
+            "EXTERNAL_DAEMON_PID_MISMATCH",
+            "The running daemon is a different process from the externally managed owner.",
+            {"expected_pid": expected_pid, "actual_pid": status.get("pid")},
+        )
+    if not status.get("compatible"):
+        raise DevError(
+            "DAEMON_VERSION_MISMATCH",
+            "The externally managed service uses a different build; its supervisor must update it.",
+        )
+    state = _read_state(project)
+    if state is None:
+        raise DevError("EXTERNAL_DAEMON_UNAVAILABLE", "The external owner disappeared.")
+    if state.get("pid") != expected_pid:
+        raise DevError("EXTERNAL_DAEMON_PID_MISMATCH", "The external owner changed during lookup.")
+    return state
+
+
+def _command_scoped_pid_namespace() -> bool:
+    if sys.platform != "linux":
+        return False
+    try:
+        command = Path("/proc/1/cmdline").read_bytes().split(b"\0")
+        executable = Path(os.fsdecode(command[0])).name
+    except (OSError, ValueError):
+        return False
+    # Detaching a process group cannot outlive the PID namespace's command-scoped init.
+    return executable == "codex-linux-sandbox" or b"--apply-seccomp-then-exec" in command
+
+
 def ensure_daemon(project: Path) -> dict[str, Any]:
     project = project.resolve()
+    external = _external_daemon_state(project)
+    if external is not None:
+        return external
     directory = project / ".maa-dev"
     directory.mkdir(parents=True, exist_ok=True, mode=0o700)
     with project_lock(directory / "daemon.start.lock"):
@@ -181,6 +248,14 @@ def ensure_daemon(project: Path) -> dict[str, Any]:
                     "The running service uses a different build; run daemon stop, then retry",
                 )
             return _read_state(project)  # type: ignore[return-value]
+        if _command_scoped_pid_namespace():
+            raise DevError(
+                "DAEMON_REQUIRES_SUPERVISOR",
+                "This Codex command runs in a temporary PID namespace. Start 'vibe-maa "
+                "--project PATH daemon serve' in a stable host terminal or persistent tool "
+                "session before opening a device session. A background '&' is insufficient.",
+                {"project": str(project)},
+            )
         # An unresponsive existing owner must not be replaced by a second controller.
         try:
             with project_lock(directory / "daemon.owner.lock", blocking=False):
@@ -219,7 +294,29 @@ def ensure_daemon(project: Path) -> dict[str, Any]:
 
 
 def request(project: Path, method: str, params: dict[str, Any]) -> dict[str, Any]:
-    state = ensure_daemon(project)
+    state = _external_daemon_state(project)
+    if state is None and ("session_id" in params or method == "session.list"):
+        status = daemon_status(project)
+        if not status["running"]:
+            if method == "session.list" and _read_state(project) is None:
+                return envelope({"sessions": [], "daemon_running": False})
+            raise DevError(
+                "SESSION_OWNER_LOST" if "session_id" in params else "DAEMON_UNAVAILABLE",
+                "The device-session owner is unavailable. No replacement service was started. "
+                "Inspect retained evidence, then establish a stable 'daemon serve' lifetime "
+                "before opening a new session; do not replay uncertain UI input.",
+                {"project": str(project.resolve()), "session_id": params.get("session_id")},
+            )
+        if not status.get("compatible"):
+            raise DevError(
+                "DAEMON_VERSION_MISMATCH",
+                "The running service uses a different build; establish a compatible owner first.",
+            )
+        state = _read_state(project)
+        if state is None:
+            raise DevError("SESSION_OWNER_LOST", "The device-session owner disappeared.")
+    if state is None:
+        state = ensure_daemon(project)
     timeout = 60.0
     if method in {"run", "task.run"}:
         duration = params.get("timeout_seconds", 20)
@@ -230,6 +327,12 @@ def request(project: Path, method: str, params: dict[str, Any]) -> dict[str, Any
 
 
 def stop_daemon(project: Path) -> dict[str, Any]:
+    if _external_contract() is not None:
+        raise DevError(
+            "EXTERNAL_DAEMON_MANAGED",
+            "This daemon belongs to an external supervisor. Close device sessions if needed; "
+            "leave daemon shutdown and replacement to that supervisor.",
+        )
     state = _read_state(project)
     if state is None or not daemon_status(project)["running"]:
         return envelope({"stopped": False, "running": False})
@@ -349,6 +452,11 @@ class _Handler(socketserver.StreamRequestHandler):
 
 
 def run_daemon(project: Path, service_factory: Any = None) -> None:
+    if _external_contract() is not None:
+        raise DevError(
+            "EXTERNAL_DAEMON_MANAGED",
+            "An external supervisor owns daemon lifecycle; this client cannot replace it.",
+        )
     project = project.resolve()
     directory = project / ".maa-dev"
     directory.mkdir(parents=True, exist_ok=True, mode=0o700)

@@ -6,6 +6,8 @@
 
 A project-local daemon owns live sessions and their native controllers. Independent CLI processes communicate with that daemon over an authenticated loopback TCP connection. The daemon metadata file carries the protocol version, port, PID, and random token; on POSIX its permissions are `0600`. Operating-system locks protect startup and lifetime ownership.
 
+A detached child cannot outlive a Linux PID namespace whose init process exits. In coding-agent sandboxes, `daemon serve` runs in a persistent foreground tool session, or a stable host supervisor owns the service. Session-bound requests never start a replacement owner after a service is lost. A managed external owner is bound by project, reported PID and build; a mismatch fails before dispatch, and shutdown belongs to the supervisor.
+
 The service serializes operations, including observation and recognition, so concurrent requests cannot interleave device mutations. Health checks remain responsive during an operation. The client never automatically replays a mutation when a response is lost: the device may already have received it.
 
 ADB sessions retain a per-user OS file lock keyed by the normalized endpoint across project daemons. This prevents two projects from controlling the same address; different aliases for the same physical device cannot always be identified. Shutdown rejects queued operations before dispatch while allowing an already-running bounded operation to finish.
@@ -63,7 +65,7 @@ Attempts are written before execution. Context recovery checks source hashes, ta
 
 The wheel includes examples, labeled images, the Skill, concise protocol references and a checksum-pinned draw.io provisioner. Bootstrap and export commands operate without a source checkout. Portable evidence bundles rewrite local paths and verify file digests; normal project exports keep MaaFW resources separate from runtime/authentication state.
 
-The optional CI harness uses pinned open-source Codex CLI against a user-configured Responses API. The agent sees images and input tools and writes ordinary Pipeline files. An independent grader outside its writable project starts fresh real application contexts and examines the application model to check the result; that privileged oracle is absent from the product API. Model settings, usage, time budgets and failures are recorded separately from deterministic tool tests. A model's completion message never constitutes acceptance.
+The optional CI harness uses pinned open-source Codex CLI against a user-configured Responses API. It starts the device service outside individual sandboxed commands and monitors that owner while the model runs. The agent sees images and input tools and writes ordinary Pipeline files. An independent grader outside its writable project starts fresh real application contexts and examines the application model to check the result; that privileged oracle is absent from the product API. Model settings, usage, time budgets and failures are recorded separately from deterministic tool tests. A model's completion message never constitutes acceptance.
 
 ## Resettable fixture
 

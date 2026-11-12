@@ -68,11 +68,25 @@ API 密钥只在运行 Agent 的步骤提供，并从 shell 工具环境排除�
 或由维护者推送带 `[agent-ci]` 标记的提交触发，
 不在外部 PR 上运行，也没有仓库写入权限。
 
+开始付费模型调用前，CI 使用锁定的 Codex 二进制运行无模型预检：在不同的实际 sandbox
+调用之间打开、观察和关闭原生示例会话，确认宿主服务持续存在，并确认 sandbox 客户端不能停止
+宿主拥有的服务。预检失败时不会进入模型调用步骤。
+
+正式运行同样先由 harness 在 Agent sandbox 外启动服务并核验版本、构建和 PID，然后才调用模型。
+`VIBE_MAA_EXTERNAL_DAEMON_PROJECT` 与 `VIBE_MAA_EXTERNAL_DAEMON_PID` 是传给工具的非密钥所有权信息：
+客户端只能复用这一个服务，服务消失、换 PID 或版本不一致时明确失败，不能自动另起空服务。
+模型仍然需要自行打开会话并完成全部界面探索；结束时只关闭自己打开的会话，服务由 harness 清理。
+
+harness 每五秒检查一次正在使用的服务。服务丢失会终止模型运行，并单独记录
+`infrastructure_error`，避免继续消耗预算并把工具故障误记成模型能力不足。
+提示词明确给出实际秒数预算、截止时间，以及 draw.io 与独立检查共同使用的 1280×720 视口。
+
 ## 结果
 
 Artifact `agent-acceptance-TARGET` 包含：
 
 - `acceptance.json`：实际 harness 版本、时间预算、模型配置、上游版本、独立验收结果。
+- `preflight.json`：无模型调用的实际 Codex sandbox 跨命令服务持久性检查。
 - `agent-activity.json`：最多 1 MiB 的安全工具活动摘要，仅保留工具命令、状态、截断输出及用量；不包含模型思考、加密内容或认证字段。
 - `automation.zip`：普通 MaaFW 项目及来源清单，可继续开发或独立执行。
 - `evidence-RUN_ID.zip`：独立验收各次运行的可移植记录、原图和配置来源，不包含服务认证元数据。

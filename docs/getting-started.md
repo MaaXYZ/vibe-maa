@@ -44,6 +44,16 @@ vibe-maa --project ./example agent show
 
 Codex 的 Skill 放在项目 `.agents/skills/vibe-maa/`；Claude Code 放在 `.claude/skills/vibe-maa/`。安装已有目录会明确失败，便于保留用户修改。可以用 `agent export --output skills-copy` 先导出并比较内容。安装后刷新编程 AI 会话。Skill 和示例数据都包含在安装包中，无需额外克隆本仓库。
 
+编程 AI 的多次工具调用需要共用一个持续运行的服务。在 Codex 等按命令隔离进程的环境中，先通过执行工具的持久 exec 或 PTY 会话运行下列命令，让工具返回会话 ID，保留命令继续运行；也可以由稳定的宿主终端或进程管理器运行：
+
+```bash
+vibe-maa --project ./example daemon serve
+```
+
+随后在另一次工具调用中运行 `vibe-maa --project ./example daemon status`，确认 `running` 和 `compatible` 都为 `true`，再打开设备会话。`daemon serve` 在前台等待，完成工作后用另一条命令 `daemon stop` 结束。不要只在短命 shell 里追加 `&`：沙箱退出时可能清理整个 PID 命名空间，连同后台服务一起终止。项目上下文和历史证据可以保留，设备会话则会随服务退出而失效。
+
+已有运行且兼容的服务可以直接复用。若测试 harness 或外部进程管理器声明它负责服务生命周期，AI 只关闭自己打开的设备会话；服务的启动、重启和停止由外部管理者负责。
+
 可以给 AI 这样的任务描述：
 
 > 使用 vibe-maa 完成 mailbox 任务。先读取任务上下文，再探索界面、修改 Pipeline 并验证；保留 HomeVisible 完成条件和已有样本标签，最后交付项目与验证报告。
@@ -81,6 +91,8 @@ vibe-maa --project ./example session open --backend demo --initial-state popup
 vibe-maa --project ./android-project session open --backend adb --device 127.0.0.1:16384 --adb-path adb
 vibe-maa --project ./web-project session open --backend browser --url http://127.0.0.1:8080 --width 1280 --height 720
 ```
+
+若返回 `DAEMON_REQUIRES_SUPERVISOR`，需要先在持久会话中启动 `daemon serve`。若返回 `SESSION_OWNER_LOST`，先读取已保存的任务和操作证据，修复服务生命周期，再建立新设备会话并重新观察当前界面。反复打开新会话无法修复短命服务；响应丢失前的输入可能已经发生，不要自动重放。
 
 浏览器默认无头运行；`--headed` 用于需要观看窗口的本机调试。`--browser-executable PATH` 可指定已有 Chromium。连接浏览器不会给 AI 页面脚本或 DOM 操作能力；输入依赖观察和 MaaFW 图像识别。
 

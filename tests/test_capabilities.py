@@ -190,3 +190,52 @@ def test_unknown_method_returns_actionable_stable_error():
         capabilities.show("click")
     assert caught.value.code == "UNKNOWN_METHOD"
     assert caught.value.details["next"] == "vibe-maa capabilities"
+
+
+def test_daemon_discovery_guides_persistent_tool_sessions_without_connecting(monkeypatch):
+    from vibe_maa import daemon
+    from vibe_maa.cli import _parser
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("Discovery must not start or inspect the daemon")
+
+    monkeypatch.setattr(daemon, "ensure_daemon", forbidden)
+    monkeypatch.setattr(daemon, "daemon_status", forbidden)
+    monkeypatch.setenv("VIBE_MAA_EXTERNAL_DAEMON_PROJECT", "PRIVATE_PROJECT_VALUE")
+    monkeypatch.setenv("VIBE_MAA_EXTERNAL_DAEMON_PID", "PRIVATE_PID_VALUE")
+    result = capabilities.show()
+    lifetime = result["daemon"]
+    assert "long-lived exec/PTY tool session" in lifetime["lifetime"]
+    assert "separate call" in lifetime["lifetime"]
+    assert "running and compatible" in lifetime["lifetime"]
+    assert "Never loop session.open" in lifetime["owner_loss"]
+    for operation in ("serve", "status", "stop"):
+        arguments = _parser().parse_args(["--project", "PATH", "daemon", operation])
+        assert arguments.command == "daemon"
+        assert arguments.operation == operation
+    assert lifetime["stop_recovery"]["next"] == "session.close"
+    assert "PRIVATE_PROJECT_VALUE" not in json.dumps(result)
+    assert "PRIVATE_PID_VALUE" not in json.dumps(result)
+
+
+def test_daemon_failure_recovery_preserves_external_owner_and_avoids_open_loops():
+    action = capabilities.show("act")
+    recovery = action["recovery"]
+    assert recovery["DAEMON_REQUIRES_SUPERVISOR"]["next"] == "daemon serve"
+    assert "let the tool yield" in recovery["DAEMON_REQUIRES_SUPERVISOR"]["instruction"]
+    assert recovery["SESSION_OWNER_LOST"]["next"] == "context"
+    assert "Do not loop session.open" in recovery["SESSION_OWNER_LOST"]["instruction"]
+    for code in [
+        "EXTERNAL_DAEMON_CONFIGURATION",
+        "EXTERNAL_DAEMON_PROJECT_MISMATCH",
+        "EXTERNAL_DAEMON_UNAVAILABLE",
+        "EXTERNAL_DAEMON_PID_MISMATCH",
+    ]:
+        assert recovery[code]["next"] == "context"
+    assert (
+        "do not stop or replace"
+        in capabilities.show("session.open")["recovery"]["DAEMON_VERSION_MISMATCH"]["instruction"]
+    )
+    assert "SESSION_OWNER_LOST" not in capabilities.show("session.open")["recovery"]
+    for method in ["task.create", "task.list", "task.context"]:
+        assert "DAEMON_REQUIRES_SUPERVISOR" not in capabilities.show(method)["recovery"]

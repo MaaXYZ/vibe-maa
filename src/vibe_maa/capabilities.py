@@ -18,7 +18,11 @@ _METHODS = {
         "handler": ("service", "DevelopmentService", "session_open"),
         "summary": "Open a persistent, explicitly selected device or fixture connection.",
         "effects": ["connects a device or starts a browser/fixture", "retains a live session"],
-        "prerequisites": ["existing project resource directory", "backend-specific setup"],
+        "prerequisites": [
+            "persistent, compatible project daemon",
+            "existing project resource directory",
+            "backend-specific setup",
+        ],
         "returns": ["session_id", "backend", "device", "coordinates", "runtime"],
         "example": {"backend": "browser", "url": "http://127.0.0.1:8765"},
         "notes": ["ADB requires device; browser requires url; demo is synthetic, not a game."],
@@ -230,8 +234,8 @@ _RECOVERY = {
         "instruction": "Check the configured in-project resource path. Initialize only a new project; preserve existing files.",
     },
     "SESSION_NOT_FOUND": {
-        "next": "session.open",
-        "instruction": "Open the intended backend again; read task.context to resume.",
+        "next": "daemon status",
+        "instruction": "Confirm a stable compatible owner, read task.context, then reopen the intended backend once and observe. Repeated session.open calls cannot repair a short-lived daemon.",
     },
     "STALE_OBSERVATION": {
         "next": "observe",
@@ -258,14 +262,52 @@ _RECOVERY = {
         "instruction": "Use the saved task's exact name, or create the intended acceptance contract first.",
     },
     "DAEMON_VERSION_MISMATCH": {
-        "next": "daemon stop",
-        "instruction": "Stop the old service, reopen connections and resume from saved task context.",
+        "next": "context",
+        "instruction": "Read saved context. For your own service, stop the old build and establish a persistent compatible owner before reopening connections. For an externally managed owner, report the mismatch to its runner; do not stop or replace it.",
     },
     "DAEMON_UNAVAILABLE": {
         "next": "daemon status",
-        "instruction": "Inspect saved actions/runs before retrying; input may already have occurred.",
+        "instruction": "Inspect saved actions/runs before retrying; input may already have occurred. Repair the service lifetime before opening another session; preserve an externally managed owner.",
+    },
+    "DAEMON_REQUIRES_SUPERVISOR": {
+        "next": "daemon serve",
+        "instruction": "Start once in a long-lived exec or PTY session and let the tool yield while the foreground command keeps running. In a separate call confirm daemon status is running and compatible before session.open. Shell & alone may be killed with its command sandbox.",
+    },
+    "SESSION_OWNER_LOST": {
+        "next": "context",
+        "instruction": "Read saved evidence first. Restore a persistent owner, confirm daemon status, then open one new session and observe the current UI. Do not loop session.open or replay old inputs; an external supervisor must restore its own owner.",
+    },
+    "EXTERNAL_DAEMON_CONFIGURATION": {
+        "next": "context",
+        "instruction": "The owning runner must supply a valid external-project/PID environment pair. Preserve evidence and report the configuration failure; do not invent PID values or start a replacement daemon.",
+    },
+    "EXTERNAL_DAEMON_PROJECT_MISMATCH": {
+        "next": "context",
+        "instruction": "Use the project assigned by the owning runner. Report the mismatch; do not replace its daemon or change the external-owner environment to bypass it.",
+    },
+    "EXTERNAL_DAEMON_UNAVAILABLE": {
+        "next": "context",
+        "instruction": "Read saved evidence and report the unavailable owner to the supervising runner. Do not run daemon serve, restart it, or loop session.open.",
+    },
+    "EXTERNAL_DAEMON_PID_MISMATCH": {
+        "next": "context",
+        "instruction": "The external owner was replaced. Preserve evidence and report to the supervising runner; do not attach to the replacement or change its expected PID.",
+    },
+    "EXTERNAL_DAEMON_MANAGED": {
+        "next": "session.close",
+        "instruction": "Close your device sessions when finished; only the owning runner may stop or replace the externally managed daemon.",
     },
 }
+
+_LOCAL_TASK_METHODS = {"task.create", "task.list", "task.context"}
+_OWNER_ERRORS = [
+    "DAEMON_REQUIRES_SUPERVISOR",
+    "SESSION_OWNER_LOST",
+    "EXTERNAL_DAEMON_CONFIGURATION",
+    "EXTERNAL_DAEMON_PROJECT_MISMATCH",
+    "EXTERNAL_DAEMON_UNAVAILABLE",
+    "EXTERNAL_DAEMON_PID_MISMATCH",
+]
 
 _ERRORS = {
     "session.open": [
@@ -446,7 +488,12 @@ def show(method: str | None = None) -> dict[str, Any]:
                 "UNKNOWN_METHOD", f"Unknown capability: {method}", {"next": "vibe-maa capabilities"}
             )
         metadata = _METHODS[method]
-        recovery = {code: deepcopy(_RECOVERY[code]) for code in _ERRORS.get(method, [])}
+        codes = list(_ERRORS.get(method, []))
+        if method not in _LOCAL_TASK_METHODS:
+            codes.extend(code for code in _OWNER_ERRORS if code != "SESSION_OWNER_LOST")
+            if "session_id" in _schema(method)["properties"]:
+                codes.append("SESSION_OWNER_LOST")
+        recovery = {code: deepcopy(_RECOVERY[code]) for code in codes}
         recovery["INVALID_ARGUMENT"] = {
             "next": f"capabilities --method {method}",
             "instruction": "Check required and conditional parameters against this method's input_schema before retrying.",
@@ -504,7 +551,17 @@ def show(method: str | None = None) -> dict[str, Any]:
             "scope": "fixture/device for runs; offline_recognition_only for cases. Fixture or offline success does not prove a live-game result.",
         },
         "coordinates": "Full controller screenshot pixels. A box is [x,y,width,height], never [x1,y1,x2,y2].",
+        "daemon": {
+            "foreground_command": "vibe-maa --project PATH daemon serve",
+            "readiness_command": "vibe-maa --project PATH daemon status",
+            "lifetime": "Keep daemon serve running in a long-lived exec/PTY tool session; let the tool yield, then use a separate call. Confirm running and compatible before session.open. Shell & alone is insufficient in command-lifetime sandboxes.",
+            "owner_loss": "Read context and saved evidence, repair service lifetime, then open one new session and observe. Never loop session.open or automatically replay old inputs.",
+            "external_owner": "When a runner provides VIBE_MAA_EXTERNAL_DAEMON_PROJECT and VIBE_MAA_EXTERNAL_DAEMON_PID, attach only to that owner. The runner manages its lifetime; do not serve, stop, replace it or change these values.",
+            "stop_recovery": deepcopy(_RECOVERY["EXTERNAL_DAEMON_MANAGED"]),
+        },
         "cli_tools": [
+            "context [--task NAME]: bounded project orientation and retained evidence",
+            "daemon serve|status|stop: persistent foreground owner, readiness and shutdown; externally managed owners belong to their runner",
             "reference --topic pipeline|recognition|actions|errors: offline protocol examples",
             "doctor / devices: readiness checks and ADB discovery",
             "agent show|install|export: bundled Skill integration",
@@ -513,5 +570,5 @@ def show(method: str | None = None) -> dict[str, Any]:
             "browser install: explicit Chromium installation",
             "report list|show|export and export: compact evidence and portable project handoff",
         ],
-        "next": "Check doctor, select an explicit backend, observe, then use a focused method contract. Resume work with task.context.",
+        "next": "Read context and doctor. Establish or attach to a persistent compatible daemon, select an explicit backend, then observe. Resume with task.context and focused method contracts.",
     }
