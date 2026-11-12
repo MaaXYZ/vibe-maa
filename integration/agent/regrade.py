@@ -10,7 +10,7 @@ import sys
 from pathlib import Path, PurePosixPath
 from typing import Any
 
-from grader import drawio_server, grade_drawio, grade_mailbox, write_result
+from grader import DRAWIO_STARTING_STATES, drawio_server, grade_drawio, grade_mailbox, write_result
 
 from vibe_maa.reports import Reports
 
@@ -76,6 +76,8 @@ def replay(
     cache: Path,
     browser_executable: str | None = None,
     source_archive: Path | None = None,
+    starting_states: tuple[str, ...] = ("blank",),
+    repetitions: int = 2,
 ) -> dict[str, Any]:
     project, output = project.resolve(), output.resolve()
     if output.exists():
@@ -88,7 +90,13 @@ def replay(
     upstream = None
     if target == "drawio":
         with drawio_server(cache.resolve()) as (url, upstream):
-            grade = grade_drawio(project, url, browser_executable)
+            grade = grade_drawio(
+                project,
+                url,
+                browser_executable,
+                starting_states=starting_states,
+                repetitions=repetitions,
+            )
     else:
         grade = grade_mailbox(project)
     after = source_hashes(project)
@@ -127,6 +135,10 @@ def main() -> int:
     parser.add_argument("--cache", type=Path, default=Path("work/targets"))
     parser.add_argument("--browser-executable")
     parser.add_argument("--source-archive", type=Path)
+    parser.add_argument(
+        "--starting-states", nargs="+", choices=DRAWIO_STARTING_STATES, default=["blank"]
+    )
+    parser.add_argument("--repetitions", type=int, choices=range(1, 11), default=2)
     args = parser.parse_args()
     result = replay(
         args.project,
@@ -135,6 +147,8 @@ def main() -> int:
         args.cache,
         args.browser_executable,
         args.source_archive,
+        tuple(args.starting_states),
+        args.repetitions,
     )
     print(json.dumps(result, ensure_ascii=False))
     return 0 if result["grade"]["passed"] and result["source_unchanged"] else 1

@@ -57,3 +57,39 @@ def test_real_shape_renderer_acceptance(tmp_path, palette_x, expected):
         assert check["document"][0]["rectangle_renderer"] is expected
         assert check["document"][0]["ellipse_renderer"] is not expected
     assert result["blocked_external_requests"] == []
+
+
+@pytest.mark.skipif(
+    os.name == "nt", reason="The original seed's exact Windows replay is unverified"
+)
+def test_recorded_seed_reproduces_failure_without_modifying_source(tmp_path, monkeypatch):
+    import sys
+
+    monkeypatch.syspath_prepend(str(Path(__file__).parent))
+    from recovery import initialize_recovery, record_baseline
+    from regrade import source_hashes, verify_manifest
+
+    published = tmp_path / "published"
+    published.mkdir()
+    project = tmp_path / "project"
+    metadata = initialize_recovery(project, published)
+    assert metadata["seed_manifest"]["verified_files"] == 10
+    before = source_hashes(project)
+    grader = sys.modules["grader"]
+    cache = Path(os.environ.get("VIBE_MAA_DRAWIO_CACHE", "work/targets"))
+    with grader.drawio_server(cache) as (url, _upstream):
+        baseline = record_baseline(
+            project, published, url, os.environ.get("VIBE_MAA_BROWSER_EXECUTABLE")
+        )
+    assert baseline["passed"] is False
+    blank, splash = baseline["checks"]
+    assert blank["passed"] is True and splash["passed"] is False
+    assert splash["initial_state"] == {
+        "current_file": False,
+        "graph_enabled": False,
+        "dialog_count": 1,
+    }
+    assert splash["document"] == []
+    assert source_hashes(project) == before
+    assert verify_manifest(project)["present"] is False  # Original manifest stays in starter.zip.
+    assert len(list(published.glob("baseline-evidence-*.zip"))) == 2

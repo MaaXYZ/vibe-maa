@@ -22,7 +22,8 @@
 Secret 优先于同名 Variable。密钥始终只使用 Secret。
 
 随后打开 **Actions → Real agent acceptance → Run workflow**。默认目标是 `drawio`；
-`mailbox` 是更小的工具链自检场景。缺少 API 密钥或模型 ID 会明确失败，不会跳过后显示成功。
+`drawio-recovery` 从已有原始交付物继续维护，`mailbox` 是更小的工具链自检场景。
+缺少 API 密钥或模型 ID 会明确失败，不会跳过后显示成功。
 
 每次运行还可以选择 `reasoning_effort`：
 
@@ -48,6 +49,11 @@ gh workflow run agent-acceptance.yml --repo MaaXYZ/vibe-maa \
 - `drawio`：运行固定版本的真实 diagrams.net/draw.io，上游发布包经 SHA256 校验后在本地提供。
   Agent 只通过 vibe-maa 的截图与输入探索，交付 `AgentTask` 入口，创建标有 `Vibe Maa` 的形状。
   独立检查程序在两次全新的浏览器上下文中执行交付物，并检查真实画布中的标签。
+- `drawio-recovery`：复制上次隔离 low 试验的十个原始文件，校验原始清单，并保留 `starter.zip`。
+  在调用模型之前，先确认原项目在正常空白文档上通过、在上游原生启动弹窗上失败；保留运行报告与原图。
+  Agent 只获得已有项目、现场报告和两个启动 URL，必须自行观察和修复，不提供按钮位置或修复代码。
+  独立验收在正常与弹窗起点各运行三次，均使用新浏览器上下文，要求恰好一个矩形、精确标签和没有遗留弹窗。
+  这是接续既有项目的维护试验，不能标成没有参考答案的从零开发。重放不消耗模型调用。
 - `mailbox`：从故意缺少公告分支的起步项目开发。独立检查程序从主页、邮箱、公告三种状态
   启动真实 MaaFW 执行，检查实际访问邮箱和返回主页。它属于 fixture 验证，不冒充真实应用结果。
 
@@ -96,6 +102,9 @@ Artifact `agent-acceptance-TARGET` 包含：
 - `agent-activity.json`：最多 1 MiB 的安全工具活动摘要，仅保留工具命令、状态、截断输出及用量；不包含模型思考、加密内容或认证字段。
 - `automation.zip`：普通 MaaFW 项目及来源清单，可继续开发或独立执行。
 - `evidence-RUN_ID.zip`：独立验收各次运行的可移植记录、原图和配置来源，不包含服务认证元数据。
+- `agent-evidence-RUN_ID.zip`：Agent 开发期间实际执行的运行证据，包括失败；与最终独立验收分开。
+- 修复试验另有 `starter.zip`、`recovery.json`、`baseline.json` 和 `baseline-evidence-RUN_ID.zip`，
+  保留起步项目的哈希、正常/异常对照和修改前现场。
 
 只有 `published/` 上传。认证目录、daemon token、原始 Agent 事件流和私有日志不上传。
 运行失败或超时会使 job 失败；没有真实调用模型的运行不能声明通过 Agent 验收。

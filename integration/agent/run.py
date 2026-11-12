@@ -18,8 +18,17 @@ from typing import Any
 from urllib.parse import urlsplit
 
 from activity import ActivityTrace
-from grader import ENTRY, drawio_server, grade_drawio, grade_mailbox, write_result
+from grader import (
+    DRAWIO_STARTING_STATES,
+    ENTRY,
+    drawio_server,
+    drawio_start_url,
+    grade_drawio,
+    grade_mailbox,
+    write_result,
+)
 from isolation import policy_metadata, profile_arguments
+from recovery import initialize_recovery, record_baseline
 
 from vibe_maa.bootstrap import initialize_demo, skill_install
 from vibe_maa.cli import initialize
@@ -159,11 +168,30 @@ def prompt_for(target: str, project: Path, url: str | None, seconds: int = 600) 
         "Vibe Maa. Deliver a standard MaaFramework Pipeline with entry AgentTask that repeats this "
         "from a fresh blank document. Use the browser backend at this URL: " + str(url)
     )
+    if target == "drawio-recovery":
+        task = (
+            "Maintain the existing MaaFramework project; do not start over. It is an authorized "
+            "copy of an earlier agent deliverable that passed on a fresh blank draw.io document. "
+            "Resume its AgentCanvas task and inspect the retained failed run reports and original "
+            "screenshots before editing. A new application starting state now fails. Observe the "
+            "real application, repair the standard Pipeline, and rerun the repaired source. "
+            "The objective remains exactly one rectangle on the canvas labelled exactly Vibe Maa, "
+            "with no modal left open. Entry must remain AgentTask. Keep the established completion "
+            "condition and existing case labels; extend cases with evidence for the new state. "
+            "The same entry must handle both fresh sessions at these URLs, without external setup "
+            "inputs: original blank start "
+            + drawio_start_url(str(url), "blank")
+            + " ; new start "
+            + drawio_start_url(str(url), "splash")
+            + ". The independent grader repeats each state three times. "
+            "Use context and task context to resume, and save the new constraints and actual "
+            "verification in the project's durable task."
+        )
     deadline = (datetime.now(timezone.utc) + timedelta(seconds=seconds)).isoformat()
     browser_contract = (
         "Browser viewport contract: 1280 by 720 controller pixels. Open browser sessions with "
         "--width 1280 --height 720; the independent grader uses that same viewport.\n"
-        if target == "drawio"
+        if target in {"drawio", "drawio-recovery"}
         else ""
     )
     return (
@@ -400,18 +428,26 @@ def run(arguments: argparse.Namespace) -> dict[str, Any]:
     project, private, published = output / "project", output / "private", output / "published"
     private.mkdir(parents=True)
     published.mkdir()
+    recovery = None
     if arguments.target == "mailbox":
         initialize_demo(project, starter=True)
+    elif arguments.target == "drawio-recovery":
+        recovery = initialize_recovery(project, published)
     else:
         initialize(project)
     skill_install(project, "codex")
     server = (
         drawio_server(arguments.cache.resolve())
-        if arguments.target == "drawio"
+        if arguments.target in {"drawio", "drawio-recovery"}
         else contextlib.nullcontext((None, None))
     )
     try:
         with server as (url, upstream):
+            if recovery is not None:
+                baseline = record_baseline(project, published, url, arguments.browser_executable)
+                recovery["baseline"] = "baseline.json"
+                recovery["baseline_run_ids"] = [c["run_id"] for c in baseline["checks"]]
+                write_result(published / "recovery.json", recovery)
             service = start_tool_service(project)
             prompt = prompt_for(arguments.target, project, url, arguments.timeout_seconds)
             (private / "prompt.txt").write_text(prompt, encoding="utf-8")
@@ -426,12 +462,23 @@ def run(arguments: argparse.Namespace) -> dict[str, Any]:
                 external_service=service,
             )
             stop_daemon(project)
+            development_runs = Reports(project).list_runs(limit=1000)["runs"]
+            baseline_ids = set(recovery["baseline_run_ids"]) if recovery else set()
+            development_ids = [
+                r["run_id"] for r in development_runs if r["run_id"] not in baseline_ids
+            ]
             # The grader is external to the writable project and does not trust the agent's verdict.
             try:
                 grade = (
                     grade_mailbox(project)
                     if arguments.target == "mailbox"
-                    else grade_drawio(project, url, arguments.browser_executable)
+                    else grade_drawio(
+                        project,
+                        url,
+                        arguments.browser_executable,
+                        starting_states=DRAWIO_STARTING_STATES if recovery else ("blank",),
+                        repetitions=3 if recovery else 2,
+                    )
                 )
             except Exception as exc:
                 grade = {
@@ -453,9 +500,15 @@ def run(arguments: argparse.Namespace) -> dict[str, Any]:
                 "source_revision": os.environ.get("GITHUB_SHA"),
                 "upstream": upstream,
                 "grade": grade,
+                "recovery": recovery,
+                "development_run_ids": development_ids,
             }
             try:
                 Reports(project).export_project(str(published / "automation.zip"))
+                for run_id in development_ids:
+                    Reports(project).export_run(
+                        run_id, str(published / f"agent-evidence-{run_id}.zip")
+                    )
                 for check in grade.get("checks", []):
                     if check.get("run_id"):
                         run_id = check["run_id"]
@@ -476,7 +529,9 @@ def run(arguments: argparse.Namespace) -> dict[str, Any]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--target", choices=["drawio", "mailbox"], default="drawio")
+    parser.add_argument(
+        "--target", choices=["drawio", "drawio-recovery", "mailbox"], default="drawio"
+    )
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--cache", type=Path, default=ROOT / "work/upstream")
     parser.add_argument("--timeout-seconds", type=int, default=600)

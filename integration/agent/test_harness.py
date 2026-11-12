@@ -573,6 +573,51 @@ def test_prompt_explicitly_states_service_budget_and_viewport(monkeypatch, tmp_p
     assert "open your own sessions" in prompt
 
 
+def test_recovery_prompt_resumes_seed_and_preserves_the_business_goal(monkeypatch, tmp_path):
+    monkeypatch.syspath_prepend(str(DIRECTORY))
+    module = _module("run")
+    prompt = module.prompt_for(
+        "drawio-recovery", tmp_path, "http://127.0.0.1:1234/?offline=1&splash=0", 600
+    )
+    assert "Maintain the existing" in prompt and "Resume its AgentCanvas task" in prompt
+    assert "retained failed run reports and original screenshots before editing" in prompt
+    assert "exactly one rectangle" in prompt and "existing case labels" in prompt
+    assert "splash=0" in prompt and "splash=1" in prompt
+    assert "three times" in prompt and "--width 1280 --height 720" in prompt
+    assert "Create New Diagram" not in prompt  # The repair remains the agent's work.
+
+
+def test_drawio_start_selection_preserves_pinned_launch_contract():
+    grader = _module("grader")
+    from urllib.parse import parse_qs, urlsplit
+
+    url = "http://127.0.0.1:1234/?offline=1&local=1&lang=en&ui=atlas&splash=0&picker=0#fragment"
+    selected = grader.drawio_start_url(url, "splash")
+    assert urlsplit(selected).fragment == "fragment"
+    assert parse_qs(urlsplit(selected).query) == {**parse_qs(urlsplit(url).query), "splash": ["1"]}
+    assert grader.drawio_start_url(selected, "blank") == url
+    with pytest.raises(ValueError, match="Unknown"):
+        grader.drawio_start_url(url, "unregistered-state")
+
+
+def test_recovery_baseline_rejects_external_requests_before_model_calls(tmp_path, monkeypatch):
+    monkeypatch.syspath_prepend(str(DIRECTORY))
+    module = _module("recovery")
+    baseline = {
+        "checks": [
+            {"starting_state": "blank", "passed": True, "run_id": "normal"},
+            {"starting_state": "splash", "passed": False, "run_id": "new"},
+        ],
+        "blocked_external_requests": ["https://external.invalid/request"],
+    }
+    monkeypatch.setattr(module, "grade_drawio", lambda *a, **k: baseline)
+    exports = []
+    monkeypatch.setattr(module.Reports, "export_run", lambda *a: exports.append(a))
+    with pytest.raises(ValueError, match="external requests"):
+        module.record_baseline(tmp_path, tmp_path, "http://127.0.0.1", None)
+    assert (tmp_path / "baseline.json").is_file() and len(exports) == 2
+
+
 def test_execute_inherits_external_service_and_does_not_recheck_completed_agent(
     tmp_path, monkeypatch
 ):

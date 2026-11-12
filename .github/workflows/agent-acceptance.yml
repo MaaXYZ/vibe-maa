@@ -9,7 +9,7 @@ on:
         required: true
         default: drawio
         type: choice
-        options: [drawio, mailbox]
+        options: [drawio, drawio-recovery, mailbox]
       timeout_seconds:
         description: Agent wall-time budget in seconds (30 to 600)
         required: true

@@ -10,7 +10,7 @@ import json
 import threading
 from pathlib import Path
 from typing import Any, Iterator
-from urllib.parse import urlsplit
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 import numpy as np
 
@@ -21,6 +21,17 @@ from vibe_maa.service import DevelopmentService, load_nodes
 ROOT = Path(__file__).resolve().parents[2]
 ENTRY = "AgentTask"
 ALLOWED_ACTIONS = {"DoNothing", "Click", "LongPress", "Swipe", "ClickKey", "InputText"}
+DRAWIO_STARTING_STATES = ("blank", "splash")
+
+
+def drawio_start_url(url: str, starting_state: str) -> str:
+    """Select an upstream startup screen without changing the application bytes."""
+    if starting_state not in DRAWIO_STARTING_STATES:
+        raise ValueError(f"Unknown draw.io starting state: {starting_state}")
+    parsed = urlsplit(url)
+    query = dict(parse_qsl(parsed.query))
+    query["splash"] = "1" if starting_state == "splash" else "0"
+    return urlunsplit(parsed._replace(query=urlencode(query)))
 
 
 def validate_submission(project: Path) -> None:
@@ -145,13 +156,29 @@ def _drawio_oracle(url: str) -> Iterator[list[str]]:
 
     def dispatch(page: Any, operation: str, args: tuple[Any, ...]) -> Any:
         if operation == "__grader_ready":
+            starting_state = args[0] if args else "blank"
             page.wait_for_function(
-                "window.__vibe_grader_editor && __vibe_grader_editor.getCurrentFile() && __vibe_grader_editor.editor.graph.isEnabled()",
+                """state => {
+                    const app = window.__vibe_grader_editor;
+                    if (!app) return false;
+                    const dialogs = document.querySelectorAll('.geDialog').length;
+                    return state === 'splash'
+                        ? !app.getCurrentFile() && dialogs === 1
+                        : app.getCurrentFile() && app.editor.graph.isEnabled() && dialogs === 0;
+                }""",
+                arg=starting_state,
                 timeout=10000,
             )
             return True
+        if operation == "__grader_state":
+            return page.evaluate("""() => ({
+                current_file: !!window.__vibe_grader_editor.getCurrentFile(),
+                graph_enabled: window.__vibe_grader_editor.editor.graph.isEnabled(),
+                dialog_count: document.querySelectorAll('.geDialog').length
+            })""")
         if operation == "__grader_document":
             return page.evaluate("""() => {
+                if (!window.__vibe_grader_editor.getCurrentFile()) return [];
                 const graph = window.__vibe_grader_editor.editor.graph;
                 return Object.values(graph.model.cells).filter(cell => cell.vertex).map(cell => ({
                     label: graph.convertValueToString(cell), style: cell.style || '',
@@ -172,43 +199,84 @@ def _drawio_oracle(url: str) -> Iterator[list[str]]:
         Browser.new_context = original_context
 
 
-def grade_drawio(project: Path, url: str, browser_executable: str | None = None) -> dict[str, Any]:
+def grade_drawio(
+    project: Path,
+    url: str,
+    browser_executable: str | None = None,
+    *,
+    starting_states: tuple[str, ...] = ("blank",),
+    repetitions: int = 2,
+    timeout_seconds: float = 30,
+) -> dict[str, Any]:
+    if not starting_states or not 1 <= repetitions <= 10:
+        raise ValueError("Specify starting states and between 1 and 10 repetitions")
+    launches = [(state, drawio_start_url(url, state)) for state in starting_states]
     validate_submission(project)
     checks = []
     with _drawio_oracle(url) as blocked:
-        for repetition in range(2):
-            service = DevelopmentService(project)
-            try:
-                options = {"backend": "browser", "url": url}
-                if browser_executable:
-                    options["browser_executable"] = browser_executable
-                opened = service.session_open(**options)
-                backend = service.sessions[opened["session_id"]].backend
-                backend._worker.call("__grader_ready")
-                before = backend._worker.call("__grader_document")
-                report = service.run(opened["session_id"], ENTRY, timeout_seconds=30)
-                document = backend._worker.call("__grader_document")
-                changed = completed_drawio_document(before, document)
+        for starting_state, launch in launches:
+            for repetition in range(repetitions):
                 checks.append(
-                    {
-                        "repetition": repetition + 1,
-                        "execution_status": report["execution_status"],
-                        "label_in_canvas": changed,
-                        "document": document,
-                        "run_id": report["run_id"],
-                        "passed": report["execution_status"] == "succeeded" and changed,
-                    }
+                    _grade_drawio_once(
+                        project,
+                        launch,
+                        browser_executable,
+                        starting_state,
+                        repetition,
+                        timeout_seconds,
+                    )
                 )
-            finally:
-                service.close()
     return {
         "passed": all(c["passed"] for c in checks) and not blocked,
         "target": "drawio",
         "scope": "application",
+        "starting_states": list(starting_states),
+        "repetitions_per_state": repetitions,
         "checks": checks,
         "blocked_external_requests": blocked,
         "oracle": "fresh real application canvas DOM, independent from agent-supplied goals",
     }
+
+
+def _grade_drawio_once(
+    project: Path,
+    url: str,
+    browser_executable: str | None,
+    starting_state: str,
+    repetition: int,
+    timeout_seconds: float,
+) -> dict[str, Any]:
+    service = DevelopmentService(project)
+    try:
+        options = {"backend": "browser", "url": url}
+        if browser_executable:
+            options["browser_executable"] = browser_executable
+        opened = service.session_open(**options)
+        backend = service.sessions[opened["session_id"]].backend
+        backend._worker.call("__grader_ready", starting_state)
+        initial_state = backend._worker.call("__grader_state")
+        before = backend._worker.call("__grader_document")
+        report = service.run(opened["session_id"], ENTRY, timeout_seconds=timeout_seconds)
+        document = backend._worker.call("__grader_document")
+        final_state = backend._worker.call("__grader_state")
+        changed = completed_drawio_document(before, document)
+        return {
+            "starting_state": starting_state,
+            "repetition": repetition + 1,
+            "initial_state": initial_state,
+            "final_state": final_state,
+            "execution_status": report["execution_status"],
+            "label_in_canvas": changed,
+            "document": document,
+            "run_id": report["run_id"],
+            "passed": report["execution_status"] == "succeeded"
+            and changed
+            and final_state["current_file"]
+            and final_state["graph_enabled"]
+            and final_state["dialog_count"] == 0,
+        }
+    finally:
+        service.close()
 
 
 def completed_drawio_document(before: list[dict[str, Any]], document: list[dict[str, Any]]) -> bool:

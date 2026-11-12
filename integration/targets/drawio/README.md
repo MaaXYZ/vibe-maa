@@ -27,6 +27,14 @@ requests except the exact local origin. Provisioning is the only step that
 needs upstream network access. Runtime tests use a fresh browser context at a
 fixed 1280×720 viewport and device scale 1.
 
+The maintenance trial changes only the upstream `splash` query parameter to `1`.
+The unchanged application then opens its native Device startup dialog before a
+document exists. Both startup URLs keep the same pinned bytes, offline mode,
+language, layout and viewport. No repair nodes or UI coordinates are added by
+the harness. The original isolated agent project must pass the blank start and
+fail this new start before a model is called. Final grading repeats both starts
+three times and also rejects an open modal. See [the agent CI](../../../docs/agent-ci.md).
+
 The browser is the platform-neutral screenshot/input transport. AI automation
 must receive image pixels and send input through MaaFramework's controller; it
 must not obtain DOM selectors or the editor's internal graph model. Independent
