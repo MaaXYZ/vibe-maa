@@ -14,4 +14,6 @@ uv run python integration/agent/regrade.py --project examples/agent-generated/dr
 
 This is one task on one pinned application/UI, not evidence that arbitrary games or all starting states work. The authored recognition templates and cases remain application-specific.
 
+The exact submission passes on the original Ubuntu CI environment after the oracle correction. Windows and a separate Linux host failed its text-heavy dialog template. Those failures are retained in [the cross-platform replay](https://github.com/MaaXYZ/vibe-maa/actions/runs/43187724753). A separate [portable reference](../../drawio-portable/README.md) is tested across platforms; it is not substituted for this original model output.
+
 ![Actual independently replayed application](dev/cases/vibe_maa_rectangle.png)

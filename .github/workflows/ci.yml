@@ -2,6 +2,7 @@ name: CI
 
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
@@ -28,7 +29,7 @@ jobs:
       - run: uv sync --locked --python ${{ matrix.python }}
       - run: uv run ruff check .
       - run: uv run ruff format --check .
-      - run: uv run pytest tests integration/targets/drawio/test_prepare.py
+      - run: uv run pytest tests integration/targets/drawio/test_prepare.py integration/agent/test_harness.py
       - run: uv build
       - name: Exercise installed wheel outside the source project
         shell: bash

@@ -1,5 +1,7 @@
 # vibe-maa
 
+真实模型运行与跨平台结果见[验收记录](docs/benchmarks.md)；原始生成脚本和派生参考流程分别保留。
+
 让编程 AI 边观察软件、边开发 MaaFramework 自动化，最终交付普通 MaaFW 项目。
 
 你描述目标，Codex 或 Claude Code 负责探索界面、编辑 Pipeline；vibe-maa 提供持久设备会话、同帧观察、仅识别试验、真实运行、任务上下文和验证证据。AI 可以根据失败现场继续修复，也可以在新会话中接着上一次任务工作。

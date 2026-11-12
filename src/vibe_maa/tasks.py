@@ -172,10 +172,10 @@ class TaskManager:
         return spec.get("scenarios") or {"default": None}
 
     @staticmethod
-    def _target(record: dict[str, Any]) -> tuple[str, str, str, str]:
+    def _target(record: dict[str, Any]) -> tuple[str, ...]:
         return tuple(
             record.get(key, "unknown") for key in ("scope", "backend", "device", "resource_path")
-        )
+        ) + (json.dumps(record.get("runtime", {}), sort_keys=True),)
 
     def _report_current(self, record: dict[str, Any]) -> bool:
         try:
@@ -198,6 +198,7 @@ class TaskManager:
                 and report.get("device") == record.get("device")
                 and report.get("scope") == record.get("scope")
                 and report.get("resource_path") == record.get("resource_path")
+                and report.get("runtime", {}) == record.get("runtime", {})
             )
         except (KeyError, TypeError, ValueError, OSError, DevError):
             return False
@@ -402,6 +403,9 @@ class TaskManager:
             "scope": "fixture" if session.kind == "demo" else "device",
             "backend": session.kind,
             "device": session.device,
+            "runtime": getattr(session.backend, "runtime_info", {})
+            if hasattr(session, "backend")
+            else {},
             "inputs": {},
             "case_inputs": {},
             "attempt_path": str(path),
@@ -436,6 +440,7 @@ class TaskManager:
                     "backend": result.get("backend", session.kind),
                     "device": result.get("device", session.device),
                     "scope": result.get("scope", "fixture" if session.kind == "demo" else "device"),
+                    "runtime": result.get("runtime", {}),
                     "execution_status": result.get("execution_status"),
                     "goal_status": result.get("goal_status"),
                     "after_observation": result.get("after_observation"),
