@@ -60,3 +60,234 @@ def test_publication_rejects_secret_inside_zip(tmp_path, monkeypatch):
     with pytest.raises(ValueError, match="Publication rejected"):
         module.verify_publication(tmp_path, "do-not-upload-this-key")
     assert not archive.exists()
+
+
+def test_drawio_default_label_renderer_is_a_rectangle():
+    grader = _module("grader")
+    rectangle = {
+        "label": "Vibe Maa",
+        "shape": "label",
+        "rectangle_renderer": True,
+        "ellipse_renderer": False,
+        "width": 120,
+        "height": 60,
+    }
+    assert grader.completed_drawio_document([], [rectangle]) is True
+    ellipse = {
+        **rectangle,
+        "shape": "ellipse",
+        "rectangle_renderer": False,
+        "ellipse_renderer": True,
+    }
+    assert grader.completed_drawio_document([], [ellipse]) is False
+    assert grader.completed_drawio_document([rectangle], [rectangle]) is False
+
+
+def test_activity_publishes_only_safe_tool_fields(monkeypatch):
+    import json
+
+    monkeypatch.syspath_prepend(str(DIRECTORY))
+    activity = _module("activity")
+    trace = activity.ActivityTrace("real-fixture-api-key")
+    trace.add(
+        {
+            "type": "item.completed",
+            "item": {
+                "type": "reasoning",
+                "text": "private chain of thought",
+                "encrypted_content": "encrypted-private-value",
+            },
+        }
+    )
+    trace.add(
+        {
+            "type": "item.completed",
+            "item": {"type": "agent_message", "text": "unpublished model text"},
+        }
+    )
+    trace.add(
+        {
+            "type": "item.completed",
+            "item": {
+                "type": "command_execution",
+                "id": "item_4",
+                "status": "completed",
+                "command": "printf real-fixture-api-key",
+                "exit_code": 0,
+                "session_token": "private-session-token",
+                "encrypted_content": "encrypted-private-value",
+                "aggregated_output": json.dumps(
+                    {
+                        "result": "done",
+                        "authorization": "Bearer private-bearer",
+                        "session_token": "private-session-token",
+                        "encrypted_content": "encrypted-private-value",
+                        "reasoning_content": "private chain of thought",
+                    }
+                ),
+            },
+        }
+    )
+    saved = json.dumps(trace.result())
+    for private in [
+        "real-fixture-api-key",
+        "private-session-token",
+        "encrypted-private-value",
+        "private-bearer",
+        "private chain of thought",
+        "unpublished model text",
+    ]:
+        assert private not in saved
+    assert '"tool_type": "command_execution"' in saved
+    assert "done" in saved
+    assert trace.progress(31.6) == {
+        "event": "agent.progress",
+        "elapsed_seconds": 31,
+        "parsed_events": 3,
+        "tool_items": 1,
+    }
+
+
+def test_activity_tracks_recovered_errors_and_usage(monkeypatch):
+    monkeypatch.syspath_prepend(str(DIRECTORY))
+    activity = _module("activity")
+    trace = activity.ActivityTrace()
+    trace.add({"type": "turn.failed", "error": {"message": "temporary retry error"}})
+    trace.add({"type": "turn.started"})
+    trace.add({"type": "turn.completed", "usage": {"input_tokens": 20, "output_tokens": 6}})
+    trace.add({"type": "error", "message": "recovered transport warning"})
+    trace.add(
+        {
+            "type": "turn.completed",
+            "usage": {
+                "input_tokens": 30,
+                "output_tokens": 8,
+                "cached_input_tokens": 25,
+                "encrypted_content": "private",
+            },
+        }
+    )
+    result = trace.result()
+    assert result["terminal_state"] == "completed"
+    assert trace.terminal_error is None
+    assert len(result["historical_errors"]) == 2
+    assert result["usage"] == {"input_tokens": 50, "output_tokens": 14, "cached_input_tokens": 25}
+    assert result["completed_turns"] == 2
+    assert "encrypted_content" not in result["usage"]
+
+
+def test_activity_budget_and_partial_reads(monkeypatch):
+    import io
+    import json
+
+    monkeypatch.syspath_prepend(str(DIRECTORY))
+    activity = _module("activity")
+    trace = activity.ActivityTrace(max_bytes=32768)
+    event = {
+        "type": "item.completed",
+        "item": {
+            "type": "command_execution",
+            "id": "item_unicode",
+            "command": "界面",
+            "status": "completed",
+            "aggregated_output": "x" * 9000,
+        },
+    }
+    data = json.dumps(event, ensure_ascii=False).encode() + b"\n"
+    trace.read(io.BytesIO(data[:33]))
+    assert trace.progress(0)["parsed_events"] == 0
+    trace.read(io.BytesIO(data[33:]))
+    for _ in range(20):
+        trace.add(event)
+    result = trace.result()
+    assert len(json.dumps(result, ensure_ascii=False).encode()) <= 32768
+    assert result["truncated_records"] > 0
+
+
+def test_execute_preserves_success_after_recovered_error(tmp_path, monkeypatch):
+    import json
+    import subprocess
+    import sys
+    from types import SimpleNamespace
+
+    monkeypatch.syspath_prepend(str(DIRECTORY))
+    module = _module("run")
+    real_popen = subprocess.Popen
+    records = [
+        {"type": "error", "message": "transient issue"},
+        {"type": "turn.started"},
+        {
+            "type": "item.completed",
+            "item": {
+                "type": "command_execution",
+                "id": "item_1",
+                "command": "echo ok",
+                "status": "completed",
+                "aggregated_output": "ok",
+                "exit_code": 0,
+            },
+        },
+        {"type": "turn.completed", "usage": {"input_tokens": 10, "output_tokens": 4}},
+    ]
+    child = (
+        "import json; records="
+        + repr(records)
+        + "; [print(json.dumps(r),flush=True) for r in records]"
+    )
+
+    def start(_command, **kwargs):
+        return real_popen([sys.executable, "-c", child], **kwargs)
+
+    monkeypatch.setattr(module.subprocess, "Popen", start)
+    monkeypatch.setattr(
+        module.subprocess, "run", lambda *a, **k: SimpleNamespace(stdout="codex-cli fixture")
+    )
+    private = tmp_path / "private"
+    private.mkdir()
+    result = module.execute("fixture", tmp_path, "fixture prompt", {}, 3, private, True)
+    assert result["returncode"] == 0
+    assert result["terminal_state"] == "completed"
+    assert result["error"] is None
+    assert result["historical_error_count"] == 1
+    assert result["usage"] == {"input_tokens": 10, "output_tokens": 4}
+    trace = json.loads((tmp_path / "published/agent-activity.json").read_text())
+    assert len(trace["records"]) == 1
+
+
+def test_benchmark_defaults_cannot_hide_executable_actions(tmp_path):
+    import json
+
+    grader = _module("grader")
+    resource = tmp_path / "resource"
+    (resource / "pipeline").mkdir(parents=True)
+    (resource / "pipeline/task.json").write_text(json.dumps({"AgentTask": {"action": "DoNothing"}}))
+    (resource / "default_pipeline.json").write_text(json.dumps({"Default": {"action": "Command"}}))
+    with pytest.raises(Exception, match="default_pipeline"):
+        grader.validate_submission(tmp_path)
+
+
+def test_replay_verifies_original_manifest(tmp_path, monkeypatch):
+    import hashlib
+    import json
+
+    monkeypatch.syspath_prepend(str(DIRECTORY))
+    module = _module("regrade")
+    source = tmp_path / "source.json"
+    source.write_bytes(b"original")
+    (tmp_path / "manifest.json").write_text(
+        json.dumps(
+            {
+                "files": [
+                    {
+                        "path": "source.json",
+                        "sha256": hashlib.sha256(b"original").hexdigest(),
+                        "size": 8,
+                    }
+                ]
+            }
+        )
+    )
+    assert module.verify_manifest(tmp_path.resolve())["verified_files"] == 1
+    source.write_bytes(b"modified")
+    with pytest.raises(ValueError, match="checksum mismatch"):
+        module.verify_manifest(tmp_path.resolve())

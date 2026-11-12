@@ -10,11 +10,13 @@ import shutil
 import signal
 import subprocess
 import sys
+import time
 import zipfile
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
 
+from activity import ActivityTrace
 from grader import ENTRY, drawio_server, grade_drawio, grade_mailbox, write_result
 
 from vibe_maa.bootstrap import initialize_demo, skill_install
@@ -189,6 +191,9 @@ def execute(
     # The launcher keeps auth outside the writable project; no auth/log directory is published.
     raw_path = private / "agent-output.private.jsonl"
     timed_out = False
+    activity = ActivityTrace(secret)
+    started = time.monotonic()
+    next_heartbeat = started + 30
     with raw_path.open("w", encoding="utf-8") as output:
         process = subprocess.Popen(
             command,
@@ -197,38 +202,44 @@ def execute(
             stderr=subprocess.STDOUT,
             start_new_session=os.name != "nt",
         )
-        try:
-            returncode = process.wait(timeout=seconds)
-        except subprocess.TimeoutExpired:
-            timed_out = True
-            if os.name != "nt":
-                os.killpg(process.pid, signal.SIGTERM)
-            else:
-                process.terminate()
-            try:
-                process.wait(timeout=10)
-            except subprocess.TimeoutExpired:
-                if os.name != "nt":
-                    os.killpg(process.pid, signal.SIGKILL)
-                else:
-                    process.kill()
-                process.wait()
-            returncode = process.returncode
+        with raw_path.open("rb") as stream:
+            while True:
+                activity.read(stream)
+                returncode = process.poll()
+                if returncode is not None:
+                    break
+                current = time.monotonic()
+                if current >= next_heartbeat:
+                    print(json.dumps(activity.progress(current - started)), flush=True)
+                    next_heartbeat = current + 30
+                if current - started >= seconds:
+                    timed_out = True
+                    if os.name != "nt":
+                        os.killpg(process.pid, signal.SIGTERM)
+                    else:
+                        process.terminate()
+                    try:
+                        process.wait(timeout=10)
+                    except subprocess.TimeoutExpired:
+                        if os.name != "nt":
+                            os.killpg(process.pid, signal.SIGKILL)
+                        else:
+                            process.kill()
+                        process.wait()
+                    returncode = process.returncode
+                    break
+                time.sleep(min(0.25, max(0.01, seconds - (current - started))))
+            activity.read(stream, final=True)
+    trace_path = private.parent / "published" / "agent-activity.json"
+    write_result(trace_path, activity.result())
+    print(json.dumps(activity.progress(time.monotonic() - started)), flush=True)
     raw = raw_path.read_text(encoding="utf-8", errors="replace")
     sanitized = redact(raw, secret)
     (private / "agent-output.redacted.jsonl").write_text(sanitized, encoding="utf-8")
     raw_path.unlink()
-    failure = None
-    usage = None
-    for line in sanitized.splitlines():
-        try:
-            event = json.loads(line)
-        except ValueError:
-            continue
-        if isinstance(event, dict) and event.get("type") in {"error", "turn.failed"}:
-            failure = event.get("error", event.get("message"))
-        if isinstance(event, dict) and event.get("type") == "turn.completed":
-            usage = event.get("usage")
+    failure = activity.terminal_error
+    if returncode != 0 and failure is None and activity.errors:
+        failure = activity.errors[-1]
     version = subprocess.run(
         [binary, "--version"], text=True, capture_output=True, check=True
     ).stdout.strip()
@@ -240,7 +251,14 @@ def execute(
         "wall_time_budget_seconds": seconds,
         "budget_scope": "wall_time_only_not_a_currency_or_token_limit",
         "error": failure,
-        "usage": usage,
+        "usage": dict(activity.usage) or None,
+        "usage_last_turn": activity.usage_last_turn,
+        "completed_turns": activity.completed_turns,
+        "usage_measurement": "sum_of_reported_turn.completed_events",
+        "terminal_state": activity.terminal_state,
+        "activity_trace": trace_path.name,
+        "historical_error_count": activity.event_types["error"]
+        + activity.event_types["turn.failed"],
     }
 
 
@@ -289,7 +307,12 @@ def run(arguments: argparse.Namespace) -> dict[str, Any]:
                     "passed": False,
                     "error": {"type": type(exc).__name__, "message": str(exc)},
                 }
-            if agent["returncode"] != 0 or agent["timed_out"] or agent["error"]:
+            if (
+                agent["returncode"] != 0
+                or agent["timed_out"]
+                or agent["error"]
+                or agent["terminal_state"] != "completed"
+            ):
                 grade["passed"] = False
             result = {
                 "schema_version": 1,

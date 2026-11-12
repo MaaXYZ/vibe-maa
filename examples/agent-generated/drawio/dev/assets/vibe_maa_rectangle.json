@@ -1,0 +1,12 @@
+{
+  "box": [
+    700,
+    399,
+    121,
+    70
+  ],
+  "image_path": "resource/image/vibe_maa_rectangle.png",
+  "observation_id": "obs_e9c8ad3c75944dd091c487039a00c391",
+  "sha256": "b5d6b4dabebea6d996d42fd11a143fb763a2059d536dc9f622be406dd11a088f",
+  "source_sha256": "b8b49a86fb0614162625bb2c05f28896234654b30c6e9bb022f52eaa9a8812fb"
+}

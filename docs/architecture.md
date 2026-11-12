@@ -12,6 +12,8 @@ ADB sessions retain a per-user OS file lock keyed by the normalized endpoint acr
 
 The daemon's public request envelope is versioned. Application errors carry stable codes. A successful RPC means that a request was processed, not that a device action or business task succeeded.
 
+Each daemon captures its package version and implementation digest at startup. Clients compare that identity before dispatch; replacing files on disk does not silently upgrade a resident controller. Health and stop requests remain available across a version mismatch, without replaying inputs.
+
 ## Observations and actions
 
 An observation contains an immutable PNG, SHA256, capture timestamp, screenshot dimensions, session identity, mutation generation, and optional OCR results from those exact pixels. Images retain MaaFramework controller coordinates. Image arrays inside adapters are BGR `uint8`; PNGs are stored in RGB.
@@ -50,6 +52,18 @@ Execution and business completion are separate fields:
 A missing goal is `unknown`. A goal cannot be unconditional DirectHit. Goals are checked against the final saved observation, without running goal-node actions. A passing goal only proves the configured observable condition. The agent must not silently weaken that condition to make a test pass.
 
 Offline cases label screenshot/node pairs with explicit expected hits. They test recognition, including false positives on negative examples. They do not simulate the application's reaction to input, restore an account's server-side state, or prove live end-to-end behavior.
+
+## Durable development tasks
+
+Task definitions under `dev/tasks/` record objectives, entry and goal nodes, optional case suites, attempt budgets and named starting scenarios. Each configured scenario has an observable start condition. A successful run for one starting state cannot accept the others. Natural-language constraints are retained for the coding agent and remain explicitly unverified unless covered by executable checks.
+
+Attempts are written before execution. Context recovery checks source hashes, task and case revisions, run-report integrity and scope; it aggregates the latest current proof for each required scenario. New failures, edited sources or missing evidence invalidate acceptance. Fixture and live application proofs cannot be combined into a single claim.
+
+## Installed use and external-agent acceptance
+
+The wheel includes examples, labeled images, the Skill, concise protocol references and a checksum-pinned draw.io provisioner. Bootstrap and export commands operate without a source checkout. Portable evidence bundles rewrite local paths and verify file digests; normal project exports keep MaaFW resources separate from runtime/authentication state.
+
+The optional CI harness uses pinned open-source Codex CLI against a user-configured Responses API. The agent sees images and input tools and writes ordinary Pipeline files. An independent grader outside its writable project starts fresh real application contexts and examines the application model to check the result; that privileged oracle is absent from the product API. Model settings, usage, time budgets and failures are recorded separately from deterministic tool tests. A model's completion message never constitutes acceptance.
 
 ## Resettable fixture
 

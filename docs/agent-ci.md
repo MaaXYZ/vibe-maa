@@ -54,11 +54,18 @@ API 密钥只在运行 Agent 的步骤提供，并从 shell 工具环境排除�
 Artifact `agent-acceptance-TARGET` 包含：
 
 - `acceptance.json`：实际 harness 版本、时间预算、模型配置、上游版本、独立验收结果。
+- `agent-activity.json`：最多 1 MiB 的安全工具活动摘要，仅保留工具命令、状态、截断输出及用量；不包含模型思考、加密内容或认证字段。
 - `automation.zip`：普通 MaaFW 项目及来源清单，可继续开发或独立执行。
 - `evidence-RUN_ID.zip`：独立验收各次运行的可移植记录、原图和配置来源，不包含服务认证元数据。
+- `activity.json`：有界的工具操作摘要与用量；不包含模型思考文本、认证内容或完整私有事件流。
 
 只有 `published/` 上传。认证目录、daemon token、原始 Agent 事件流和私有日志不上传。
 运行失败或超时会使 job 失败；没有真实调用模型的运行不能声明通过 Agent 验收。
+
+运行期间每 30 秒打印经过时间、已解析事件数和工具调用数，不打印模型思考或原始输出。
+`usage` 为各次 `turn.completed` 所报告 token 数的和，并另保留最后一次用量；缓存和推理 token
+仅在提供方返回时记录，不估算缺失值。暂时错误保留在历史摘要中；后续成功完成的 turn 会清除
+终态错误，不会因为已恢复的重试记录而错误拒绝成功交付。
 
 ## 本地复现
 
@@ -75,3 +82,29 @@ uv run python integration/agent/run.py --target drawio --output work/agent-run
 
 实现入口为 [run.py](../integration/agent/run.py)，独立检查位于
 [grader.py](../integration/agent/grader.py)。
+
+## 不再次调用模型的复验
+
+`examples/agent-generated/drawio/` 保存首次真实模型运行的原始交付物及校验清单。
+`integration/agent/regrade.py` 可以在新环境独立重放，验证前后源码不变：
+
+```bash
+uv run python integration/agent/regrade.py --project examples/agent-generated/drawio --output work/replay
+```
+
+初次验收错误地把 draw.io 的默认 `label` 矩形渲染器视为非矩形，原 CI 红色记录保留。
+修正后的检查验证实际矩形渲染器，并用真实椭圆做反例。重放与重新调用模型分别记录；
+不同系统字体或渲染环境仍可能使原来的图像模板失配，不能通过手动改交付物来冒充原样通过。
+
+## 免费重放已有交付物
+
+```bash
+uv run python integration/agent/regrade.py \
+  --project examples/agent-generated/drawio \
+  --cache work/targets --output work/drawio-replay
+```
+
+这条命令不加载 harness，也不调用模型 API。存在原始 `manifest.json` 时先核验全部来源文件，
+然后在新应用会话中运行原脚本，记录执行前后源码哈希、原生证据包和最后截图。
+`--source-archive PATH` 可额外记录原始 ZIP 的 SHA256。它不会修改脚本或放宽模板阈值；
+字体、操作系统或浏览器导致的识别差异会作为真实重放失败保留。

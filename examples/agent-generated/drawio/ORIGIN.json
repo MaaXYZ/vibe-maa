@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "origin": "coding_agent_generated_unmodified_submission",
+  "original_workflow": "https://github.com/MaaXYZ/vibe-maa/actions/runs/43185072506",
+  "upstream": "jgraph/drawio v32.6.10",
+  "harness": "openai/codex 0.167.2",
+  "model": "deepseek-flash",
+  "reasoning_effort_requested": "provider_default",
+  "provider_documented_default": "high",
+  "source_archive_sha256": "0fe4ebe52d4aff9704c86184874657160e0852754f74f6b186422bc2f3a3099d",
+  "initial_verdict": "rejected_by_incorrect_shape_name_check",
+  "correction": "Canonical draw.io rectangle uses an mxLabel renderer; the corrected oracle checks the actual rectangular renderer and rejects ellipses.",
+  "source_modified_after_agent": false,
+  "usage": {
+    "input_tokens": 3508388,
+    "cached_input_tokens": 3442560,
+    "output_tokens": 30804,
+    "reasoning_output_tokens": 9588
+  },
+  "scope": "one_pinned_application_task_not_general_game_automation"
+}

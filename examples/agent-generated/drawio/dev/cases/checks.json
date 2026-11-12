@@ -1,0 +1,12 @@
+[
+  {
+    "expected_hit": true,
+    "image": "vibe_maa_rectangle.png",
+    "node": "VibeMaaLabelVisible"
+  },
+  {
+    "expected_hit": false,
+    "image": "blank_canvas.png",
+    "node": "VibeMaaLabelVisible"
+  }
+]

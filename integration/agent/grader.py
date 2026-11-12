@@ -24,6 +24,11 @@ ALLOWED_ACTIONS = {"DoNothing", "Click", "LongPress", "Swipe", "ClickKey", "Inpu
 
 
 def validate_submission(project: Path) -> None:
+    if any((project / "resource").rglob("default_pipeline.json")):
+        raise DevError(
+            "INVALID_SUBMISSION",
+            "This benchmark requires explicit nodes; default_pipeline.json is not allowed",
+        )
     nodes = load_nodes(project)
     if ENTRY not in nodes:
         raise DevError("INVALID_SUBMISSION", f"Deliver a standard Pipeline with entry {ENTRY}")
@@ -151,6 +156,8 @@ def _drawio_oracle(url: str) -> Iterator[list[str]]:
                 return Object.values(graph.model.cells).filter(cell => cell.vertex).map(cell => ({
                     label: graph.convertValueToString(cell), style: cell.style || '',
                     shape: graph.getCellStyle(cell).shape,
+                    rectangle_renderer: graph.view.getState(cell).shape instanceof mxRectangleShape,
+                    ellipse_renderer: graph.view.getState(cell).shape instanceof mxEllipse,
                     width: cell.geometry.width, height: cell.geometry.height
                 }));
             }""")
@@ -181,14 +188,7 @@ def grade_drawio(project: Path, url: str, browser_executable: str | None = None)
                 before = backend._worker.call("__grader_document")
                 report = service.run(opened["session_id"], ENTRY, timeout_seconds=30)
                 document = backend._worker.call("__grader_document")
-                changed = (
-                    not before
-                    and len(document) == 1
-                    and document[0]["label"] == "Vibe Maa"
-                    and document[0]["shape"] == "rectangle"
-                    and document[0]["width"] > 0
-                    and document[0]["height"] > 0
-                )
+                changed = completed_drawio_document(before, document)
                 checks.append(
                     {
                         "repetition": repetition + 1,
@@ -209,6 +209,20 @@ def grade_drawio(project: Path, url: str, browser_executable: str | None = None)
         "blocked_external_requests": blocked,
         "oracle": "fresh real application canvas DOM, independent from agent-supplied goals",
     }
+
+
+def completed_drawio_document(before: list[dict[str, Any]], document: list[dict[str, Any]]) -> bool:
+    # draw.io's default rectangular palette shape uses mxLabel, a subclass of mxRectangleShape.
+    # The style ID is "label"; comparing it to "rectangle" falsely rejects the canonical shape.
+    return (
+        not before
+        and len(document) == 1
+        and document[0]["label"] == "Vibe Maa"
+        and document[0].get("rectangle_renderer") is True
+        and document[0].get("ellipse_renderer") is False
+        and document[0]["width"] > 0
+        and document[0]["height"] > 0
+    )
 
 
 def write_result(path: Path, result: dict[str, Any]) -> None:

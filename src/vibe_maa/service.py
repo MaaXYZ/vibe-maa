@@ -163,6 +163,7 @@ class DevelopmentService:
             "backend": backend,
             "device": device,
             "coordinates": "controller screenshot pixels",
+            "runtime": getattr(adapter, "runtime_info", {}),
         }
 
     def session_list(self) -> dict[str, Any]:
@@ -208,6 +209,7 @@ class DevelopmentService:
             "backend": session.kind,
             "device": session.device,
             "scope": "fixture" if session.kind == "demo" else "device",
+            "runtime": getattr(session.backend, "runtime_info", {}),
             "captured_at": captured_at,
             "resource_path": session.resource_path,
             "image_path": str(image_path),
@@ -444,6 +446,7 @@ class DevelopmentService:
             "backend": session.kind,
             "device": session.device,
             "scope": "fixture" if session.kind == "demo" else "device",
+            "runtime": getattr(session.backend, "runtime_info", {}),
             "resource_path": session.resource_path,
             "entry": entry,
             "override": override or {},

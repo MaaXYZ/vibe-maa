@@ -1,0 +1,67 @@
+{
+  "files": [
+    {
+      "path": "dev/assets/new_diagram_create.json",
+      "sha256": "aa7e33a705b49c9c6119d1d5ed29e4a70eec48d29c37357af6674092a402cfec",
+      "size": 336
+    },
+    {
+      "path": "dev/assets/new_diagram_dialog.json",
+      "sha256": "1227600e48dac30b7258b0a1bee316a1709199f56e985a023c4d6027f5a8ed0b",
+      "size": 338
+    },
+    {
+      "path": "dev/assets/vibe_maa_rectangle.json",
+      "sha256": "72bb2b0f1d079b36985e78a11f955b81031bb85e3a20cec4fce3ca97807daba3",
+      "size": 337
+    },
+    {
+      "path": "dev/cases/blank_canvas.png",
+      "sha256": "f090622ab79f6c9d6035664c31344b070938fffaaf19dba231eea42b0fde5db6",
+      "size": 68156
+    },
+    {
+      "path": "dev/cases/checks.json",
+      "sha256": "1cd0526d75e0ccc0f980b2b96fdd276a739ac95b5e7a3cdbab7ecfa14953123e",
+      "size": 214
+    },
+    {
+      "path": "dev/cases/vibe_maa_rectangle.png",
+      "sha256": "6ad1c9dcdbb6396689118e5dc493572b8b03d32b891fe8367e166c1ccabc14b0",
+      "size": 72443
+    },
+    {
+      "path": "dev/tasks/diagrams-rectangle-vibe-maa.json",
+      "sha256": "405df683f942b2e0dbf6dfd316a4384652807419796e46bdbd13d92b5ef73c99",
+      "size": 672
+    },
+    {
+      "path": "interface.json",
+      "sha256": "ca36073a4d56618a63db7079a1f9346e37ef018bcac0dc67fc004e79d8ebe082",
+      "size": 325
+    },
+    {
+      "path": "resource/image/new_diagram_create.png",
+      "sha256": "07410bfb319cddb2a90c3d17874733565a06a242e8cd87c0879457c55a19ae43",
+      "size": 1102
+    },
+    {
+      "path": "resource/image/new_diagram_dialog.png",
+      "sha256": "54d9cb511b0ab8781295c706b9acb97458f63ccd8b5432b4bd83c75a43506a35",
+      "size": 8253
+    },
+    {
+      "path": "resource/image/vibe_maa_rectangle.png",
+      "sha256": "b5d6b4dabebea6d996d42fd11a143fb763a2059d536dc9f622be406dd11a088f",
+      "size": 1098
+    },
+    {
+      "path": "resource/pipeline/AgentTask.json",
+      "sha256": "17451e6cb130d6a35e83192ef3b4212fe0d1f621a7c1474181d740b7bee23cfb",
+      "size": 1863
+    }
+  ],
+  "kind": "maa_project",
+  "schema_version": 1,
+  "verification": "Packaging alone does not establish task acceptance."
+}

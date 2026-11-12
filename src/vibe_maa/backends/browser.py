@@ -8,8 +8,10 @@ No DOM selectors, accessibility tree, or JavaScript evaluation are exposed.
 from __future__ import annotations
 
 import contextlib
+import importlib.metadata
 import io
 import math
+import platform
 import queue
 import threading
 import time
@@ -93,7 +95,7 @@ class _BrowserWorker:
         )
         self._thread.start()
         try:
-            self._ready.result(timeout=45)
+            self.runtime_info = self._ready.result(timeout=45)
         except TimeoutError as exc:
             # If startup eventually returns, this sentinel still closes its browser.
             self._queue.put_nowait(("close", (), Future()))
@@ -136,7 +138,7 @@ class _BrowserWorker:
                 page.goto(url, wait_until="domcontentloaded", timeout=30000)
             except Exception as exc:
                 raise DevError("BROWSER_NAVIGATION_FAILED", f"Cannot open {url}: {exc}") from exc
-            self._ready.set_result(True)
+            self._ready.set_result({"browser_version": browser.version})
             while True:
                 operation, args, future = self._queue.get()
                 if operation == "close":
@@ -352,6 +354,13 @@ class BrowserBackend(MaaBackend):
         self.url = url
         self.width, self.height = width, height
         self._worker = _BrowserWorker(url, headless, width, height, executable_path)
+        self.runtime_info = {
+            **self._worker.runtime_info,
+            "playwright_version": importlib.metadata.version("playwright"),
+            "viewport": {"width": width, "height": height, "device_scale_factor": 1},
+            "headless": headless,
+            "platform": platform.system(),
+        }
         try:
             controller = BrowserController(self._worker, url)
             super().__init__(

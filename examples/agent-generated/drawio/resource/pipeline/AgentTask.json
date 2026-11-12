@@ -1,0 +1,80 @@
+{
+  "AgentTask": {
+    "recognition": "DirectHit",
+    "action": "DoNothing",
+    "next": ["OpenFileMenu"],
+    "timeout": 3000,
+    "rate_limit": 50
+  },
+  "OpenFileMenu": {
+    "recognition": "DirectHit",
+    "action": "Click",
+    "target": [64, 20],
+    "next": ["OpenNewDiagram"],
+    "timeout": 1500,
+    "post_delay": 200
+  },
+  "OpenNewDiagram": {
+    "recognition": "DirectHit",
+    "action": "Click",
+    "target": [99, 40],
+    "next": ["NewDiagramDialogVisible"],
+    "timeout": 1500,
+    "post_delay": 300
+  },
+  "NewDiagramDialogVisible": {
+    "recognition": "TemplateMatch",
+    "template": "new_diagram_dialog.png",
+    "threshold": 0.9,
+    "action": "DoNothing",
+    "next": ["CreateNewDiagram"],
+    "timeout": 3000
+  },
+  "CreateNewDiagram": {
+    "recognition": "TemplateMatch",
+    "template": "new_diagram_create.png",
+    "threshold": 0.9,
+    "action": "Click",
+    "target": true,
+    "next": ["CanvasBlank"],
+    "timeout": 3000,
+    "post_delay": 300
+  },
+  "CanvasBlank": {
+    "recognition": "DirectHit",
+    "action": "Swipe",
+    "begin": [32, 181],
+    "end": [700, 400],
+    "duration": 800,
+    "next": ["LabelRectangle"],
+    "timeout": 3000,
+    "pre_delay": 200,
+    "post_delay": 300
+  },
+  "LabelRectangle": {
+    "recognition": "DirectHit",
+    "action": "InputText",
+    "input_text": "Vibe Maa",
+    "target": [700, 400],
+    "next": ["CommitLabel"],
+    "timeout": 3000,
+    "post_delay": 300
+  },
+  "CommitLabel": {
+    "recognition": "DirectHit",
+    "action": "Click",
+    "target": [900, 600],
+    "next": ["VibeMaaLabelVisible"],
+    "timeout": 3000,
+    "post_delay": 500
+  },
+  "VibeMaaLabelVisible": {
+    "recognition": "TemplateMatch",
+    "template": "vibe_maa_rectangle.png",
+    "roi": [288, 86, 700, 550],
+    "threshold": 0.9,
+    "action": "DoNothing",
+    "timeout": 3000,
+    "rate_limit": 100
+  }
+}
