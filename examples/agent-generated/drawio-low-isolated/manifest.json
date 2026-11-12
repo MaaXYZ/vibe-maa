@@ -1,0 +1,57 @@
+{
+  "files": [
+    {
+      "path": "dev/assets/rectangle_tool.json",
+      "sha256": "bcc18a0e879a8056fb2898dec369a61dd307a4e8f8cf3136ef222bbfc04a7b89",
+      "size": 331
+    },
+    {
+      "path": "dev/assets/vibe_maa_rectangle.json",
+      "sha256": "7dd703be083b136f8b18b418e59fa46c3e4dad4731ff82eca7e8fa4a78f7303e",
+      "size": 337
+    },
+    {
+      "path": "dev/cases/AgentCanvas.json",
+      "sha256": "d7db64e1a14983260e25ebbce925ee57b6b45970805d0f5dc5150d0bf2154f77",
+      "size": 206
+    },
+    {
+      "path": "dev/cases/VibeMaa_negative.png",
+      "sha256": "27ad41c93ab0dad2202ed282737aef3071245921fc50252f6f2d71f32fc1e0a9",
+      "size": 68204
+    },
+    {
+      "path": "dev/cases/VibeMaa_positive.png",
+      "sha256": "9ff0f063d8b05309d4b903e8dc7a4038b6359218d0d309c2e55acf6b6adca744",
+      "size": 72424
+    },
+    {
+      "path": "dev/tasks/AgentCanvas.json",
+      "sha256": "4633afaad1c797f8d8916275e541dcd48ea8495297da1a366602229d97092f95",
+      "size": 637
+    },
+    {
+      "path": "interface.json",
+      "sha256": "e956be3236bf2397c1d0e340847f4e330ecbc2002e439269cca06404c44f7c9e",
+      "size": 369
+    },
+    {
+      "path": "resource/image/rectangle_tool.png",
+      "sha256": "f7e4346d55dcbc892667bb4ffbb0a475eef29d3dfb82c2554c66d94a44d0b46f",
+      "size": 114
+    },
+    {
+      "path": "resource/image/vibe_maa_rectangle.png",
+      "sha256": "ca8b2f24f8d279016963ca88e5a96e1d97d4a5f9d75e17a353cdd3115180d2ad",
+      "size": 1203
+    },
+    {
+      "path": "resource/pipeline/agent_task.json",
+      "sha256": "eec5781e9a947474814bb2bd6bab08dd63859e0a7ba74fcca283958df864102d",
+      "size": 1626
+    }
+  ],
+  "kind": "maa_project",
+  "schema_version": 1,
+  "verification": "Packaging alone does not establish task acceptance."
+}

@@ -10,6 +10,7 @@
 - Keep device services alive across coding-agent PID namespaces with foreground serving and externally supervised CI ownership; reject lost-session retries without replacing the owner.
 - Redact authentication fields in mixed native logs and JSON, and keep metrics consistent with the final published activity trace.
 - Preserve reference-assisted model results explicitly, and use a real sandbox preflight to block access to prior solutions and privileged acceptance code before independent trials.
+- Retain the successful isolated `deepseek-flash` low-reasoning draw.io deliverable, positive/negative cases and independent replay records; add model-free Linux regression replays.
 
 ## 0.2.0
 

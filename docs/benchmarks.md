@@ -64,8 +64,24 @@ The failed run also exposed a mixed-log redaction gap for an expired local daemo
 
 These figures are one observation, not a price or success-rate claim. The retained shell activity shows no direct DOM or Playwright app access; it does not independently establish image-view tool use. The single nonzero command used an unsupported explicit `--headless` flag and was corrected using help. The CLI now accepts that ordinary flag, and a generic ProjectInterface reference reduces the need to inspect unrelated examples for handoff syntax.
 
-## Next comparison
+## Filesystem-isolated low trial
 
 The shared permission policy now exposes the installed tool runtime and current submission, while blocking existing solutions, the privileged grader, old results, tests, Git metadata and private logs. The [actual Codex sandbox check](records/codex-isolation-proof.json) verifies denied direct and symlink reads while native session reuse still succeeds. A final preflight uses the same policy helper as model execution. This filesystem policy does not isolate network egress; the task contract also forbids fetching prior solutions and retained tool activity remains subject to audit.
 
-Repeat the bounded `low` task under this policy. Keep both earlier trials and their limitations visible rather than replacing their records with a later result.
+[Run 43198829628](https://github.com/MaaXYZ/vibe-maa/actions/runs/43198829628), source `40d5b51`, completed successfully with the same configured `deepseek-flash`, explicit `low`, target and 600-second budget. Model execution took **151.232 seconds**. The unmodified deliverable contains **eight nodes, two templates, one durable task, and a case manifest with positive/negative screenshots**. The independent oracle passed both fresh real-application contexts. The original files also passed unchanged replay in two fresh contexts on a second Linux host; Linux CI now retains a free replay of this isolated sample. Exact-source Windows replay has not been established.
+
+The [original source](../examples/agent-generated/drawio-low-isolated/README.md), [result](records/drawio-low-isolated-43198829628.json) and [tool activity](records/drawio-low-isolated-43198829628-activity.json) are retained. Visible commands show no reads of prior solutions, privileged grader data or network answers, and no direct DOM/Playwright app access. The activity format still does not independently establish complete screenshot-view tool coverage. One nonzero command used an unsupported `task context --max-bytes` option; the agent continued and delivered valid resources.
+
+| Reported metric | Value |
+| --- | ---: |
+| Tool items / completed shell commands | 41 / 40 |
+| Input tokens, including cached | 1,440,197 |
+| Cached input tokens | 1,395,200 |
+| Output tokens | 18,335 |
+| Reasoning output tokens | 5,750 |
+
+This is one successful constrained draw.io task, not a statistical success rate or evidence that arbitrary game dailies are solved. The earlier infrastructure-blocked and reference-assisted trials remain visible. Tooling, references, lifecycle and permission policies changed between trials, so elapsed time or token differences cannot be attributed only to reasoning effort.
+
+## Next acceptance work
+
+Expand application and unseen-start-state coverage, retain original outputs and failure evidence, and improve tool ergonomics from observed command errors. Keep offline recognition cases, fixture results and real application outcomes distinct.

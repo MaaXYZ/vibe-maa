@@ -13,7 +13,8 @@ vibe-maa 的主要调用者是编程 AI。README 介绍项目；这里按使用�
 - [验收记录](benchmarks.md)：真实模型使用、原始交付物、兼容性发现和当前验证范围。
 - [真实软件测试目标](test-targets.md)：固定版本 draw.io 的准备、运行和独立检查。
 - [Agent CI](agent-ci.md)：使用模型 API 执行真实编程 Agent 验收。
-- [原始模型交付物](../examples/agent-generated/drawio/README.md)与[跨平台参考流程](../examples/drawio-portable/README.md)。
+- [隔离环境下的低思考模型交付物](../examples/agent-generated/drawio-low-isolated/README.md)、[参考示例辅助的交付物](../examples/agent-generated/drawio-low-assisted/README.md)和[首次模型交付物](../examples/agent-generated/drawio/README.md)。
+- [跨平台参考流程](../examples/drawio-portable/README.md)：单独标注的开发者实现。
 
 ## 参与项目开发
 

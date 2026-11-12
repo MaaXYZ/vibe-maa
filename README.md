@@ -39,7 +39,7 @@ vibe-maa 与 Codex、Claude Code 等编程 AI 配合工作。
 
 项目的真实应用测试覆盖 Windows 和 Ubuntu。模型原始交付物与跨平台参考流程分别保留，成功、失败及适用范围都记录在[验收记录](docs/benchmarks.md)中。
 
-![真实模型生成的 draw.io 自动化结果](examples/agent-generated/drawio/dev/cases/vibe_maa_rectangle.png)
+![真实模型生成的 draw.io 自动化结果](examples/agent-generated/drawio-low-isolated/dev/cases/VibeMaa_positive.png)
 
 这套开发方式也提供了可复位的起步示例，便于先让 AI 体验一次“发现遗漏 → 修改脚本 → 重新验证”的完整过程。
 
@@ -47,7 +47,7 @@ vibe-maa 与 Codex、Claude Code 等编程 AI 配合工作。
 
 我们的目标是：你说出想完成的事情，AI 就能基于 MaaFramework 把自动化项目开发出来，并在变化中持续维护。
 
-- [查看真实模型的交付物](examples/agent-generated/drawio/README.md)
+- [查看真实模型的交付物](examples/agent-generated/drawio-low-isolated/README.md)
 - [了解正在推进的工作](ROADMAP.md)
 - [参与贡献](CONTRIBUTING.md) · [查看版本变化](CHANGELOG.md)
 
