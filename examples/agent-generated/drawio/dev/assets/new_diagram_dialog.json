@@ -1,0 +1,12 @@
+{
+  "box": [
+    520,
+    392,
+    398,
+    119
+  ],
+  "image_path": "resource/image/new_diagram_dialog.png",
+  "observation_id": "obs_329de34fa899461a8dc3b55e0250d973",
+  "sha256": "54d9cb511b0ab8781295c706b9acb97458f63ccd8b5432b4bd83c75a43506a35",
+  "source_sha256": "9e110a4c9474c19877a16c1a94ae6fcc6ce4bc9f28f34e128e367a3901d7f9c7"
+}

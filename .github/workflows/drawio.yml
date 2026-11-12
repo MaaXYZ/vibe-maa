@@ -1,0 +1,52 @@
+name: Real draw.io acceptance
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  real-application:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    env:
+      VIBE_MAA_DRAWIO_CACHE: .cache/drawio
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          enable-cache: true
+      - run: uv sync --locked --extra browser
+      - if: runner.os == 'Linux'
+        run: uv run playwright install --with-deps chromium
+      - if: runner.os != 'Linux'
+        run: uv run playwright install chromium
+      - run: uv run python -c "from pathlib import Path; Path('work').mkdir(exist_ok=True)"
+      - run: uv run pytest -q integration/targets/drawio/test_prepare.py integration/targets/drawio/test_drawio.py --basetemp work/drawio-tests
+      - run: uv run pytest -q integration/agent/test_drawio_grader.py
+      - name: Replay the exact AI-authored deliverable without calling a model
+        if: runner.os == 'Linux'
+        run: uv run python integration/agent/regrade.py --project examples/agent-generated/drawio --output work/drawio-authored-replay --cache .cache/drawio
+      - name: Verify the portable reference in fresh application contexts
+        run: uv run python integration/agent/regrade.py --project examples/drawio-portable --output work/drawio-portable-replay --cache .cache/drawio
+      - if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: drawio-evidence-${{ runner.os }}
+          path: |
+            work/drawio-tests/
+            work/drawio-authored-replay/
+            work/drawio-portable-replay/
+          include-hidden-files: true
+          if-no-files-found: warn

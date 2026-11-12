@@ -1,0 +1,73 @@
+name: Real agent acceptance
+
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Application to develop an automation against
+        required: true
+        default: drawio
+        type: choice
+        options: [drawio, mailbox]
+      timeout_seconds:
+        description: Agent wall-time budget in seconds (30 to 600)
+        required: true
+        default: 600
+        type: number
+
+permissions:
+  contents: read
+
+concurrency:
+  group: agent-acceptance-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  acceptance:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[agent-ci]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: "24"
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          enable-cache: true
+      - name: Install tool and pinned open-source harness
+        run: |
+          uv sync --locked --extra browser
+          npm ci --prefix integration/agent
+          uv run playwright install --with-deps chromium
+      - name: Develop and independently grade the automation
+        env:
+          VIBE_MAA_LLM_API_KEY: ${{ secrets.VIBE_MAA_LLM_API_KEY }}
+          VIBE_MAA_LLM_MODEL: ${{ secrets.VIBE_MAA_LLM_MODEL || vars.VIBE_MAA_LLM_MODEL }}
+          VIBE_MAA_LLM_BASE_URL: ${{ secrets.VIBE_MAA_LLM_BASE_URL || vars.VIBE_MAA_LLM_BASE_URL || 'https://api.openai.com/v1' }}
+          VIBE_MAA_LLM_REASONING_EFFORT: ${{ secrets.VIBE_MAA_LLM_REASONING_EFFORT || vars.VIBE_MAA_LLM_REASONING_EFFORT }}
+          AGENT_TARGET: ${{ inputs.target || 'drawio' }}
+          AGENT_BUDGET: ${{ inputs.timeout_seconds || '600' }}
+        run: |
+          python - <<'PY'
+          import os
+          value = int(os.environ["AGENT_BUDGET"])
+          if not 30 <= value <= 600:
+              raise SystemExit("timeout_seconds must be between 30 and 600")
+          PY
+          uv run python integration/agent/run.py \
+            --target "$AGENT_TARGET" \
+            --output work/agent-acceptance \
+            --timeout-seconds "$AGENT_BUDGET"
+      - name: Upload independent results and ordinary MaaFW deliverable
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: agent-acceptance-${{ inputs.target || 'drawio' }}
+          path: work/agent-acceptance/published/
+          if-no-files-found: warn
+          retention-days: 14

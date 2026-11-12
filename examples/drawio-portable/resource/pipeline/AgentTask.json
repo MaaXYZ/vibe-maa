@@ -1,0 +1,61 @@
+{
+  "AgentTask": {
+    "recognition": "DirectHit",
+    "action": "DoNothing",
+    "next": [
+      "InsertRectangle"
+    ],
+    "timeout": 3000
+  },
+  "InsertRectangle": {
+    "recognition": "TemplateMatch",
+    "template": "RectangleButton.png",
+    "roi": [
+      18,
+      162,
+      38,
+      36
+    ],
+    "threshold": 0.98,
+    "action": "Click",
+    "post_delay": 250,
+    "next": [
+      "SelectRectangle"
+    ],
+    "timeout": 3000
+  },
+  "SelectRectangle": {
+    "action": "Click",
+    "target": [
+      630,
+      420,
+      1,
+      1
+    ],
+    "post_delay": 100,
+    "next": [
+      "EditLabel"
+    ]
+  },
+  "EditLabel": {
+    "action": "ClickKey",
+    "key": 113,
+    "post_delay": 100,
+    "next": [
+      "WriteLabel"
+    ]
+  },
+  "WriteLabel": {
+    "action": "InputText",
+    "input_text": "Vibe Maa",
+    "post_delay": 100,
+    "next": [
+      "FinishEditing"
+    ]
+  },
+  "FinishEditing": {
+    "action": "ClickKey",
+    "key": 27,
+    "post_delay": 150
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "box": [
+    812,
+    459,
+    60,
+    25
+  ],
+  "image_path": "resource/image/new_diagram_create.png",
+  "observation_id": "obs_329de34fa899461a8dc3b55e0250d973",
+  "sha256": "07410bfb319cddb2a90c3d17874733565a06a242e8cd87c0879457c55a19ae43",
+  "source_sha256": "9e110a4c9474c19877a16c1a94ae6fcc6ce4bc9f28f34e128e367a3901d7f9c7"
+}
