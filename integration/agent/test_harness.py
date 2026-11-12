@@ -422,3 +422,79 @@ def test_replay_verifies_original_manifest(tmp_path, monkeypatch):
     source.write_bytes(b"modified")
     with pytest.raises(ValueError, match="checksum mismatch"):
         module.verify_manifest(tmp_path.resolve())
+
+
+def _trace_overflow_records():
+    records = [
+        {
+            "type": "item.completed",
+            "item": {
+                "type": "command_execution",
+                "id": f"item_{index}",
+                "command": "trial",
+                "exit_code": 1 if index == 0 else 0,
+                "aggregated_output": "x" * 6000,
+            },
+        }
+        for index in range(8)
+    ]
+    records.extend(
+        {"type": "error", "error": {"message": "m" * 2000, "code": "c" * 2000, "type": "t" * 2000}}
+        for _ in range(4)
+    )
+    records.append({"type": "turn.completed", "usage": {"input_tokens": 10, "output_tokens": 5}})
+    return records
+
+
+def test_final_trace_metrics_follow_post_serialization_trimming(monkeypatch):
+    import json
+
+    monkeypatch.syspath_prepend(str(DIRECTORY))
+    activity = _module("activity")
+    trace = activity.ActivityTrace(max_bytes=65536)
+    for record in _trace_overflow_records():
+        trace.add(record)
+    assert len(trace.events) == 8 and trace.dropped == 0
+    assert activity.retained_command_metrics(trace.events)["failed_command_items"] == 1
+    result = trace.result()
+    assert len(json.dumps(result, ensure_ascii=False).encode()) <= 65536
+    assert len(result["records"]) < len(trace.events)
+    assert result["truncated_records"] == len(trace.events) - len(result["records"])
+    assert (
+        result["failed_command_items"] == 0
+    )  # The failed command was trimmed from the publication.
+    assert result["completed_command_items"] == len(result["records"])
+    assert trace.result() == result  # Finalization must not mutate accumulated evidence.
+
+
+def test_execute_metrics_match_the_exact_published_trace_after_trimming(tmp_path, monkeypatch):
+    import json
+    import subprocess
+    import sys
+    from types import SimpleNamespace
+
+    monkeypatch.syspath_prepend(str(DIRECTORY))
+    module = _module("run")
+    real_popen, real_trace = subprocess.Popen, module.ActivityTrace
+    records_path = tmp_path / "events.json"
+    records_path.write_text(json.dumps(_trace_overflow_records()), encoding="utf-8")
+    child = "import json,sys; records=json.load(open(sys.argv[1])); [print(json.dumps(r),flush=True) for r in records]"
+
+    def start(_command, **kwargs):
+        return real_popen([sys.executable, "-c", child, str(records_path)], **kwargs)
+
+    monkeypatch.setattr(module.subprocess, "Popen", start)
+    monkeypatch.setattr(
+        module.subprocess, "run", lambda *a, **k: SimpleNamespace(stdout="codex-cli fixture")
+    )
+    monkeypatch.setattr(module, "ActivityTrace", lambda secret: real_trace(secret, max_bytes=65536))
+    private = tmp_path / "private"
+    private.mkdir()
+    result = module.execute("fixture", tmp_path, "fixture prompt", {}, 3, private, True)
+    published = json.loads((tmp_path / "published/agent-activity.json").read_text(encoding="utf-8"))
+    assert published["truncated_records"] > 0
+    assert result["failed_command_items"] == published["failed_command_items"] == 0
+    assert result["activity_truncated_records"] == published["truncated_records"]
+    assert result["tool_items"] == published["tool_items"] == 8
+    assert result["usage"] == published["usage"]
+    assert result["terminal_state"] == published["terminal_state"] == "completed"

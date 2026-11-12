@@ -268,7 +268,8 @@ def execute(
                 time.sleep(min(0.25, max(0.01, seconds - (current - started))))
             activity.read(stream, final=True)
     trace_path = private.parent / "published" / "agent-activity.json"
-    write_result(trace_path, activity.result())
+    final_trace = activity.result()
+    write_result(trace_path, final_trace)
     print(json.dumps(activity.progress(time.monotonic() - started)), flush=True)
     raw = raw_path.read_text(encoding="utf-8", errors="replace")
     sanitized = redact(raw, secret)
@@ -280,11 +281,6 @@ def execute(
     version = subprocess.run(
         [binary, "--version"], text=True, capture_output=True, check=True
     ).stdout.strip()
-    completed_commands = {
-        item.get("item_id", f"record_{index}"): item
-        for index, item in enumerate(activity.events)
-        if item.get("tool_type") == "command_execution" and item.get("event") == "item.completed"
-    }
     return {
         "returncode": returncode,
         "timed_out": timed_out,
@@ -294,21 +290,18 @@ def execute(
         "elapsed_seconds": round(time.monotonic() - started, 3),
         "budget_scope": "wall_time_only_not_a_currency_or_token_limit",
         "error": failure,
-        "usage": dict(activity.usage) or None,
-        "usage_last_turn": activity.usage_last_turn,
-        "completed_turns": activity.completed_turns,
-        "usage_measurement": "sum_of_reported_turn.completed_events",
-        "terminal_state": activity.terminal_state,
+        "usage": final_trace["usage"] or None,
+        "usage_last_turn": final_trace["usage_last_turn"],
+        "completed_turns": final_trace["completed_turns"],
+        "usage_measurement": final_trace["usage_measurement"],
+        "terminal_state": final_trace["terminal_state"],
         "activity_trace": trace_path.name,
-        "historical_error_count": activity.event_types["error"]
-        + activity.event_types["turn.failed"],
-        "tool_items": len(activity.tool_ids),
-        "failed_command_items": sum(
-            type(item.get("exit_code")) is int and item["exit_code"] != 0
-            for item in completed_commands.values()
-        ),
-        "command_failure_measurement": "retained_completed_command_items",
-        "activity_truncated_records": activity.dropped,
+        "historical_error_count": final_trace["event_types"].get("error", 0)
+        + final_trace["event_types"].get("turn.failed", 0),
+        "tool_items": final_trace["tool_items"],
+        "failed_command_items": final_trace["failed_command_items"],
+        "command_failure_measurement": final_trace["command_failure_measurement"],
+        "activity_truncated_records": final_trace["truncated_records"],
     }
 
 

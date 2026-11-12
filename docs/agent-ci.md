@@ -121,20 +121,14 @@ uv run python integration/agent/run.py --target drawio --output work/agent-low -
 `integration/agent/regrade.py` 可以在新环境独立重放，验证前后源码不变：
 
 ```bash
-uv run python integration/agent/regrade.py --project examples/agent-generated/drawio --output work/replay
+uv run python integration/agent/regrade.py \
+  --project examples/agent-generated/drawio \
+  --cache work/targets --output work/drawio-replay
 ```
 
 初次验收错误地把 draw.io 的默认 `label` 矩形渲染器视为非矩形，原 CI 红色记录保留。
 修正后的检查验证实际矩形渲染器，并用真实椭圆做反例。重放与重新调用模型分别记录；
 不同系统字体或渲染环境仍可能使原来的图像模板失配，不能通过手动改交付物来冒充原样通过。
-
-## 免费重放已有交付物
-
-```bash
-uv run python integration/agent/regrade.py \
-  --project examples/agent-generated/drawio \
-  --cache work/targets --output work/drawio-replay
-```
 
 这条命令不加载 harness，也不调用模型 API。存在原始 `manifest.json` 时先核验全部来源文件，
 然后在新应用会话中运行原脚本，记录执行前后源码哈希、原生证据包和最后截图。

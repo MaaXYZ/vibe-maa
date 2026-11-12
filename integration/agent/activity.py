@@ -83,6 +83,22 @@ def safe_text(value: Any, secret: str | None, limit: int = MAX_OUTPUT_BYTES) -> 
     )
 
 
+def retained_command_metrics(records: list[dict[str, Any]]) -> dict[str, Any]:
+    completed = {
+        item.get("item_id", f"record_{index}"): item
+        for index, item in enumerate(records)
+        if item.get("tool_type") == "command_execution" and item.get("event") == "item.completed"
+    }
+    return {
+        "completed_command_items": len(completed),
+        "failed_command_items": sum(
+            type(item.get("exit_code")) is int and item["exit_code"] != 0
+            for item in completed.values()
+        ),
+        "command_failure_measurement": "retained_completed_command_items",
+    }
+
+
 class ActivityTrace:
     def __init__(self, secret: str | None = None, max_bytes: int = MAX_TRACE_BYTES):
         self.secret = secret
@@ -218,7 +234,7 @@ class ActivityTrace:
             "event_count": sum(self.event_types.values()),
             "event_types": dict(self.event_types),
             "tool_items": len(self.tool_ids),
-            "records": self.events,
+            "records": list(self.events),
             "truncated_records": self.dropped,
             "byte_budget": self.max_bytes,
             "terminal_state": self.terminal_state,
@@ -228,11 +244,12 @@ class ActivityTrace:
             "completed_turns": self.completed_turns,
             "usage_measurement": "sum_of_reported_turn.completed_events",
         }
-        result["records"] = list(self.events)
-        while (
-            len(json.dumps(result, ensure_ascii=False).encode()) > self.max_bytes
-            and result["records"]
-        ):
+        while True:
+            result.update(retained_command_metrics(result["records"]))
+            if (
+                len(json.dumps(result, ensure_ascii=False).encode()) <= self.max_bytes
+                or not result["records"]
+            ):
+                return result
             result["records"].pop(0)
             result["truncated_records"] += 1
-        return result

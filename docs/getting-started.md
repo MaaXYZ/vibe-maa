@@ -58,9 +58,7 @@ vibe-maa capabilities --method act
 vibe-maa --project ./example context --max-bytes 6000
 ```
 
-恢复已有任务时使用 `vibe-maa --project ./example context --task mailbox`。
-
-能力索引提供方法清单；按方法查询返回参数 JSON Schema、CLI 示例、前置条件和结果语义。上下文默认限制在 12 KB，可选 2–64 KB；省略计数会标出截断内容。保存的图片标为历史，不构成当前输入授权。需要完整约束、证据和验收解释时继续读取 `task context NAME`。
+能力索引提供方法清单；按方法查询返回参数 JSON Schema、CLI 示例、前置条件和结果语义。上下文默认限制在 12 KB，可选 2–64 KB；超出预算的内容会被截断，并在结果中注明省略项数量。保存的图片标为历史，不构成当前输入授权。需要完整约束、证据和验收解释时继续读取 `task context NAME`。
 
 任务定义保存在 `dev/tasks/`，可以进入版本控制：
 
@@ -69,6 +67,8 @@ vibe-maa --project ./example task create mailbox --objective "打开邮箱并返
 vibe-maa --project ./example task list
 vibe-maa --project ./example task context mailbox
 ```
+
+恢复已有任务时使用 `vibe-maa --project ./example context --task mailbox`。
 
 可重复使用 `--constraint` 记录资源使用等要求。这些文字要求由编程 AI 遵守，工具不会声称它们已被自动验证。入口与完成条件要由可观察事实支撑，不能把 `DirectHit` 当作完成证明。
 
