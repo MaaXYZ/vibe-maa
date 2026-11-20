@@ -90,9 +90,11 @@ def _fixture_pdf(pages: tuple[tuple[str, str], ...]) -> bytes:
     return bytes(result)
 
 
+_FIXTURES = {variant: _fixture_pdf(pages) for variant, pages in _DOCUMENTS.items()}
+
+
 @contextmanager
 def launch(cache: Path, variant: str = VARIANTS[0]) -> Iterator[tuple[str, dict[str, Any]]]:
-    document = _fixture_pdf(_DOCUMENTS[variant])
     document_path = "/fixtures/release.pdf"
     webroot = provision_archive(
         cache,
@@ -103,9 +105,12 @@ def launch(cache: Path, variant: str = VARIANTS[0]) -> Iterator[tuple[str, dict[
     )
     metadata = {
         **_UPSTREAM,
-        "fixture_sha256": hashlib.sha256(document).hexdigest(),
+        "fixture_sha256": {
+            name: hashlib.sha256(document).hexdigest() for name, document in _FIXTURES.items()
+        },
     }
-    with serve_directory(webroot, assets={document_path: ("application/pdf", document)}) as origin:
+    assets = {document_path: ("application/pdf", _FIXTURES[variant])}
+    with serve_directory(webroot, assets=assets) as origin:
         yield f"{origin}/web/viewer.html?{urlencode({'file': document_path})}", metadata
 
 

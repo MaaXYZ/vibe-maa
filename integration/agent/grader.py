@@ -21,7 +21,16 @@ BROWSER_TARGETS = {"drawio": DRAWIO, "jupyterlab": JUPYTERLAB, "pdfjs": PDFJS}
 TARGETS = (*BROWSER_TARGETS, "mailbox")
 BROWSER_WIDTH, BROWSER_HEIGHT = 1280, 720
 ENTRY = "AgentTask"
-ALLOWED_ACTIONS = {"DoNothing", "Click", "LongPress", "Swipe", "ClickKey", "InputText"}
+ALLOWED_ACTIONS = {
+    "DoNothing",
+    "Click",
+    "LongPress",
+    "Swipe",
+    "ClickKey",
+    "KeyDown",
+    "KeyUp",
+    "InputText",
+}
 
 
 def validate_submission(project: Path) -> None:
@@ -99,44 +108,40 @@ def grade_target(
     upstream = None
     for repetition, variant in enumerate(target.variants, start=1):
         check = {"repetition": repetition, "starting_state": variant, "passed": False}
+        blocked = []
         try:
             with (
-                target.launch(cache, variant) as (url, upstream),
+                target.launch(cache, variant) as (url, metadata),
                 browser_oracle(url, target) as blocked,
+                contextlib.closing(DevelopmentService(project)) as service,
             ):
-                try:
-                    service = DevelopmentService(project)
-                    try:
-                        options = {
-                            "backend": "browser",
-                            "url": url,
-                            "width": BROWSER_WIDTH,
-                            "height": BROWSER_HEIGHT,
-                        }
-                        if browser_executable:
-                            options["browser_executable"] = browser_executable
-                        opened = service.session_open(**options)
-                        session_id = opened["session_id"]
-                        worker = service.sessions[session_id].backend._worker
-                        worker.call("__grader_ready")
-                        before = worker.call("__grader_snapshot")
-                        check["before"] = before
-                        report = service.run(session_id, ENTRY, timeout_seconds=30)
-                        check.update(
-                            run_id=report["run_id"], execution_status=report["execution_status"]
-                        )
-                        after = worker.call("__grader_snapshot")
-                        completed = target.completed(before, after)
-                        check.update(after=after, application_goal_met=completed)
-                    finally:
-                        service.close()
-                    check["passed"] = (
-                        report["execution_status"] == "succeeded" and completed and not blocked
-                    )
-                finally:
-                    blocked_requests.extend(blocked)
+                if upstream is None:
+                    upstream = metadata
+                options = {
+                    "backend": "browser",
+                    "url": url,
+                    "width": BROWSER_WIDTH,
+                    "height": BROWSER_HEIGHT,
+                }
+                if browser_executable:
+                    options["browser_executable"] = browser_executable
+                opened = service.session_open(**options)
+                session_id = opened["session_id"]
+                worker = service.sessions[session_id].backend._worker
+                worker.call("__grader_ready")
+                before = worker.call("__grader_snapshot")
+                check["before"] = before
+                report = service.run(session_id, ENTRY, timeout_seconds=30)
+                check.update(run_id=report["run_id"], execution_status=report["execution_status"])
+                after = worker.call("__grader_snapshot")
+                completed = target.completed(before, after)
+                check.update(after=after, application_goal_met=completed)
+            check["passed"] = (
+                report["execution_status"] == "succeeded" and completed and not blocked
+            )
         except Exception as exc:
-            check.update(passed=False, error={"type": type(exc).__name__, "message": str(exc)})
+            check["error"] = {"type": type(exc).__name__, "message": str(exc)}
+        blocked_requests.extend(blocked)
         checks.append(check)
     grade = {
         "passed": all(c["passed"] for c in checks),

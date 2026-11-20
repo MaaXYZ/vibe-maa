@@ -1,4 +1,5 @@
 name: Real agent acceptance
+run-name: Agent acceptance (${{ inputs.target || 'drawio' }})
 
 on:
   push:

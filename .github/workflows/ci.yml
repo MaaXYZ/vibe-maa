@@ -54,3 +54,44 @@ jobs:
       - run: uv sync --locked --extra browser
       - run: uv run playwright install --with-deps chromium
       - run: uv run pytest -m browser
+
+  application-replay:
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [jupyterlab, pdfjs]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      APP_TARGET: ${{ matrix.target }}
+      APP_CACHE: .cache/targets
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          enable-cache: true
+      - run: uv sync --locked --extra browser
+      - run: uv run playwright install --with-deps chromium
+      - name: Install pinned JupyterLab
+        if: matrix.target == 'jupyterlab'
+        run: |
+          uv venv --python 3.12 "$APP_CACHE/jupyterlab/venv"
+          uv pip sync --python "$APP_CACHE/jupyterlab/venv" integration/agent/jupyterlab.requirements.txt
+      - name: Replay and independently verify the MaaFW project
+        run: |
+          uv run python integration/agent/regrade.py \
+            --target "$APP_TARGET" \
+            --project "examples/$APP_TARGET-portable" \
+            --cache "$APP_CACHE" \
+            --output "work/$APP_TARGET-replay"
+      - name: Reject successful Pipeline execution without the application outcome
+        run: uv run pytest -q integration/agent/test_application_acceptance.py -k "$APP_TARGET"
+      - if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: application-replay-${{ matrix.target }}
+          path: work/${{ matrix.target }}-replay/
+          if-no-files-found: warn

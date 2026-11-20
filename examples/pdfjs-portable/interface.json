@@ -1,0 +1,18 @@
+{
+  "interface_version": 2,
+  "name": "pdfjs-portable-example",
+  "controller": [],
+  "resource": [
+    {
+      "name": "Default",
+      "path": ["./resource"]
+    }
+  ],
+  "task": [
+    {
+      "name": "AgentTask",
+      "label": "Find the release notes match",
+      "entry": "AgentTask"
+    }
+  ]
+}

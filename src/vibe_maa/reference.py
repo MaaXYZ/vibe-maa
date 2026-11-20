@@ -146,11 +146,14 @@ _TOPICS: dict[str, dict[str, Any]] = {
     },
     "actions": {
         "content": (
-            "Use exact native action names: DoNothing, Click, Swipe, ClickKey, InputText. "
+            "Use exact native action names: DoNothing, Click, Swipe, ClickKey, KeyDown, KeyUp, InputText. "
             "Click target defaults to true: the just-matched box; target [x,y] is a fixed point; "
             "[x,y,width,height] is a region, with a sampled click location. Numeric coordinates "
             "must come from observations. Swipe uses begin/end and duration in milliseconds. "
             "ClickKey uses numeric key, not key_name; InputText uses input_text, not text. "
+            "A ClickKey array taps keys sequentially. For a browser shortcut, hold the modifier "
+            "with KeyDown and auto_up:true, tap the other key using ClickKey, then release the "
+            "modifier with KeyUp. Auto-release lets MaaFramework clean up on task exit. "
             "Key codes depend on the controller: browser/Win32 VK 113 is F2, while Android 4 is "
             "Back. Browser supports its documented subset of VK codes and no DOM selectors; "
             "some native controllers limit text to ASCII. Observe again after input. CLI act "
@@ -165,6 +168,16 @@ _TOPICS: dict[str, dict[str, Any]] = {
                 "target": True,
             },
             "browser_or_win32_f2": {"recognition": "DirectHit", "action": "ClickKey", "key": 113},
+            "browser_control_s": {
+                "HoldControl": {
+                    "action": "KeyDown",
+                    "key": 17,
+                    "auto_up": True,
+                    "next": ["PressS"],
+                },
+                "PressS": {"action": "ClickKey", "key": 83, "next": ["ReleaseControl"]},
+                "ReleaseControl": {"action": "KeyUp", "key": 17},
+            },
             "android_back": {"recognition": "DirectHit", "action": "ClickKey", "key": 4},
             "type_text": {
                 "recognition": "DirectHit",

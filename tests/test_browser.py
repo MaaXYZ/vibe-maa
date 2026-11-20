@@ -17,6 +17,7 @@ import pytest
 
 from vibe_maa.backends.browser import BrowserBackend
 from vibe_maa.errors import DevError
+from vibe_maa.reference import show
 
 pytestmark = pytest.mark.browser
 
@@ -29,6 +30,12 @@ input{position:absolute;left:20px;top:100px;width:150px;height:40px}
 <input oninput="if(this.value==='hello')document.body.style.backgroundColor='rgb(255,0,0)'">
 <div id="drag"></div><script>
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.body.style.backgroundColor='rgb(0,0,255)'});
+document.addEventListener('keydown', e => {
+    if (e.key === 's') {
+        e.preventDefault();
+        document.body.style.backgroundColor = e.ctrlKey ? 'rgb(255,255,0)' : 'rgb(0,255,255)';
+    }
+});
 let start=null;
 document.getElementById('drag').addEventListener('pointerdown',e=>start=e.clientX);
 document.addEventListener('pointerup',e=>{if(start!==null&&e.clientX-start>20)document.body.style.backgroundColor='rgb(128,0,128)';start=null});
@@ -163,6 +170,22 @@ def test_close_from_another_thread_releases_owner_and_blocks_operations(browser)
     with pytest.raises(DevError):
         backend.capture()
     backend.close()  # Idempotent, including the fixture's final close.
+
+
+@pytest.mark.parametrize("explicit_release", [True, False])
+def test_native_shortcut_dispatches_and_releases_modifier(browser, explicit_release):
+    backend, resource = browser
+    nodes = show("actions")["examples"]["browser_control_s"]
+    if not explicit_release:
+        nodes["PressS"]["next"] = []
+        del nodes["ReleaseControl"]
+    (resource / "test.json").write_text(json.dumps(nodes), encoding="utf-8")
+
+    result = backend.run("HoldControl", {}, 10, lambda *_: None)
+    assert result["execution_status"] == "succeeded"
+    assert np.array_equal(backend.capture()[0, 0], [0, 255, 255])  # Ctrl+S
+    assert backend.act({"type": "key", "key": 83})
+    assert np.array_equal(backend.capture()[0, 0], [255, 255, 0])  # Plain S
 
 
 @pytest.mark.parametrize(

@@ -19,6 +19,7 @@ from urllib.parse import urlsplit
 
 from activity import ActivityTrace
 from grader import (
+    ALLOWED_ACTIONS,
     BROWSER_HEIGHT,
     BROWSER_TARGETS,
     BROWSER_WIDTH,
@@ -194,8 +195,9 @@ def prompt_for(target: str, project: Path, url: str | None, seconds: int = 600) 
         "Use only vibe-maa observations/screenshots and input operations for application exploration; "
         "inspect saved PNGs with your image viewing tool. Do not use DOM, accessibility, Playwright "
         "directly, application internals, or hidden grader information to implement the automation. "
-        "You may use native Click, LongPress, Swipe, ClickKey, InputText, and DoNothing actions, plus "
-        "built-in recognition. Shell/Command/Custom actions are not allowed in the deliverable. "
+        f"Use native actions ({', '.join(sorted(ALLOWED_ACTIONS))}) and built-in recognition. "
+        "For keyboard shortcuts, see `vibe-maa reference --topic actions` for holding and releasing "
+        "modifier keys. Shell/Command/Custom actions are not allowed in the deliverable. "
         "Edit ordinary files under resource/pipeline and resource/image. "
         "Expose the AgentTask entry in interface.json's task list for a normal MaaFW handoff. "
         f"The independent grader will start new sessions and run {ENTRY}; completion claims are "
