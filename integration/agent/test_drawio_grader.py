@@ -48,12 +48,13 @@ def test_real_shape_renderer_acceptance(tmp_path, palette_x, expected):
     }
     (tmp_path / "resource/pipeline/task.json").write_text(json.dumps(nodes), encoding="utf-8")
     cache = Path(os.environ.get("VIBE_MAA_DRAWIO_CACHE", "work/targets"))
-    with grader.drawio_server(cache) as (url, _upstream):
-        result = grader.grade_drawio(tmp_path, url, os.environ.get("VIBE_MAA_BROWSER_EXECUTABLE"))
+    result, _ = grader.grade_target(
+        tmp_path, "drawio", cache, os.environ.get("VIBE_MAA_BROWSER_EXECUTABLE")
+    )
     assert result["passed"] is expected
     for check in result["checks"]:
         assert check["execution_status"] == "succeeded"
-        assert len(check["document"]) == 1 and check["document"][0]["label"] == "Vibe Maa"
-        assert check["document"][0]["rectangle_renderer"] is expected
-        assert check["document"][0]["ellipse_renderer"] is not expected
+        assert len(check["after"]) == 1 and check["after"][0]["label"] == "Vibe Maa"
+        assert check["after"][0]["rectangle_renderer"] is expected
+        assert check["after"][0]["ellipse_renderer"] is not expected
     assert result["blocked_external_requests"] == []

@@ -10,7 +10,7 @@ import sys
 from pathlib import Path, PurePosixPath
 from typing import Any
 
-from grader import drawio_server, grade_drawio, grade_mailbox, write_result
+from grader import TARGETS, grade_target, write_result
 
 from vibe_maa.reports import Reports
 
@@ -85,12 +85,7 @@ def replay(
     if not before:
         raise ValueError("The submitted project is empty")
     output.mkdir(parents=True)
-    upstream = None
-    if target == "drawio":
-        with drawio_server(cache.resolve()) as (url, upstream):
-            grade = grade_drawio(project, url, browser_executable)
-    else:
-        grade = grade_mailbox(project)
+    grade, upstream = grade_target(project, target, cache.resolve(), browser_executable)
     after = source_hashes(project)
     result = {
         "schema_version": 1,
@@ -123,7 +118,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--project", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--target", choices=["drawio", "mailbox"], default="drawio")
+    parser.add_argument("--target", choices=TARGETS, default="drawio")
     parser.add_argument("--cache", type=Path, default=Path("work/targets"))
     parser.add_argument("--browser-executable")
     parser.add_argument("--source-archive", type=Path)

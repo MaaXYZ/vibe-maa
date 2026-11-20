@@ -3,22 +3,23 @@
 from __future__ import annotations
 
 import contextlib
-import functools
-import http.server
-import importlib.util
 import json
-import threading
 from pathlib import Path
-from typing import Any, Iterator
-from urllib.parse import urlsplit
+from typing import Any
 
 import numpy as np
+from browser_support import browser_oracle
+from drawio_target import TARGET as DRAWIO
+from jupyterlab_target import TARGET as JUPYTERLAB
+from pdfjs_target import TARGET as PDFJS
 
 from vibe_maa.errors import DevError
 from vibe_maa.evidence import read_image
 from vibe_maa.service import DevelopmentService, load_nodes
 
-ROOT = Path(__file__).resolve().parents[2]
+BROWSER_TARGETS = {"drawio": DRAWIO, "jupyterlab": JUPYTERLAB, "pdfjs": PDFJS}
+TARGETS = (*BROWSER_TARGETS, "mailbox")
+BROWSER_WIDTH, BROWSER_HEIGHT = 1280, 720
 ENTRY = "AgentTask"
 ALLOWED_ACTIONS = {"DoNothing", "Click", "LongPress", "Swipe", "ClickKey", "InputText"}
 
@@ -41,33 +42,6 @@ def validate_submission(project: Path) -> None:
         kind = recognition.get("type") if isinstance(recognition, dict) else recognition
         if kind == "Custom":
             raise DevError("INVALID_SUBMISSION", "Custom handlers are outside this benchmark")
-
-
-class _QuietHandler(http.server.SimpleHTTPRequestHandler):
-    def log_message(self, format: str, *args: Any) -> None:
-        pass
-
-
-@contextlib.contextmanager
-def drawio_server(cache: Path) -> Iterator[tuple[str, dict[str, Any]]]:
-    source = ROOT / "integration/targets/drawio/prepare.py"
-    spec = importlib.util.spec_from_file_location("vibe_drawio_prepare", source)
-    if spec is None or spec.loader is None:
-        raise RuntimeError("draw.io provisioner is unavailable")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    webroot = module.provision(cache)
-    metadata = module.manifest()
-    handler = functools.partial(_QuietHandler, directory=str(webroot))
-    server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
-    thread = threading.Thread(target=server.serve_forever, daemon=True)
-    thread.start()
-    try:
-        yield f"http://127.0.0.1:{server.server_port}{metadata['launch_path']}", metadata
-    finally:
-        server.shutdown()
-        server.server_close()
-        thread.join(timeout=5)
 
 
 def grade_mailbox(project: Path) -> dict[str, Any]:
@@ -106,123 +80,73 @@ def grade_mailbox(project: Path) -> dict[str, Any]:
     }
 
 
-@contextlib.contextmanager
-def _drawio_oracle(url: str) -> Iterator[list[str]]:
-    """Test-only private DOM oracle. No DOM operation is added to the product API."""
-    from playwright.sync_api import Browser
-
-    from vibe_maa.backends.browser import _BrowserWorker
-
-    original = _BrowserWorker._dispatch
-    original_context = Browser.new_context
-    parsed = urlsplit(url)
-    origin = f"{parsed.scheme}://{parsed.netloc}"
-    blocked = []
-
-    def context(browser: Any, *args: Any, **kwargs: Any) -> Any:
-        kwargs["service_workers"] = "block"
-        instance = original_context(browser, *args, **kwargs)
-        instance.add_init_script("""
-            window.addEventListener('load', () => {
-                const init = App.prototype.init;
-                App.prototype.init = function() {
-                    window.__vibe_grader_editor = this;
-                    return init.apply(this, arguments);
-                };
-            }, {once: true});
-        """)
-
-        def route(request: Any) -> None:
-            target = urlsplit(request.request.url)
-            if f"{target.scheme}://{target.netloc}" == origin or target.scheme in {"data", "blob"}:
-                request.continue_()
-            else:
-                blocked.append(request.request.url)
-                request.abort()
-
-        instance.route("**/*", route)
-        return instance
-
-    def dispatch(page: Any, operation: str, args: tuple[Any, ...]) -> Any:
-        if operation == "__grader_ready":
-            page.wait_for_function(
-                "window.__vibe_grader_editor && __vibe_grader_editor.getCurrentFile() && __vibe_grader_editor.editor.graph.isEnabled()",
-                timeout=10000,
-            )
-            return True
-        if operation == "__grader_document":
-            return page.evaluate("""() => {
-                const graph = window.__vibe_grader_editor.editor.graph;
-                return Object.values(graph.model.cells).filter(cell => cell.vertex).map(cell => ({
-                    label: graph.convertValueToString(cell), style: cell.style || '',
-                    shape: graph.getCellStyle(cell).shape,
-                    rectangle_renderer: graph.view.getState(cell).shape instanceof mxRectangleShape,
-                    ellipse_renderer: graph.view.getState(cell).shape instanceof mxEllipse,
-                    width: cell.geometry.width, height: cell.geometry.height
-                }));
-            }""")
-        return original(page, operation, args)
-
-    _BrowserWorker._dispatch = staticmethod(dispatch)
-    Browser.new_context = context
-    try:
-        yield blocked
-    finally:
-        _BrowserWorker._dispatch = staticmethod(original)
-        Browser.new_context = original_context
+def launch_target(name: str, cache: Path):
+    if name == "mailbox":
+        return contextlib.nullcontext((None, None))
+    target = BROWSER_TARGETS[name]
+    return target.launch(cache, target.variants[0])
 
 
-def grade_drawio(project: Path, url: str, browser_executable: str | None = None) -> dict[str, Any]:
+def grade_target(
+    project: Path, name: str, cache: Path, browser_executable: str | None = None
+) -> tuple[dict[str, Any], dict[str, Any] | None]:
+    if name == "mailbox":
+        return grade_mailbox(project), None
+    target = BROWSER_TARGETS[name]
     validate_submission(project)
     checks = []
-    with _drawio_oracle(url) as blocked:
-        for repetition in range(2):
-            service = DevelopmentService(project)
-            try:
-                options = {"backend": "browser", "url": url}
-                if browser_executable:
-                    options["browser_executable"] = browser_executable
-                opened = service.session_open(**options)
-                backend = service.sessions[opened["session_id"]].backend
-                backend._worker.call("__grader_ready")
-                before = backend._worker.call("__grader_document")
-                report = service.run(opened["session_id"], ENTRY, timeout_seconds=30)
-                document = backend._worker.call("__grader_document")
-                changed = completed_drawio_document(before, document)
-                checks.append(
-                    {
-                        "repetition": repetition + 1,
-                        "execution_status": report["execution_status"],
-                        "label_in_canvas": changed,
-                        "document": document,
-                        "run_id": report["run_id"],
-                        "passed": report["execution_status"] == "succeeded" and changed,
-                    }
-                )
-            finally:
-                service.close()
-    return {
-        "passed": all(c["passed"] for c in checks) and not blocked,
-        "target": "drawio",
+    blocked_requests = []
+    upstream = None
+    for repetition, variant in enumerate(target.variants, start=1):
+        check = {"repetition": repetition, "starting_state": variant, "passed": False}
+        try:
+            with (
+                target.launch(cache, variant) as (url, upstream),
+                browser_oracle(url, target) as blocked,
+            ):
+                try:
+                    service = DevelopmentService(project)
+                    try:
+                        options = {
+                            "backend": "browser",
+                            "url": url,
+                            "width": BROWSER_WIDTH,
+                            "height": BROWSER_HEIGHT,
+                        }
+                        if browser_executable:
+                            options["browser_executable"] = browser_executable
+                        opened = service.session_open(**options)
+                        session_id = opened["session_id"]
+                        worker = service.sessions[session_id].backend._worker
+                        worker.call("__grader_ready")
+                        before = worker.call("__grader_snapshot")
+                        check["before"] = before
+                        report = service.run(session_id, ENTRY, timeout_seconds=30)
+                        check.update(
+                            run_id=report["run_id"], execution_status=report["execution_status"]
+                        )
+                        after = worker.call("__grader_snapshot")
+                        completed = target.completed(before, after)
+                        check.update(after=after, application_goal_met=completed)
+                    finally:
+                        service.close()
+                    check["passed"] = (
+                        report["execution_status"] == "succeeded" and completed and not blocked
+                    )
+                finally:
+                    blocked_requests.extend(blocked)
+        except Exception as exc:
+            check.update(passed=False, error={"type": type(exc).__name__, "message": str(exc)})
+        checks.append(check)
+    grade = {
+        "passed": all(c["passed"] for c in checks),
+        "target": name,
         "scope": "application",
         "checks": checks,
-        "blocked_external_requests": blocked,
-        "oracle": "fresh real application canvas DOM, independent from agent-supplied goals",
+        "blocked_external_requests": blocked_requests,
+        "oracle": target.oracle,
     }
-
-
-def completed_drawio_document(before: list[dict[str, Any]], document: list[dict[str, Any]]) -> bool:
-    # draw.io's default rectangular palette shape uses mxLabel, a subclass of mxRectangleShape.
-    # The style ID is "label"; comparing it to "rectangle" falsely rejects the canonical shape.
-    return (
-        not before
-        and len(document) == 1
-        and document[0]["label"] == "Vibe Maa"
-        and document[0].get("rectangle_renderer") is True
-        and document[0].get("ellipse_renderer") is False
-        and document[0]["width"] > 0
-        and document[0]["height"] > 0
-    )
+    return grade, upstream
 
 
 def write_result(path: Path, result: dict[str, Any]) -> None:

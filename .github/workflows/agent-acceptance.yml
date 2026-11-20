@@ -9,7 +9,7 @@ on:
         required: true
         default: drawio
         type: choice
-        options: [drawio, mailbox]
+        options: [drawio, mailbox, jupyterlab, pdfjs]
       timeout_seconds:
         description: Agent wall-time budget in seconds (30 to 600)
         required: true
@@ -26,7 +26,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: agent-acceptance-${{ github.ref }}
+  group: agent-acceptance-${{ github.ref }}-${{ inputs.target || 'drawio' }}
   cancel-in-progress: false
 
 jobs:
@@ -34,6 +34,9 @@ jobs:
     if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[agent-ci]')
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      AGENT_TARGET: ${{ inputs.target || 'drawio' }}
+      APP_CACHE: .cache/targets
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: actions/setup-node@v7.1.0
@@ -50,6 +53,11 @@ jobs:
           uv sync --locked --extra browser
           npm ci --prefix integration/agent
           uv run playwright install --with-deps chromium
+      - name: Install pinned JupyterLab
+        if: env.AGENT_TARGET == 'jupyterlab'
+        run: |
+          uv venv --python 3.12 "$APP_CACHE/jupyterlab/venv"
+          uv pip sync --python "$APP_CACHE/jupyterlab/venv" integration/agent/jupyterlab.requirements.txt
       - name: Prove tool service persistence across real Codex sandboxes without model calls
         run: uv run python integration/agent/preflight.py --output work/codex-preflight.json
       - name: Develop and independently grade the automation
@@ -58,7 +66,6 @@ jobs:
           VIBE_MAA_LLM_MODEL: ${{ secrets.VIBE_MAA_LLM_MODEL || vars.VIBE_MAA_LLM_MODEL }}
           VIBE_MAA_LLM_BASE_URL: ${{ secrets.VIBE_MAA_LLM_BASE_URL || vars.VIBE_MAA_LLM_BASE_URL || 'https://api.openai.com/v1' }}
           VIBE_MAA_LLM_REASONING_EFFORT: ${{ secrets.VIBE_MAA_LLM_REASONING_EFFORT || vars.VIBE_MAA_LLM_REASONING_EFFORT }}
-          AGENT_TARGET: ${{ inputs.target || 'drawio' }}
           AGENT_BUDGET: ${{ inputs.timeout_seconds || '600' }}
           AGENT_REASONING_EFFORT: ${{ inputs.reasoning_effort || 'configured' }}
         run: |
@@ -70,6 +77,7 @@ jobs:
           PY
           uv run python integration/agent/run.py \
             --target "$AGENT_TARGET" \
+            --cache "$APP_CACHE" \
             --output work/agent-acceptance \
             --timeout-seconds "$AGENT_BUDGET" \
             --reasoning-effort "$AGENT_REASONING_EFFORT"
