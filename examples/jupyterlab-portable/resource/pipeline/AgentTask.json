@@ -11,7 +11,7 @@
   "SelectMarkdown": {
     "recognition": "TemplateMatch",
     "template": "SelectedMarkdown.png",
-    "roi": [40, 130, 29, 57],
+    "roi": [40, 116, 29, 82],
     "threshold": 0.9,
     "action": "Click",
     "next": ["RenameSelected"]
@@ -22,10 +22,6 @@
     "next": ["WriteFilename"]
   },
   "WriteFilename": {
-    "recognition": "TemplateMatch",
-    "template": "RenameField.png",
-    "roi": [253, 129, 28, 58],
-    "threshold": 0.9,
     "action": "InputText",
     "input_text": "release-notes",
     "next": ["ConfirmRename"]
