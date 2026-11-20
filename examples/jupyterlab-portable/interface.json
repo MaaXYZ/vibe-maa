@@ -1,0 +1,7 @@
+{
+  "interface_version": 2,
+  "name": "jupyterlab-portable-example",
+  "controller": [],
+  "resource": [{"name": "Default", "path": ["./resource"]}],
+  "task": [{"name": "AgentTask", "entry": "AgentTask"}]
+}

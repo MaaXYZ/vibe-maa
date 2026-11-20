@@ -1,0 +1,77 @@
+{
+  "AgentTask": {
+    "recognition": "TemplateMatch",
+    "template": "MarkdownLauncher.png",
+    "roi": [520, 160, 105, 108],
+    "threshold": 0.95,
+    "action": "Click",
+    "timeout": 5000,
+    "next": ["SelectMarkdown"]
+  },
+  "SelectMarkdown": {
+    "recognition": "TemplateMatch",
+    "template": "SelectedMarkdown.png",
+    "roi": [40, 116, 29, 82],
+    "threshold": 0.9,
+    "action": "Click",
+    "next": ["RenameSelected"]
+  },
+  "RenameSelected": {
+    "action": "ClickKey",
+    "key": 113,
+    "next": ["WriteFilename"]
+  },
+  "WriteFilename": {
+    "action": "InputText",
+    "input_text": "release-notes",
+    "next": ["ConfirmRename"]
+  },
+  "ConfirmRename": {
+    "action": "ClickKey",
+    "key": 13,
+    "next": ["FocusEditor"],
+    "timeout": 5000
+  },
+  "FocusEditor": {
+    "recognition": "TemplateMatch",
+    "template": "EditorTab.png",
+    "roi": [291, 33, 26, 25],
+    "threshold": 0.9,
+    "action": "Click",
+    "target": [338, 78],
+    "next": ["WriteMarkdown"]
+  },
+  "WriteMarkdown": {
+    "action": "InputText",
+    "input_text": "# Vibe Maa\nAutomation verified.",
+    "next": ["HoldControl"]
+  },
+  "HoldControl": {
+    "recognition": "TemplateMatch",
+    "template": "DirtyEditorTab.png",
+    "roi": [478, 35, 23, 24],
+    "threshold": 0.95,
+    "action": "KeyDown",
+    "key": 17,
+    "auto_up": true,
+    "next": ["SaveMarkdown"]
+  },
+  "SaveMarkdown": {
+    "action": "ClickKey",
+    "key": 83,
+    "next": ["ReleaseControl"]
+  },
+  "ReleaseControl": {
+    "action": "KeyUp",
+    "key": 17,
+    "next": ["SaveCompleted"],
+    "timeout": 5000
+  },
+  "SaveCompleted": {
+    "recognition": "TemplateMatch",
+    "template": "SavedEditorTab.png",
+    "roi": [478, 35, 23, 24],
+    "threshold": 0.95,
+    "action": "DoNothing"
+  }
+}

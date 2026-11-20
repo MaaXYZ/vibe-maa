@@ -197,7 +197,7 @@ def test_publication_rejects_secret_inside_zip(tmp_path, monkeypatch):
 
 
 def test_drawio_default_label_renderer_is_a_rectangle():
-    grader = _module("grader")
+    target = _module("drawio_target")
     rectangle = {
         "label": "Vibe Maa",
         "shape": "label",
@@ -206,15 +206,15 @@ def test_drawio_default_label_renderer_is_a_rectangle():
         "width": 120,
         "height": 60,
     }
-    assert grader.completed_drawio_document([], [rectangle]) is True
+    assert target.completed([], [rectangle]) is True
     ellipse = {
         **rectangle,
         "shape": "ellipse",
         "rectangle_renderer": False,
         "ellipse_renderer": True,
     }
-    assert grader.completed_drawio_document([], [ellipse]) is False
-    assert grader.completed_drawio_document([rectangle], [rectangle]) is False
+    assert target.completed([], [ellipse]) is False
+    assert target.completed([rectangle], [rectangle]) is False
 
 
 def test_activity_publishes_only_safe_tool_fields(monkeypatch):

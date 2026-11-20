@@ -1,0 +1,31 @@
+{
+  "AgentTask": {
+    "action": "DoNothing",
+    "next": ["OpenFind"],
+    "timeout": 5000
+  },
+  "OpenFind": {
+    "recognition": "TemplateMatch",
+    "template": "FindInDocument.png",
+    "roi": [66, 0, 35, 32],
+    "threshold": 0.95,
+    "action": "Click",
+    "next": ["SearchForReleaseCode"]
+  },
+  "SearchForReleaseCode": {
+    "action": "InputText",
+    "input_text": "CEDAR LANTERN",
+    "post_delay": 0,
+    "next": ["AdvanceFromDraftMatch"],
+    "timeout": 10000
+  },
+  "AdvanceFromDraftMatch": {
+    "recognition": "ColorMatch",
+    "roi": [245, 72, 700, 190],
+    "lower": [181, 206, 181],
+    "upper": [201, 226, 201],
+    "count": 200,
+    "action": "ClickKey",
+    "key": 13
+  }
+}

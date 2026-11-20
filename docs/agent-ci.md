@@ -1,8 +1,8 @@
 # 使用真实编程 Agent 的 CI 验收
 
-普通 CI 不调用模型。另有手动触发的 **Real agent acceptance** 工作流：用开源
-[Codex CLI](https://github.com/openai/codex) 观察应用、编辑普通 MaaFW Pipeline，再由独立程序
-从干净状态重跑交付物。模型说“完成”不会使验收通过。
+普通 CI 在真实应用里重放仓库中的 MaaFW 项目，全程无需模型。手动触发 **Real agent acceptance**
+后，开源 Codex CLI 会从任务描述出发观察应用、编写 MaaFW Pipeline，独立程序再从干净状态重跑交付物并检查实际结果。
+[Codex CLI](https://github.com/openai/codex)
 
 ## 配置 GitHub
 
@@ -21,8 +21,8 @@
 
 Secret 优先于同名 Variable。密钥始终只使用 Secret。
 
-随后打开 **Actions → Real agent acceptance → Run workflow**。默认目标是 `drawio`；
-`mailbox` 是更小的工具链自检场景。缺少 API 密钥或模型 ID 会明确失败，不会跳过后显示成功。
+随后打开 **Actions → Real agent acceptance → Run workflow**。默认目标是 `drawio`，还可以选择
+`jupyterlab`、`pdfjs` 或用于工具链自检的 `mailbox`。缺少 API 密钥或模型 ID 会使运行失败。
 
 每次运行还可以选择 `reasoning_effort`：
 
@@ -32,11 +32,13 @@ Secret 优先于同名 Variable。密钥始终只使用 Secret。
 | `low` | 仅本次明确请求低思考强度，不修改仓库配置或模型名称 |
 | `high` | 仅本次明确请求高思考强度，不修改仓库配置或模型名称 |
 
-命令行也能明确选择：
+可以通过命令行分别触发两个应用的完整验收。测试功能分支时，在命令中加入 `--ref BRANCH`。
 
 ```bash
 gh workflow run agent-acceptance.yml --repo MaaXYZ/vibe-maa \
-  -f target=drawio -f timeout_seconds=600 -f reasoning_effort=low
+  -f target=jupyterlab -f timeout_seconds=600 -f reasoning_effort=low
+gh workflow run agent-acceptance.yml --repo MaaXYZ/vibe-maa \
+  -f target=pdfjs -f timeout_seconds=600 -f reasoning_effort=low
 ```
 
 `acceptance.json.configuration` 同时保留请求值和 `configuration_source`，区分单次覆盖、
@@ -45,11 +47,16 @@ gh workflow run agent-acceptance.yml --repo MaaXYZ/vibe-maa \
 
 ## 验收内容
 
-- `drawio`：运行固定版本的真实 diagrams.net/draw.io，上游发布包经 SHA256 校验后在本地提供。
-  Agent 只通过 vibe-maa 的截图与输入探索，交付 `AgentTask` 入口，创建标有 `Vibe Maa` 的形状。
-  独立检查程序在两次全新的浏览器上下文中执行交付物，并检查真实画布中的标签。
-- `mailbox`：从故意缺少公告分支的起步项目开发。独立检查程序从主页、邮箱、公告三种状态
-  启动真实 MaaFW 执行，检查实际访问邮箱和返回主页。它属于 fixture 验证，不冒充真实应用结果。
+| 目标 | 要完成的任务 | 独立验收 |
+| --- | --- | --- |
+| `drawio` | 创建标有 `Vibe Maa` 的矩形。 | 在两个全新的空白画布中检查真实画布模型的标签和形状。 |
+| `jupyterlab` | 创建并保存包含指定内容的 `release-notes.md`。 | 从空工作区和已有笔记的工作区分别运行，通过 Contents API 核对保存的内容以及原有文件是否完整。 |
+| `pdfjs` | 搜索 `CEDAR LANTERN` 并选中第二处匹配。 | 换用两份分页不同的 PDF，检查查看器的搜索状态、可见高亮和选中页的实际文本。 |
+| `mailbox` | 补上起步项目的公告分支，打开邮箱并返回主页。 | 在测试 fixture 的主页、邮箱、公告三种状态中运行，检查实际访问邮箱并返回主页。 |
+
+三个浏览器应用各自提供任务描述、应用启动与就绪条件、初始状态和结果检查。验收共用原生 MaaFW 执行、
+新建浏览器会话和证据导出。Agent 通过 vibe-maa 的截图和输入探索，并交付 `AgentTask` 入口。
+[应用版本和测试环境](test-targets.md)
 
 独立检查程序放在 Agent 工作目录之外。提交只允许内置界面识别和输入动作，不运行
 `Command`、`Shell`、`Custom` 等可直接执行其他代码的动作。Agent 无法靠修改自己的目标节点
@@ -85,7 +92,7 @@ Agent 的命令使用具名 `vibe_agent` 文件系统权限档案。冻结的源
 
 harness 每五秒检查一次正在使用的服务。服务丢失会终止模型运行，并单独记录
 `infrastructure_error`，避免继续消耗预算并把工具故障误记成模型能力不足。
-提示词明确给出实际秒数预算、截止时间，以及 draw.io 与独立检查共同使用的 1280×720 视口。
+提示词给出实际秒数预算、截止时间，以及浏览器目标与独立检查共同使用的 1280×720 视口。
 
 ## 结果
 
@@ -135,7 +142,30 @@ uv run python integration/agent/run.py --target drawio --output work/agent-low -
 实现入口为 [run.py](../integration/agent/run.py)，独立检查位于
 [grader.py](../integration/agent/grader.py)。
 
+在同一套模型配置下，使用以下命令验收 JupyterLab 和 PDF.js。JupyterLab 的依赖安装在目标缓存中的独立环境。
+
+```bash
+uv venv --python 3.12 work/targets/jupyterlab/venv
+uv pip sync --python work/targets/jupyterlab/venv integration/agent/jupyterlab.requirements.txt
+uv run python integration/agent/run.py --target jupyterlab \
+  --cache work/targets --output work/jupyterlab-agent
+uv run python integration/agent/run.py --target pdfjs \
+  --cache work/targets --output work/pdfjs-agent
+```
+
 ## 不再次调用模型的复验
+
+普通 CI 在 Ubuntu 上重放 `examples/jupyterlab-portable` 和 `examples/pdfjs-portable`，每个项目都通过
+与完整 Agent 验收相同的 grader 检查两种初始状态。CI 上传 `application-replay-TARGET`，其中包含
+`replay.json` 和可用的运行证据。完成上面的浏览器和应用环境安装后，可在本地执行同样的验证。
+[CI 矩阵](../.github/workflows/ci.yml)
+
+```bash
+uv run python integration/agent/regrade.py --target jupyterlab \
+  --project examples/jupyterlab-portable --cache work/targets --output work/jupyterlab-replay
+uv run python integration/agent/regrade.py --target pdfjs \
+  --project examples/pdfjs-portable --cache work/targets --output work/pdfjs-replay
+```
 
 `examples/agent-generated/drawio/` 保存首次真实模型运行的原始交付物及校验清单。
 `integration/agent/regrade.py` 可以在新环境独立重放，验证前后源码不变：

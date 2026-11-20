@@ -1,11 +1,38 @@
 # Real application test targets
 
-The resettable mailbox remains a fast unit fixture. Product acceptance also
-uses a separate, well-known application: **diagrams.net / draw.io**. Its web UI
-is shared across Windows, Linux and macOS, supports screenshot-driven diagram
-editing, and can run entirely from a local static deployment.
+The resettable mailbox remains a fast unit fixture. Real application acceptance
+uses local instances of three upstream applications through the same MaaFramework
+browser controller.
 
-## Pinned target
+| Application | Pinned release and license | Task and starting states | Independent result |
+| --- | --- | --- | --- |
+| diagrams.net / draw.io | [`v32.6.10`](https://github.com/jgraph/drawio/releases/tag/v32.6.10), Apache-2.0 | Create one rectangle labeled `Vibe Maa` in two fresh blank diagrams. | The canvas model contains the requested label and rectangle renderer. |
+| JupyterLab | [`4.6.6`](https://github.com/jupyterlab/jupyterlab/releases/tag/v4.6.6), BSD-3-Clause | Create and save `release-notes.md` in an empty workspace and in a workspace with existing notes. | The Contents API reads the expected Markdown from disk and confirms the original files are unchanged. |
+| Mozilla PDF.js | [`v6.5.438`](https://github.com/mozilla/pdf.js/releases/tag/v6.5.438), Apache-2.0 | Find `CEDAR LANTERN` and select the second result in two documents with different pagination. | The viewer reports the selected match, its visible highlight, and the actual page text under `Final Release Notes`. |
+
+## Shared browser acceptance
+
+Each target supplies the task, launch and readiness steps, starting states, and
+the check against actual application state. The shared grader opens a fresh
+1280×720 Chromium session for each state, records application state before and
+after native execution, and requires both a successful MaaFW run and a passing
+independent check. Grading limits HTTP and WebSocket connections to the target's
+loopback origin. The agent explores through screenshots, native recognition,
+and input tools. Browser internals and application APIs used by the grader stay
+outside the agent tool interface.
+
+The `application-replay` jobs run the checked-in JupyterLab and PDF.js Pipeline
+projects on Ubuntu with the Chromium build from the locked Playwright dependency.
+They upload the replay verdict and run evidence. The separate model-backed workflow
+asks a coding agent to create a fresh project and runs the same independent grader
+on its submission. [CI workflow](../.github/workflows/ci.yml) · [Agent acceptance and local reproduction](agent-ci.md)
+
+The JupyterLab dependency set is pinned in a dedicated Python environment, and
+each launch gets a separate workspace with kernels and terminals disabled. PDF.js
+uses the verified upstream distribution ZIP and locally generated PDF fixtures.
+[JupyterLab requirements](../integration/agent/jupyterlab.requirements.txt) · [PDF.js version and SHA256](../integration/agent/pdfjs_target.py)
+
+## Draw.io provisioning and acceptance
 
 | Property | Value |
 | --- | --- |
@@ -20,14 +47,6 @@ The artifact includes the compiled editor and local resources. Tests do not use
 the public website, cloud accounts, remote fonts, export servers or telemetry.
 Before testing, run the explicit [provisioning step](../integration/targets/drawio/README.md).
 Runtime network routing permits only the fixture's exact loopback origin.
-
-## Acceptance boundary
-
-The agent gets original screenshots, MaaFramework recognition results and input
-tools. It explores and edits ordinary MaaFW resources. The browser transport
-must not expose DOM locators, JavaScript evaluation or draw.io's graph model as
-agent capabilities. Test setup and the independent result oracle can use those
-APIs so that a successful task is verified outside the agent's own assertion.
 
 Use a fresh browser context, English `atlas` UI, 1280×720 viewport, scale 1 and a
 blank local document. The initial acceptance task is to add a named diagram

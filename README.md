@@ -39,6 +39,8 @@ vibe-maa 与 Codex、Claude Code 等编程 AI 配合工作。
 
 项目的真实应用测试覆盖 Windows 和 Ubuntu。模型原始交付物与跨平台参考流程分别保留，成功、失败及适用范围都记录在[验收记录](docs/benchmarks.md)中。
 
+Ubuntu CI 还会复跑 JupyterLab 的文件保存和 Mozilla PDF.js 的文档搜索，使用真实应用状态确认结果。两个目标都可从模型验收工作流触发。[真实应用测试目标](docs/test-targets.md)
+
 ![真实模型生成的 draw.io 自动化结果](examples/agent-generated/drawio-low-isolated/dev/cases/VibeMaa_positive.png)
 
 这套开发方式也提供了可复位的起步示例，便于先让 AI 体验一次“发现遗漏 → 修改脚本 → 重新验证”的完整过程。

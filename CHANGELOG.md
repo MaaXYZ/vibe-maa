@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.1
+
+- Run the pinned JupyterLab and Mozilla PDF.js applications in Ubuntu CI. Each reference Pipeline is replayed from two starting states and checked against the application's actual result.
+- Share browser acceptance across draw.io, JupyterLab, and PDF.js, including fresh application instances, independent result checks, and replay evidence. Reuse verified upstream archive provisioning for draw.io and PDF.js.
+- Document native browser keyboard shortcuts with `KeyDown`, `ClickKey`, and `KeyUp`. Test explicit release and automatic cleanup of modifiers when a Pipeline ends.
+- Add both applications to model-backed acceptance. PDF.js passed independent grading of the Agent-authored Pipeline on both documents. JupyterLab passed reference replay, and both model-backed runs reached the 600-second limit.
+
 ## 0.3.0
 
 - Add compact capability discovery with method-specific JSON Schemas, examples, prerequisites and recovery guidance; include a generic ProjectInterface handoff reference and explicit browser display flags.

@@ -18,7 +18,17 @@ from typing import Any
 from urllib.parse import urlsplit
 
 from activity import ActivityTrace
-from grader import ENTRY, drawio_server, grade_drawio, grade_mailbox, write_result
+from grader import (
+    ALLOWED_ACTIONS,
+    BROWSER_HEIGHT,
+    BROWSER_TARGETS,
+    BROWSER_WIDTH,
+    ENTRY,
+    TARGETS,
+    grade_target,
+    launch_target,
+    write_result,
+)
 from isolation import policy_metadata, profile_arguments
 
 from vibe_maa.bootstrap import initialize_demo, skill_install
@@ -149,23 +159,26 @@ def harness(local_auth: bool) -> str:
 
 
 def prompt_for(target: str, project: Path, url: str | None, seconds: int = 600) -> str:
-    task = (
-        "Repair the starter so it opens the mailbox and returns home from home, mailbox, and "
-        "announcement popup starting states. The starter intentionally lacks popup handling. "
-        "Create an AgentTask entry that accomplishes this. Do not change fixture code or case labels. "
-        "Open demo sessions with explicit starting states to explore."
-        if target == "mailbox"
-        else "Create a rectangle shape in the real diagrams.net application canvas and label it exactly "
-        "Vibe Maa. Deliver a standard MaaFramework Pipeline with entry AgentTask that repeats this "
-        "from a fresh blank document. Use the browser backend at this URL: " + str(url)
-    )
+    browser_contract = ""
+    if target == "mailbox":
+        task = (
+            "Repair the starter so it opens the mailbox and returns home from home, mailbox, and "
+            "announcement popup starting states. The starter intentionally lacks popup handling. "
+            "Create an AgentTask entry that accomplishes this. Do not change fixture code or case labels. "
+            "Open demo sessions with explicit starting states to explore."
+        )
+    else:
+        task = (
+            BROWSER_TARGETS[target].objective
+            + f" Deliver a standard MaaFramework Pipeline with entry {ENTRY}. "
+            + f"Use the browser backend at {url}."
+        )
+        browser_contract = (
+            f"Browser viewport contract: {BROWSER_WIDTH} by {BROWSER_HEIGHT} controller pixels. "
+            f"Open browser sessions with --width {BROWSER_WIDTH} --height {BROWSER_HEIGHT}; "
+            "the independent grader uses that same viewport.\n"
+        )
     deadline = (datetime.now(timezone.utc) + timedelta(seconds=seconds)).isoformat()
-    browser_contract = (
-        "Browser viewport contract: 1280 by 720 controller pixels. Open browser sessions with "
-        "--width 1280 --height 720; the independent grader uses that same viewport.\n"
-        if target == "drawio"
-        else ""
-    )
     return (
         "You are developing a standard MaaFramework automation using the installed vibe-maa tool.\n"
         f"Your writable project is {project}.\n{task}\n\n"
@@ -182,8 +195,9 @@ def prompt_for(target: str, project: Path, url: str | None, seconds: int = 600) 
         "Use only vibe-maa observations/screenshots and input operations for application exploration; "
         "inspect saved PNGs with your image viewing tool. Do not use DOM, accessibility, Playwright "
         "directly, application internals, or hidden grader information to implement the automation. "
-        "You may use native Click, LongPress, Swipe, ClickKey, InputText, and DoNothing actions, plus "
-        "built-in recognition. Shell/Command/Custom actions are not allowed in the deliverable. "
+        f"Use native actions ({', '.join(sorted(ALLOWED_ACTIONS))}) and built-in recognition. "
+        "For keyboard shortcuts, see `vibe-maa reference --topic actions` for holding and releasing "
+        "modifier keys. Shell/Command/Custom actions are not allowed in the deliverable. "
         "Edit ordinary files under resource/pipeline and resource/image. "
         "Expose the AgentTask entry in interface.json's task list for a normal MaaFW handoff. "
         f"The independent grader will start new sessions and run {ENTRY}; completion claims are "
@@ -405,13 +419,8 @@ def run(arguments: argparse.Namespace) -> dict[str, Any]:
     else:
         initialize(project)
     skill_install(project, "codex")
-    server = (
-        drawio_server(arguments.cache.resolve())
-        if arguments.target == "drawio"
-        else contextlib.nullcontext((None, None))
-    )
     try:
-        with server as (url, upstream):
+        with launch_target(arguments.target, arguments.cache.resolve()) as (url, upstream):
             service = start_tool_service(project)
             prompt = prompt_for(arguments.target, project, url, arguments.timeout_seconds)
             (private / "prompt.txt").write_text(prompt, encoding="utf-8")
@@ -426,49 +435,45 @@ def run(arguments: argparse.Namespace) -> dict[str, Any]:
                 external_service=service,
             )
             stop_daemon(project)
-            # The grader is external to the writable project and does not trust the agent's verdict.
-            try:
-                grade = (
-                    grade_mailbox(project)
-                    if arguments.target == "mailbox"
-                    else grade_drawio(project, url, arguments.browser_executable)
-                )
-            except Exception as exc:
-                grade = {
-                    "passed": False,
-                    "error": {"type": type(exc).__name__, "message": str(exc)},
-                }
-            if (
-                agent["returncode"] != 0
-                or agent["timed_out"]
-                or agent["error"]
-                or agent["terminal_state"] != "completed"
-            ):
-                grade["passed"] = False
-            result = {
-                "schema_version": 1,
-                "target": arguments.target,
-                "agent": agent,
-                "configuration": config,
-                "source_revision": os.environ.get("GITHUB_SHA"),
-                "upstream": upstream,
-                "grade": grade,
+        # Reprovision the application before grading. The agent can mutate its exploration instance.
+        try:
+            grade, _ = grade_target(
+                project, arguments.target, arguments.cache.resolve(), arguments.browser_executable
+            )
+        except Exception as exc:
+            grade = {
+                "passed": False,
+                "error": {"type": type(exc).__name__, "message": str(exc)},
             }
-            try:
-                Reports(project).export_project(str(published / "automation.zip"))
-                for check in grade.get("checks", []):
-                    if check.get("run_id"):
-                        run_id = check["run_id"]
-                        Reports(project).export_run(
-                            run_id, str(published / f"evidence-{run_id}.zip")
-                        )
-            except Exception as exc:
-                result["export_error"] = str(exc)
-                grade["passed"] = False
-            verify_publication(published, os.environ.get("VIBE_MAA_LLM_API_KEY"))
-            write_result(published / "acceptance.json", result)
-            verify_publication(published, os.environ.get("VIBE_MAA_LLM_API_KEY"))
-            return result
+        if (
+            agent["returncode"] != 0
+            or agent["timed_out"]
+            or agent["error"]
+            or agent["terminal_state"] != "completed"
+        ):
+            grade["passed"] = False
+        result = {
+            "schema_version": 1,
+            "target": arguments.target,
+            "agent": agent,
+            "configuration": config,
+            "source_revision": os.environ.get("GITHUB_SHA"),
+            "upstream": upstream,
+            "grade": grade,
+        }
+        try:
+            Reports(project).export_project(str(published / "automation.zip"))
+            for check in grade.get("checks", []):
+                if check.get("run_id"):
+                    run_id = check["run_id"]
+                    Reports(project).export_run(run_id, str(published / f"evidence-{run_id}.zip"))
+        except Exception as exc:
+            result["export_error"] = str(exc)
+            grade["passed"] = False
+        verify_publication(published, os.environ.get("VIBE_MAA_LLM_API_KEY"))
+        write_result(published / "acceptance.json", result)
+        verify_publication(published, os.environ.get("VIBE_MAA_LLM_API_KEY"))
+        return result
     finally:
         with contextlib.suppress(Exception):
             stop_daemon(project)
@@ -476,7 +481,7 @@ def run(arguments: argparse.Namespace) -> dict[str, Any]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--target", choices=["drawio", "mailbox"], default="drawio")
+    parser.add_argument("--target", choices=TARGETS, default="drawio")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--cache", type=Path, default=ROOT / "work/upstream")
     parser.add_argument("--timeout-seconds", type=int, default=600)
